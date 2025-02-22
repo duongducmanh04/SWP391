@@ -222,7 +222,7 @@ import { useNavigate } from "react-router-dom";
 import { LoginDto } from "../dto/login.dto";
 import { PagePath } from "../../../enums/page-path.enum";
 import { RoleCode } from "../../../enums/role.enum";
-import "../../../style/Login.css"; // Import file CSS mới
+import "../../../style/Login.css";
 
 const { TabPane } = Tabs;
 
