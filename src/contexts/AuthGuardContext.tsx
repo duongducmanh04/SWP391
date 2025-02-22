@@ -55,6 +55,9 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
       ],
       Staff: [
         PagePath.SS_HOME,
+        PagePath.HOME,
+        PagePath.USER,
+        PagePath.BOOKING,
         PagePath.STAFF_PAGE,
         PagePath.STAFF_UPDATE_BOOKING,
       ],

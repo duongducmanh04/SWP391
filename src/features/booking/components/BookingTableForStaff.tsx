@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from "react";
 import { Table, Button, Space, Tag, Tooltip, Flex } from "antd";
 import {
   CheckCircleOutlined,
@@ -16,6 +17,8 @@ import { useDeniedBooking } from "../hooks/useDeniedBooking";
 import { Status } from "../../../enums/status-booking";
 import { showActionConfirmModal } from "../../../components/ConfirmModal";
 import { useNavigate } from "react-router-dom";
+import { BookingDto } from "../dto/booking.dto";
+import { ColumnsType } from "antd/es/table";
 
 const BookingTableForStaff = () => {
   const {
@@ -38,6 +41,7 @@ const BookingTableForStaff = () => {
   const { mutate: updateCancelled } = useCancelledBooking();
   const { mutate: updateDenied } = useDeniedBooking();
   const navigate = useNavigate();
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
 
   useEffect(() => {
     if (bookedData && !isLoadingBooked && !errorBooked) {
@@ -87,9 +91,22 @@ const BookingTableForStaff = () => {
     });
   };
 
-  const columns = [
+  const handleTableChange = (pagination: any) => {
+    setPagination(pagination);
+  };
+
+  const columns: ColumnsType<BookingDto> = [
     {
-      title: "ID",
+      title: "No",
+      dataIndex: "No",
+      fixed: "left",
+      width: 50,
+      render: (_value: any, _record: any, index: number) => {
+        return (pagination.current - 1) * pagination.pageSize + index + 1;
+      },
+    },
+    {
+      title: "BookingID",
       dataIndex: "bookingId",
       key: "bookingId",
     },
@@ -199,6 +216,7 @@ const BookingTableForStaff = () => {
         loading={isLoadingBooked || isLoadingFinished}
         rowKey="bookingId"
         bordered
+        onChange={handleTableChange}
         pagination={{ pageSize: 5 }}
       />
     </div>
