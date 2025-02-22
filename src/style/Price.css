@@ -1,0 +1,111 @@
+/* Container tổng */
+.container {
+  padding: 80px 10%;
+  background: #f1ebe4; /* Màu be nhẹ nhàng */
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Tiêu đề chính */
+.heading {
+  font-size: 32px;
+  font-weight: bold;
+  color: #3a5a40; /* Màu xanh rêu nhẹ */
+  margin-bottom: 20px;
+}
+
+/* Phần mô tả dưới tiêu đề */
+.subheading {
+  font-size: 18px;
+  color: #6b705c; /* Xanh nhạt */
+  margin-bottom: 40px;
+}
+
+/* Thẻ dịch vụ */
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  background: white;
+  padding: 20px;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Thẻ nổi bật */
+.popular {
+  border: 2px solid #ffd700; /* Viền vàng nhẹ */
+  background: #fff9e6; /* Màu vàng nhạt */
+}
+
+/* Header của card */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Tag "Phổ Biến" */
+.popularTag {
+  font-weight: bold;
+  color: #d48806; /* Màu vàng cam */
+  background: #fff3cd; /* Màu nền nhẹ */
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+/* Giá dịch vụ */
+.price {
+  color: #a7c957; /* Màu xanh thiên nhiên */
+  font-weight: bold;
+  font-size: 22px;
+  margin: 20px 0;
+}
+
+/* Danh sách tính năng */
+.features {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.featureItem {
+  margin-bottom: 8px;
+  font-size: 16px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Biểu tượng tích xanh */
+.featureItem::before {
+  content: "✅";
+  margin-right: 8px;
+}
+
+/* Nút đặt dịch vụ */
+.button {
+  width: 100%;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  background: #a7c957;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: #8aa851;
+  transform: translateY(-2px);
+}

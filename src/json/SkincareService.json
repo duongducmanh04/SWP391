@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "title": "Liệu trình làm sạch sâu",
+    "description": "Làm sạch sâu da mặt, loại bỏ bã nhờn và bụi bẩn.",
+    "price": "$50",
+    "image": "https://via.placeholder.com/150"
+  },
+  {
+    "id": 2,
+    "title": "Liệu trình dưỡng trắng da",
+    "description": "Cải thiện sắc tố da, giúp da sáng và đều màu.",
+    "price": "$70",
+    "image": "https://via.placeholder.com/150"
+  },
+  {
+    "id": 3,
+    "title": "Liệu trình trị mụn",
+    "description": "Chăm sóc và phục hồi da mụn, giảm thâm.",
+    "price": "$80",
+    "image": "https://via.placeholder.com/150"
+  },
+  {
+    "id": 4,
+    "title": "Liệu trình trẻ hóa da",
+    "description": "Tăng độ đàn hồi, giảm nếp nhăn và săn chắc da.",
+    "price": "$100",
+    "image": "https://via.placeholder.com/150"
+  }
+]

@@ -1,78 +1,21 @@
-# Visual Studio and VS Code
-.vs/
-.vscode/
-.vsconfig
-
-# User-specific files
-*.user
-*.userosscache
-*.sln.docstates
-
-
-# Build results
-bin/
-obj/
-out/
-*.dll
-*.exe
-*.pdb
+# Logs
+logs
 *.log
-*.cache
-*.csproj.user
-*.dbmdl
-*.jfm
+npm-debug.log*
+lerna-debug.log*
 
-# Packages
-packages/
-!packages/repositories.config
+node_modules
+dist
+dist-ssr
+*.local
 
-# NuGet
-*.nupkg
-project.lock.json
-project.assets.json
-nuget.lock.json
-NuGet.Config
-NuGetScratch/
-artifacts/
-
-# Entity Framework Migrations
-Migrations/
-
-# Resharper files
-_ReSharper*/
-*.DotSettings.user
-
-# Rider files
-.idea/
-
-# OS-specific files
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-._*
-
-# Logs and database
-logs/
-*.log
-*.bak
-*.mdf
-*.ldf
-*.sqlite
-
-# Environment and config
-.env
-secrets.json
-appsettings.*.json
-appsettings.Development.json
-
-# Docker
-docker-compose.override.yml
-.dockerignore
-
-# Generated files
-Generated/
-node_modules/
-wwwroot/
-
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
