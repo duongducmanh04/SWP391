@@ -3,6 +3,7 @@ using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
+using System.Linq;
 
 namespace SkincareBookingService.BLL.Services
 {
@@ -19,36 +20,35 @@ namespace SkincareBookingService.BLL.Services
             
         }
 
-        public async Task<List<ScheduleDTO>> GetAllByServiceIdAndSkinTherapistId(int serviceId, int? skinTherapistId)
+        public async Task<List<ScheduleDTO>> GetAllBySkinTherapistId(int skinTherapistId)
         {
-            //assign random skin therapist if skinTherapistId = null
-            if (skinTherapistId == null)
-            {
-                SkinTherapistService? skinTherapistService = await _skinTherapistServiceRepository
-                    .Query()
-                    .Where(sts => sts.ServiceId == serviceId)
-                    .FirstOrDefaultAsync();
-                skinTherapistId = skinTherapistService?.ServiceId;
-            }
             //Get Schedules
             List<Schedule> schedules = await _scheduleRepository
                 .Query()
                 .Where(s => s.SkinTherapistId == skinTherapistId)
                 .ToListAsync();
-            //Transform into scheduleDTO
-            List<ScheduleDTO> scheduleDTOs = new List<ScheduleDTO>();
-            foreach(Schedule schedule in schedules)
-            {
-                if(schedule != null)
-                {
-                    scheduleDTOs.Add(await MapScheduleToScheduleDTO(schedule));
-                }
-            }
 
-            return scheduleDTOs;
+            return await MapListScheduleToScheduleDTO(schedules);
         }
-
-        private async Task<ScheduleDTO> MapScheduleToScheduleDTO(Schedule? schedule)
+        public async Task<List<List<ScheduleDTO>>> GetAllByServiceId(int serviceId)
+        {
+            //Get all skin therapist that can do this service
+            List<int?> skinTherapistIds = await _skinTherapistServiceRepository
+                .Query()
+                .Where(sts => sts.ServiceId == serviceId)
+                .Select(sts => sts.SkintherapistId)
+                .ToListAsync();
+            //Get Schedules
+            List<List<ScheduleDTO>> listScheduleDTOs = new();
+            foreach(int skinTherapistId in skinTherapistIds)
+            {
+                List<ScheduleDTO> schedule = await GetAllBySkinTherapistId(skinTherapistId);
+                listScheduleDTOs.Add(schedule);
+            }
+            
+            return listScheduleDTOs;
+        }
+        private async Task<ScheduleDTO> MapScheduleToScheduleDTO(Schedule schedule)
         {
             ScheduleDTO scheduleDTO = new ScheduleDTO();
             if (schedule != null)
@@ -62,6 +62,19 @@ namespace SkincareBookingService.BLL.Services
             }
 
             return scheduleDTO;
+        }
+        private async Task<List<ScheduleDTO>> MapListScheduleToScheduleDTO(List<Schedule> schedules)
+        {
+            List<ScheduleDTO> scheduleDTOs = new List<ScheduleDTO>();
+            foreach (Schedule schedule in schedules)
+            {
+                if (schedule != null)
+                {
+                    scheduleDTOs.Add(await MapScheduleToScheduleDTO(schedule));
+                }
+            }
+
+            return scheduleDTOs;
         }
     }
 }
