@@ -1,5 +1,5 @@
-import { Card, Spin, Descriptions, Row, Col } from "antd";
-import { useParams } from "react-router-dom";
+import { Card, Spin, Descriptions, Row, Col, Breadcrumb } from "antd";
+import { useParams, Link } from "react-router-dom";
 import { useBookingById } from "../hooks/useGetBookingId";
 import dayjs from "dayjs";
 import StatusTag from "../../../components/TagStatus";
@@ -49,11 +49,15 @@ const BookingDetail = () => {
 
   return (
     <div style={{ margin: "auto" }}>
+      <Breadcrumb style={{ margin: "16px 0" }}>
+        <Breadcrumb.Item>
+          <Link to="/Home/Booking">Danh sách đặt lịch</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>Chi tiết lịch đặt</Breadcrumb.Item>
+      </Breadcrumb>
       <h2>Chi tiết lịch đặt #{booking.bookingId}</h2>
       <Row gutter={16}>
         <Col span={15}>
-          {" "}
-          {/* 60% */}
           <Card>
             <Descriptions title="Thông tin chung" bordered column={1}>
               <Descriptions.Item label="Khách hàng">
@@ -75,8 +79,6 @@ const BookingDetail = () => {
           </Card>
         </Col>
         <Col span={9}>
-          {" "}
-          {/* 40% */}
           <Card>
             <p>
               <b>Trạng thái:</b>{" "}
