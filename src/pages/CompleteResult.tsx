@@ -1,6 +1,6 @@
 import { Button, Result } from "antd";
 
-const Complete = () => (
+const CompleteBookingPage = () => (
   <Result
     status="success"
     title="Đặt dịch vụ thành công"
@@ -13,4 +13,4 @@ const Complete = () => (
   />
 );
 
-export default Complete;
+export default CompleteBookingPage;

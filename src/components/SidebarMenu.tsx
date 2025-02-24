@@ -7,6 +7,7 @@ import {
   BellFilled,
   UserOutlined,
   LogoutOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 import {
   Breadcrumb,
@@ -142,21 +143,15 @@ const SidebarMenu = () => {
         },
       ],
     },
-    {
-      key: "3",
-      icon: <AppstoreOutlined />,
-      label: "Dịch vụ",
-      children: [
-        ...(user?.role === RoleCode.STAFF || user?.role === RoleCode.THERAPIST
-          ? [
-              {
-                key: PagePath.BOOKING,
-                label: <Link to={PagePath.BOOKING}>Lịch đặt</Link>,
-              },
-            ]
-          : []),
-      ],
-    },
+    ...(user?.role === RoleCode.STAFF || user?.role === RoleCode.THERAPIST
+      ? [
+          {
+            key: "3",
+            icon: <CalendarOutlined />,
+            label: <Link to={PagePath.BOOKING}>Lịch đặt</Link>,
+          },
+        ]
+      : []),
   ];
 
   const isHomePage = location.pathname === "/home";
