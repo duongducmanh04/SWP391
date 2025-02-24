@@ -8,7 +8,6 @@ import Login from "./features/authentication/components/Login";
 import Register from "./features/authentication/components/Register";
 import Home from "./Home";
 import WorkVolume from "./features/work_volume/WorkVolume";
-import ApprovalVolume from "./features/approval_volume/ApprovalVolume";
 import UserListPage from "./features/user/pages/UserListPage";
 import CourtList from "./pages/CourtPage";
 import CourtDetail from "./pages/CourtDetail";
@@ -28,16 +27,14 @@ import ServiceDetail from "./features/services/components/SkinServiceDetail";
 import SkincareBooking from "./features/services/components/BookingService";
 import PricingTable from "./pages/PricingPage";
 import HomePage from "./pages/HomePage";
-import StaffTherapistPage from "./pages/StaffTherapistPage";
-import StaffAppoinmentPage from "./features/booking/page/StaffAppointmentPage";
-import SkinTherapistAppoinmentPage from "./features/booking/page/SkinTherapistAppointmentPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ForbiddenPage from "./pages/ForbiddenPage";
 import { AuthGuardProvider } from "./contexts/AuthGuardContext";
 import SkinTherapistListPage from "./features/skin_therapist/page/SkinTherapistListPage";
 import SkinTherapistDetailPage from "./features/skin_therapist/page/SkinTherapistDetailPage";
-import UpdateBookingServicePage from "./features/booking/page/UpdateBookingServicePage";
-import BookingTableForStaff from "./features/booking/components/BookingTableForStaff";
+import BookingListTable from "./features/booking/components/BookingListTable";
+import SkinType from "./pages/SkinTypePage";
+import BookingDetail from "./features/booking/components/BookingDetail";
 
 const App = () => {
   return (
@@ -57,14 +54,11 @@ const App = () => {
           <Route element={<SidebarMenu />}>
             <Route path={PagePath.HOME} element={<Home />}></Route>
             <Route path={PagePath.WORK_VOLUME} element={<WorkVolume />} />
-            <Route
-              path={PagePath.APPROVAL_VOLUME}
-              element={<ApprovalVolume />}
-            />
             <Route path={PagePath.USER} element={<UserListPage />} />
             <Route path={PagePath.USER_DETAIL} element={<UserDetail />} />
             <Route path={PagePath.PROFILE} element={<Profile />} />
-            <Route path={PagePath.BOOKING} element={<BookingTableForStaff />} />
+            <Route path={PagePath.BOOKING} element={<BookingListTable />} />
+            <Route path={PagePath.BOOKING_DETAIL} element={<BookingDetail />} />
           </Route>
           <Route element={<NavbarMenu />}>
             <Route path={PagePath.HOME_PAGE} element={<HomePage />} />
@@ -95,19 +89,7 @@ const App = () => {
             <Route path={PagePath.PRICE_SERVICE} element={<PricingTable />} />
             <Route path="Court" element={<CourtList />} />
             <Route path="Court/:id" element={<CourtDetail />} />
-            <Route path={PagePath.SS_HOME} element={<StaffTherapistPage />} />
-            <Route
-              path={PagePath.STAFF_PAGE}
-              element={<StaffAppoinmentPage />}
-            />
-            <Route
-              path={PagePath.STAFF_UPDATE_BOOKING}
-              element={<UpdateBookingServicePage />}
-            />
-            <Route
-              path={PagePath.SKIN_THERAPIST_PAGE}
-              element={<SkinTherapistAppoinmentPage />}
-            />
+            <Route path={PagePath.SKIN_TYPE} element={<SkinType />} />
           </Route>
         </Routes>
       </AuthGuardProvider>

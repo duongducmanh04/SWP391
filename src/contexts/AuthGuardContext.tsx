@@ -31,6 +31,7 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
       PagePath.SKIN_THERAPIST,
       PagePath.PRICE_SERVICE,
       PagePath.SKIN_SERVICE,
+      PagePath.SKIN_TYPE,
     ];
 
     if (!user || !user.role) {
@@ -49,19 +50,15 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.USER_DETAIL,
         PagePath.HOME,
         PagePath.WORK_VOLUME,
-        PagePath.APPROVAL_VOLUME,
         PagePath.PROFILE,
         PagePath.PROFILE_DETAIL,
       ],
       Staff: [
-        PagePath.SS_HOME,
         PagePath.HOME,
-        PagePath.USER,
         PagePath.BOOKING,
-        PagePath.STAFF_PAGE,
-        PagePath.STAFF_UPDATE_BOOKING,
+        PagePath.BOOKING_DETAIL.replace(":bookingId", ""),
       ],
-      Therapist: [PagePath.SS_HOME, PagePath.SKIN_THERAPIST_PAGE],
+      Therapist: [PagePath.HOME],
       Customer: [
         PagePath.BLOG,
         PagePath.BLOG_DETAIL,
@@ -72,6 +69,7 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.SKIN_THERAPIST,
         PagePath.PRICE_SERVICE,
         PagePath.QUIZ,
+        PagePath.SKIN_TYPE,
       ],
       Manager: [],
     };
