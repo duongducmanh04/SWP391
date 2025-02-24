@@ -19,6 +19,10 @@ public partial class Service
 
     public DateTime? CreatedAt { get; set; }
 
+    public int? Duration { get; set; }
+
+    public string ProcedureDescription { get; set; }
+
     public virtual ICollection<SkinTherapistService> SkinTherapistServices { get; set; } = new List<SkinTherapistService>();
 
     public virtual ICollection<SkintypeService> SkintypeServices { get; set; } = new List<SkintypeService>();

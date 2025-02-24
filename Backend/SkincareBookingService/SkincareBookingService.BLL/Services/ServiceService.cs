@@ -23,6 +23,8 @@ namespace SkincareBookingService.BLL.Services
                 Name = s.Name,
                 Description = s.Description,
                 Price = s.Price,
+                Duration = s.Duration,
+                ProcedureDescription = s.ProcedureDescription,
                 Image = s.Image
             }).ToList();
         }
@@ -38,6 +40,8 @@ namespace SkincareBookingService.BLL.Services
                 Name = service.Name,
                 Description = service.Description,
                 Price = service.Price,
+                Duration = service.Duration,
+                ProcedureDescription = service.ProcedureDescription,
                 Image = service.Image
             };
         }
