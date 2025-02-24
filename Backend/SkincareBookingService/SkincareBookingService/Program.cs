@@ -69,7 +69,10 @@ namespace SkincareBookingService
             builder.Services.AddScoped<IAuthService, AuthService>();
 
             builder.Services.AddScoped<IServiceService, ServiceService>();
+
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
+
+            builder.Services.AddScoped<ISkintypeService, BLL.Services.SkintypeService>();
 
             /*====================================================*/
 

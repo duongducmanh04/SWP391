@@ -6,5 +6,7 @@ namespace SkincareBookingService.BLL.Interfaces
     {
         Task<List<ServiceDTO>> GetServicesAsync();
         Task<ServiceDTO> GetServiceByIdAsync(int serviceId);
+
+        
     }
 }
