@@ -27,7 +27,7 @@ const SkinType = () => {
         {/* Da thường */}
         <Title level={2} className="section-title">
           Da có thể được phân loại thành nhiều loại khác nhau dựa trên đặc điểm
-          sinh lý và nhu cầu chăm sóc. Có 5 loại da chính:
+          sinh lý và nhu cầu chăm sóc. Có 4 loại da chính:
         </Title>
         <Title level={3} className="skin-title">
           1. Da thường(Normal Skin)
