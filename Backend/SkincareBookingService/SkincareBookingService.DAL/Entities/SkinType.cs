@@ -17,6 +17,8 @@ public partial class SkinType
 
     public string Status { get; set; }
 
+    public string ProsAndCons { get; set; }
+
     public virtual ICollection<CustomerSurvey> CustomerSurveys { get; set; } = new List<CustomerSurvey>();
 
     public virtual ICollection<Customer> Customers { get; set; } = new List<Customer>();

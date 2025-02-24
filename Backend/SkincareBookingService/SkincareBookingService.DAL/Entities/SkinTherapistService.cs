@@ -24,9 +24,4 @@ public partial class SkinTherapistService
     public virtual Service Service { get; set; }
 
     public virtual SkinTherapist Skintherapist { get; set; }
-
-    public static implicit operator SkinTherapistService(List<SkinTherapistService> v)
-    {
-        throw new NotImplementedException();
-    }
 }
