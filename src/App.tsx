@@ -9,8 +9,6 @@ import Register from "./features/authentication/components/Register";
 import Home from "./Home";
 import WorkVolume from "./features/work_volume/WorkVolume";
 import UserListPage from "./features/user/pages/UserListPage";
-import CourtList from "./pages/CourtPage";
-import CourtDetail from "./pages/CourtDetail";
 import UserDetail from "./features/user/components/UserListDetail";
 import { PagePath } from "./enums/page-path.enum";
 import Profile from "./features/authentication/components/Profile";
@@ -35,6 +33,7 @@ import SkinTherapistDetailPage from "./features/skin_therapist/page/SkinTherapis
 import BookingListTable from "./features/booking/components/BookingListTable";
 import SkinType from "./pages/SkinTypePage";
 import BookingDetail from "./features/booking/components/BookingDetail";
+import CompleteBookingPage from "./pages/CompleteResult";
 
 const App = () => {
   return (
@@ -87,9 +86,11 @@ const App = () => {
             />
             <Route path={PagePath.RESULT_COMPLETE} element={<Complete />} />
             <Route path={PagePath.PRICE_SERVICE} element={<PricingTable />} />
-            <Route path="Court" element={<CourtList />} />
-            <Route path="Court/:id" element={<CourtDetail />} />
             <Route path={PagePath.SKIN_TYPE} element={<SkinType />} />
+            <Route
+              path={PagePath.COMPLETE_RESULT}
+              element={<CompleteBookingPage />}
+            />
           </Route>
         </Routes>
       </AuthGuardProvider>
