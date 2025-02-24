@@ -1,7 +1,7 @@
 import { Modal, message } from "antd";
 
 interface ActionConfirmModalProps {
-  action: "checkin" | "checkout" | "cancel" | "deny";
+  action: "checkin" | "checkout" | "cancel" | "deny" | "finish";
   bookingId: number;
   onConfirm: (bookingId: number) => Promise<void>;
 }
@@ -41,6 +41,12 @@ export const showActionConfirmModal = ({
         "Bạn có chắc chắn muốn từ chối thanh toán cho lịch hẹn này không?";
       successMessage = "Từ chối thanh toán thành công!";
       errorMessage = "Từ chối thanh toán thất bại, vui lòng thử lại!";
+      break;
+    case "finish":
+      title = "Xác nhận hoàn thành dịch vụ";
+      content = "Bạn có chắc chắn hoàn thành dịch vụ này không?";
+      successMessage = "Hoàn thành dịch vụ thành công!";
+      errorMessage = "Hoàn thành dịch vụ thất bại, vui lòng thử lại!";
       break;
     default:
       return;
