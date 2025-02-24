@@ -22,6 +22,7 @@ export enum PagePath {
   RESULT_COMPLETE = "/Homepage/Complete",
   BOOKING_SERVICE = "/Homepage/BookingService",
   SKIN_TYPE = "/Homepage/SkinType",
+  COMPLETE_RESULT = "/Homepage/CompleteBooking",
   ANY = "*",
   FORBIDDEN = "/403",
   PROFILE = "/Home/Profile",
