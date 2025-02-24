@@ -22,47 +22,9 @@ import "../style/Home.css";
 import useAuthStore from "../features/authentication/hooks/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import { PagePath } from "../enums/page-path.enum";
+import { RoleCode } from "../enums/role.enum";
 
 const { Header, Content, Sider } = Layout;
-
-const items2 = [
-  {
-    key: "1",
-    icon: <HomeOutlined />,
-    label: <Link to={PagePath.HOME}>Trang chủ</Link>,
-  },
-  {
-    key: "2",
-    icon: <AppstoreOutlined />,
-    label: "Quản lý",
-    children: [
-      {
-        key: PagePath.WORK_VOLUME,
-        label: <Link to={PagePath.WORK_VOLUME}>Bảng khối lượng</Link>,
-      },
-      {
-        key: PagePath.APPROVAL_VOLUME,
-        label: (
-          <Link to={PagePath.APPROVAL_VOLUME}>Phê duyệt bảng khối lượng</Link>
-        ),
-      },
-      {
-        key: PagePath.USER,
-        label: <Link to={PagePath.USER}>Người dùng</Link>,
-      },
-      {
-        key: PagePath.BOOKING,
-        label: <Link to={PagePath.BOOKING}>Đặt lịch</Link>,
-      },
-    ],
-  },
-  {
-    key: "3",
-    icon: <AppstoreOutlined />,
-    label: "Đơn dịch vụ",
-    children: [],
-  },
-];
 
 const notificationContent = (
   <div>
@@ -159,6 +121,44 @@ const SidebarMenu = () => {
     </Menu>
   );
 
+  const items2 = [
+    {
+      key: "1",
+      icon: <HomeOutlined />,
+      label: <Link to={PagePath.HOME}>Trang chủ</Link>,
+    },
+    {
+      key: "2",
+      icon: <AppstoreOutlined />,
+      label: "Quản lý",
+      children: [
+        {
+          key: PagePath.WORK_VOLUME,
+          label: <Link to={PagePath.WORK_VOLUME}>Bảng khối lượng</Link>,
+        },
+        {
+          key: PagePath.USER,
+          label: <Link to={PagePath.USER}>Người dùng</Link>,
+        },
+      ],
+    },
+    {
+      key: "3",
+      icon: <AppstoreOutlined />,
+      label: "Dịch vụ",
+      children: [
+        ...(user?.role === RoleCode.STAFF || user?.role === RoleCode.THERAPIST
+          ? [
+              {
+                key: PagePath.BOOKING,
+                label: <Link to={PagePath.BOOKING}>Lịch đặt</Link>,
+              },
+            ]
+          : []),
+      ],
+    },
+  ];
+
   const isHomePage = location.pathname === "/home";
 
   return (
@@ -196,7 +196,7 @@ const SidebarMenu = () => {
             top: 0,
             left: 0,
             right: 0,
-            zIndex: 1,
+            zIndex: 10,
             borderBottom: "1px solid #EBEFF5",
           }}
         >
@@ -279,6 +279,7 @@ const SidebarMenu = () => {
               margin: 0,
               minHeight: 280,
               borderRadius: "8px",
+              background: "transparent",
             }}
           >
             <Outlet />
