@@ -14,12 +14,23 @@ namespace SkincareBookingService.Controllers
         {
             _scheduleService = scheduleService;
         }
-
-        [HttpGet("{serviceId}/{skintherapistId?}")]
-        public async Task<IActionResult> GetSchedule(int serviceId, int? skintherapistId)
+        // Show all schedules of the service that assigned to the skin therapist
+        [HttpGet("/search-by-skintherapist/{skintherapistId}")]
+        public async Task<IActionResult> GetSchedulesBySkinTherapistID(int skintherapistId)
         {
-            var schedules = await _scheduleService.GetAllByServiceIdAndSkinTherapistId(serviceId, skintherapistId);
+            var schedules = await _scheduleService.GetAllBySkinTherapistId(skintherapistId);
             if(schedules == null)
+            {
+                return NotFound("Cannot find the schedule");
+            }
+            return Ok(schedules);
+        }
+        // Show all schedules that execute this service
+        [HttpGet("/search-by-service/{serviceId}")]
+        public async Task<IActionResult> GetSchedulesByServiceId(int serviceId)
+        {
+            var schedules = await _scheduleService.GetAllByServiceId(serviceId);
+            if (schedules == null)
             {
                 return NotFound("Cannot find the schedule");
             }
