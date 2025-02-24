@@ -22,10 +22,8 @@ const NavbarMenu = () => {
       navigate(PagePath.PRICE_SERVICE);
     } else if (key === "home") {
       navigate(PagePath.HOME_PAGE);
-    } else if (key === "staff") {
-      navigate(PagePath.STAFF_PAGE);
-    } else if (key === "therapist") {
-      navigate(PagePath.SKIN_THERAPIST_PAGE);
+    } else if (key === "skin") {
+      navigate(PagePath.SKIN_TYPE);
     }
   };
 
@@ -69,25 +67,12 @@ const NavbarMenu = () => {
             className="navbar-menu"
             onClick={({ key }) => handleMenuClick(key)}
           >
-            {(!user || user?.role === "Customer" || user?.role === "") && (
-              <>
-                <Menu.Item key="home">Trang chủ</Menu.Item>
-                <Menu.Item key="service">Dịch vụ</Menu.Item>
-                <Menu.Item key="blog">Blog</Menu.Item>
-                <Menu.Item key="skin-therapist">
-                  Chuyên viên trị liệu da
-                </Menu.Item>
-                <Menu.Item key="price">Bảng giá</Menu.Item>
-              </>
-            )}
-
-            {user?.role === "Staff" && (
-              <Menu.Item key="staff">Trang làm việc</Menu.Item>
-            )}
-
-            {user?.role === "Therapist" && (
-              <Menu.Item key="therapist">Trang làm việc</Menu.Item>
-            )}
+            <Menu.Item key="home">Trang chủ</Menu.Item>
+            <Menu.Item key="service">Dịch vụ</Menu.Item>
+            <Menu.Item key="blog">Blog</Menu.Item>
+            <Menu.Item key="skin-therapist">Chuyên viên trị liệu da</Menu.Item>
+            <Menu.Item key="price">Bảng giá</Menu.Item>
+            <Menu.Item key="skin">Loại da</Menu.Item>
           </Menu>
         </div>
 
