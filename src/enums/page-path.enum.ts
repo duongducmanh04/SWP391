@@ -28,6 +28,8 @@ export enum PagePath {
   PROFILE = "/Home/Profile",
   BOOKING = "/Home/Booking",
   BOOKING_DETAIL = "/Home/Booking/:bookingId",
+  SCHEDULE = "/Home/Schedule",
+  SCHEDULE_DETAIL = "/Home/Schedule/:scheduleId",
   ROOT = "/",
   // TICKET_MANAGEMENT = "/ticket-management",
   // TIMEKEEPING_DETAIL = "/timekeeping/:code/detail",
