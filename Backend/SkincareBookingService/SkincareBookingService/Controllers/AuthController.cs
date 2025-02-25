@@ -32,16 +32,18 @@ namespace SkincareBookingService.Controllers
                 return Unauthorized(new { message = "Incorrect account name or password!" });
             }
 
-            // ✅ Tạo JWT Token
-            var token = _jwtService.GenerateToken(account);
+            // Generate JWT Token
+            var (token, expiration) = _jwtService.GenerateToken(account);
 
             return Ok(new
             {
                 message = "Login Successfully!",
                 accountId = account.AccountId,
                 role = account.Role,
-                token = token  // ✅ Trả về Token để sử dụng trong Swagger & API khác
+                token = token,
+                tokenExpiration = expiration.ToString("yyyy-MM-ddTHH:mm:ssZ") // Hiển thị thời gian hết hạn
             });
+
         }
     }
 }

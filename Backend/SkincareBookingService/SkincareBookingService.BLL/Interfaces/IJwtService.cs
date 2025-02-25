@@ -9,6 +9,6 @@ namespace SkincareBookingService.BLL.Interfaces
 {
     public interface IJwtService
     {
-        string GenerateToken(Account account);
+            (string Token, DateTime Expiration) GenerateToken(Account account);
     }
 }
