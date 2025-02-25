@@ -124,31 +124,45 @@ const SidebarMenu = () => {
 
   const items2 = [
     {
-      key: "1",
+      key: PagePath.HOME,
       icon: <HomeOutlined />,
       label: <Link to={PagePath.HOME}>Trang chủ</Link>,
     },
-    {
-      key: "2",
-      icon: <AppstoreOutlined />,
-      label: "Quản lý",
-      children: [
-        {
-          key: PagePath.WORK_VOLUME,
-          label: <Link to={PagePath.WORK_VOLUME}>Bảng khối lượng</Link>,
-        },
-        {
-          key: PagePath.USER,
-          label: <Link to={PagePath.USER}>Người dùng</Link>,
-        },
-      ],
-    },
+    ...(user?.role === RoleCode.ADMIN
+      ? [
+          {
+            key: PagePath.USER,
+            icon: <AppstoreOutlined />,
+            label: <Link to={PagePath.USER}>Người dùng</Link>,
+          },
+        ]
+      : []),
+    // {
+    //   key: "2",
+    //   icon: <AppstoreOutlined />,
+    //   label: "Quản lý",
+    //   children: [
+    //     {
+    //       key: PagePath.WORK_VOLUME,
+    //       label: <Link to={PagePath.WORK_VOLUME}>Bảng khối lượng</Link>,
+    //     },
+    //     {
+    //       key: PagePath.USER,
+    //       label: <Link to={PagePath.USER}>Người dùng</Link>,
+    //     },
+    //   ],
+    // },
     ...(user?.role === RoleCode.STAFF || user?.role === RoleCode.THERAPIST
       ? [
           {
-            key: "3",
+            key: PagePath.BOOKING,
             icon: <CalendarOutlined />,
-            label: <Link to={PagePath.BOOKING}>Lịch đặt</Link>,
+            label: <Link to={PagePath.BOOKING}>Lịch đặt hẹn</Link>,
+          },
+          {
+            key: PagePath.SCHEDULE,
+            icon: <CalendarOutlined />,
+            label: <Link to={PagePath.SCHEDULE}>Lịch làm việc</Link>,
           },
         ]
       : []),
