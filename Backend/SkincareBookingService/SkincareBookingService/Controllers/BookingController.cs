@@ -36,6 +36,17 @@ public class BookingController : ControllerBase
         return Ok(bookings);
     }
 
+    [HttpGet("getBookingById/{bookingId}")]
+    public async Task<IActionResult> GetBookingById(int bookingId)
+    {
+        var booking = await _bookingService.GetBookingByIdAsync(bookingId);
+        if (booking == null)
+        {
+            return NotFound("Booking not found");
+        }
+        return Ok(booking);
+    }
+
     [HttpPut("checkin/{bookingId}")]
     public async Task<IActionResult> UpdateBookingStatusToCheckIn(int bookingId)
     {
