@@ -187,7 +187,7 @@
 import { useState } from "react";
 import { Card, Button, Radio, message, Typography, Divider, Table } from "antd";
 import { Question, SkinCareProcess } from "../dto/quiz.dto";
-
+import "../../../style/Quiz.css";
 const { Title, Text } = Typography;
 
 const quizData: Question[] = [
@@ -362,22 +362,17 @@ const QuizTest = () => {
   ];
 
   return (
-    <div style={{ maxWidth: 800, margin: "50px auto", padding: 20 }}>
+    <div className="quiz-container">
       {!resultSkinType ? (
-        <Card style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+        <Card className="quiz-card">
           <Title level={4}>
             Câu hỏi {currentQuestionIndex + 1}/{quizData.length}
           </Title>
-          <Text style={{ fontSize: 16 }}>{currentQuestion.question}</Text>
+          <Text className="quiz-text">{currentQuestion.question}</Text>
           <Radio.Group
             onChange={(e) => handleSelect(e.target.value)}
             value={selectedSkinTypes[currentQuestionIndex]}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-              marginTop: 20,
-            }}
+            className="quiz-radio-group"
           >
             {currentQuestion.options.map((option) => (
               <Radio key={option.text} value={option.skinType}>
@@ -385,20 +380,16 @@ const QuizTest = () => {
               </Radio>
             ))}
           </Radio.Group>
-          <Button
-            type="primary"
-            style={{ marginTop: 20, alignSelf: "center" }}
-            onClick={handleNext}
-          >
+          <Button type="primary" className="quiz-button" onClick={handleNext}>
             {currentQuestionIndex < quizData.length - 1
               ? "Tiếp theo"
               : "Nộp bài"}
           </Button>
         </Card>
       ) : (
-        <div style={{ textAlign: "center" }}>
+        <div className="result-container">
           <Title level={3}>Quy trình dưỡng da gợi ý cho {resultSkinType}</Title>
-          <Text style={{ fontSize: 16, color: "#555" }}>
+          <Text className="result-description">
             {recommendedProcess?.description}
           </Text>
           <Divider />
