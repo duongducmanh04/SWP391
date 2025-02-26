@@ -19,8 +19,9 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<bool> UpdateStatusToCancelledAsync(int bookingId);
 
-
         Task<bool> UpdateStatusToFinishedAsync(int bookingId);
+
+        Task<bool> UpdateBookingServiceAsync(int bookingId, string serviceName); 
 
         Task<bool> CreateBooking(PostBookingDTO booking, int slotId);
     }
