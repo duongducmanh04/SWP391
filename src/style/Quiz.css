@@ -9,7 +9,7 @@
 }
 
 .quiz-card {
-  background-color: skyblue !important; /* Màu xanh mint */
+  background-color: green !important; /* Màu xanh mint */
   border: 2px solid #45b29d; /* Viền xanh đậm */
   border-radius: 12px;
   padding: 20px;
@@ -50,7 +50,7 @@
 .quiz-button {
   margin-top: 20px;
   align-self: center;
-  background-color: peru !important;
+  background-color: coral !important;
   color: burlywood;
   border: none;
   padding: 10px 20px;
