@@ -64,7 +64,7 @@ const SkincareServices = () => {
                   key="book"
                   onClick={() => handleNavigate(service.serviceId)}
                 >
-                  Đặt ngay
+                  Chi tiết
                 </Button>,
               ]}
             >
