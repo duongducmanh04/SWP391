@@ -103,7 +103,7 @@ const LoginRegister = () => {
                   <Button
                     type="primary"
                     htmlType="submit"
-                    className="login-btn"
+                    className="submit-btn"
                   >
                     Đăng nhập
                   </Button>
@@ -157,7 +157,7 @@ const LoginRegister = () => {
                   <Button
                     type="primary"
                     htmlType="submit"
-                    className="login-btn"
+                    className="submit-btn"
                   >
                     Đăng ký
                   </Button>

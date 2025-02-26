@@ -58,7 +58,11 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.BOOKING,
         PagePath.BOOKING_DETAIL.replace(":bookingId", ""),
       ],
-      Therapist: [PagePath.HOME],
+      Therapist: [
+        PagePath.HOME,
+        PagePath.BOOKING,
+        PagePath.BOOKING_DETAIL.replace(":bookingId", ""),
+      ],
       Customer: [
         PagePath.BLOG,
         PagePath.BLOG_DETAIL,

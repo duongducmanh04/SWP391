@@ -73,12 +73,13 @@
   box-shadow: 0 0 5px rgba(185, 139, 109, 0.5);
 }
 
-.login-btn {
-  background: linear-gradient(to right, #b08b6d, #9c7a5a);
-  font-size: 14px;
+.submit-btn {
+  background-color: #80461b !important;
+  font-size: 16px !important;
+  height: 40px !important;
   padding: 8px;
   border-radius: 6px;
-  width: 80%;
+  width: 100%;
   color: white;
   font-weight: 600;
   display: flex;
@@ -90,13 +91,13 @@
   box-shadow: 0 3px 6px rgba(176, 139, 109, 0.3);
 }
 
-.login-btn:hover {
+.submit-btn:hover {
   background: linear-gradient(to right, #9c7a5a, #7f6249);
   box-shadow: 0 4px 8px rgba(176, 139, 109, 0.4);
   transform: scale(1.05);
 }
 
-.login-btn:active {
+.submit-btn:active {
   transform: scale(0.98);
   box-shadow: 0 2px 4px rgba(176, 139, 109, 0.2);
 }
@@ -120,14 +121,9 @@
   width: 0;
   height: 1.5px;
   background: #7f6249;
-  transition: width 0.3s ease-in-out;
   position: absolute;
   bottom: -2px;
   left: 0;
-}
-
-.forgot-password:hover::after {
-  width: 100%;
 }
 
 @media (max-width: 768px) {
@@ -166,4 +162,25 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.login-form .ant-input-affix-wrapper {
+  height: 40px;
+}
+
+.login-form .ant-form-item-label {
+  align-content: center;
+}
+
+.login-form .ant-form-item-required {
+  font-size: 15px !important;
+}
+
+.login-form .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #a75502 !important;
+  outline: none !important;
+}
+
+.login-form .ant-tabs-ink-bar {
+  background: #a75502 !important;
 }
