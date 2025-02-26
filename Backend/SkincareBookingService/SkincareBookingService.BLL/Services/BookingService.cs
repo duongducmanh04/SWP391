@@ -1,4 +1,6 @@
-﻿using SkincareBookingService.BLL.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using SkincareBookingService.BLL.DTOs;
+using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.Core.Constants;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
@@ -11,10 +13,12 @@ namespace SkincareBookingService.BLL.Services
     public class BookingService : IBookingService
     {
         private readonly IGenericRepository<Booking> _bookingRepository;
+        private readonly IGenericRepository<Slot> _slotRepository;
 
-        public BookingService(IGenericRepository<Booking> bookingRepository)
+        public BookingService(IGenericRepository<Booking> bookingRepository, IGenericRepository<Slot> genericRepository)
         {
             _bookingRepository = bookingRepository;
+            _slotRepository = genericRepository;
         }
 
         public async Task<List<Booking>> GetBookingsAsync()
@@ -67,6 +71,44 @@ namespace SkincareBookingService.BLL.Services
         public async Task<Booking?> GetBookingByIdAsync(int bookingId)
         {
             var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            return booking;
+        }
+
+        public async Task<bool> CreateBooking(BookingDTO bookingDTO, int slotId)
+        {
+            Slot? slot = await _slotRepository
+                .Query()
+                .Where(s => s.SlotId == slotId)
+                .FirstOrDefaultAsync();
+
+            if (slot == null || slot.BookingId != null)
+            {
+                return false;
+            }
+
+            Booking newBooking = await MapBookingDTOtoBooking(bookingDTO);
+            await _bookingRepository.AddAsync(newBooking);
+            await _bookingRepository.SaveChangesAsync();
+
+            slot.BookingId = newBooking.BookingId;
+            slot.Status = "booked";
+            await _slotRepository.UpdateAsync(slot);
+            await _slotRepository.SaveChangesAsync();
+            
+            return true;
+        }
+        private async Task<Booking> MapBookingDTOtoBooking(BookingDTO bookingDTO)
+        {
+            Booking booking = new();
+            booking.Status = bookingDTO.Status;
+            booking.CustomerId = bookingDTO.CustomerId;
+            booking.Location = bookingDTO.Location;
+            booking.Date = bookingDTO.Date;
+            booking.CreateAt = DateTime.Now;
+            booking.Amount = bookingDTO.Amount;
+            booking.SkintherapistId = bookingDTO.SkintherapistId;
+            booking.ServiceName = bookingDTO?.ServiceName;
+
             return booking;
         }
     }
