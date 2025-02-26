@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SkincareBookingService.BLL.DTOs;
+using SkincareBookingService.BLL.DTOs.BookingDTOss;
 using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.Core.Constants;
 using SkincareBookingService.DAL.Entities;
@@ -74,7 +74,7 @@ namespace SkincareBookingService.BLL.Services
             return booking;
         }
 
-        public async Task<bool> CreateBooking(BookingDTO bookingDTO, int slotId)
+        public async Task<bool> CreateBooking(PostBookingDTO booking, int slotId)
         {
             Slot? slot = await _slotRepository
                 .Query()
@@ -86,30 +86,25 @@ namespace SkincareBookingService.BLL.Services
                 return false;
             }
 
-            Booking newBooking = await MapBookingDTOtoBooking(bookingDTO);
+            Booking newBooking = new();
+            //add property
+            newBooking.CustomerId = booking.CustomerId;
+            newBooking.Location = booking.Location;
+            newBooking.CreateAt = DateTime.Now;
+            newBooking.Status = booking.Status;
+            newBooking.Amount = booking.Amount;
+            newBooking.SkintherapistId = booking.SkintherapistId;
+
             await _bookingRepository.AddAsync(newBooking);
             await _bookingRepository.SaveChangesAsync();
 
             slot.BookingId = newBooking.BookingId;
-            slot.Status = "booked";
+            slot.Status = "Booked";
             await _slotRepository.UpdateAsync(slot);
             await _slotRepository.SaveChangesAsync();
             
             return true;
         }
-        private async Task<Booking> MapBookingDTOtoBooking(BookingDTO bookingDTO)
-        {
-            Booking booking = new();
-            booking.Status = bookingDTO.Status;
-            booking.CustomerId = bookingDTO.CustomerId;
-            booking.Location = bookingDTO.Location;
-            booking.Date = bookingDTO.Date;
-            booking.CreateAt = DateTime.Now;
-            booking.Amount = bookingDTO.Amount;
-            booking.SkintherapistId = bookingDTO.SkintherapistId;
-            booking.ServiceName = bookingDTO?.ServiceName;
-
-            return booking;
-        }
+        
     }
 }

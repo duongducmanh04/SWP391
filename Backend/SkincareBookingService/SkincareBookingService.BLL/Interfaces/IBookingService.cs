@@ -1,11 +1,5 @@
-﻿using SkincareBookingService.BLL.DTOs;
-using SkincareBookingService.Core.Constants;
+﻿using SkincareBookingService.BLL.DTOs.BookingDTOss;
 using SkincareBookingService.DAL.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkincareBookingService.BLL.Interfaces
 {
@@ -28,6 +22,6 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<bool> UpdateStatusToFinishedAsync(int bookingId);
 
-        Task<bool> CreateBooking(BookingDTO booking, int slotId);
+        Task<bool> CreateBooking(PostBookingDTO booking, int slotId);
     }
 }

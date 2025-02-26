@@ -1,8 +1,8 @@
-﻿namespace SkincareBookingService.BLL.DTOs
+﻿namespace SkincareBookingService.BLL.DTOs.BookingDTOss
 {
     public class BookingDTO
     {
-        public int BookingId { get; set; }
+        public int? BookingId { get; set; }
         public int CustomerId { get; set; }
         public string Location { get; set; }
         public DateTime? Date { get; set; }

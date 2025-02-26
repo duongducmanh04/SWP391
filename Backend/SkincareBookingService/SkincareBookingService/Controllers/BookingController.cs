@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SkincareBookingService.BLL.DTOs;
+using SkincareBookingService.BLL.DTOs.BookingDTOss;
 using SkincareBookingService.BLL.Interfaces;
 
 [Route("api/[controller]")]
@@ -123,8 +123,11 @@ public class BookingController : ControllerBase
         }
     }
     [HttpPost("create-booking")]
-    public async Task<IActionResult> CreateBooking([FromBody] BookingDTO booking, int slotId)
+    public async Task<IActionResult> CreateBooking([FromBody] PostBookingDTO booking, int slotId)
     {
+        if (booking == null)
+            return BadRequest();
+
         if(await _bookingService.CreateBooking(booking, slotId))
             return Ok();
         
