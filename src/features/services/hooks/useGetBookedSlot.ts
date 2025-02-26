@@ -13,7 +13,7 @@ const fetchBookedSlots = async (): Promise<SlotDto[]> => {
 // FIXED: Correct queryKey and function
 export const useBookedSlot = () => {
   return useQuery<SlotDto[], Error>({
-    queryKey: ["getBookedSlots"], 
-    queryFn: fetchBookedSlots,      
+    queryKey: ["getBookedSlots"],
+    queryFn: fetchBookedSlots,
   });
 };
