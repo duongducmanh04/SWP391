@@ -305,7 +305,7 @@ const { Title, Text } = Typography;
 
 const generateSlots = () => {
   const slots = [];
-  let currentTime = dayjs().set("hour", 8).set("minute", 0).set("second", 0);
+  let currentTime = dayjs().set("hour", 7).set("minute", 15).set("second", 0);
 
   while (currentTime.hour() < 19) {
     slots.push(currentTime.format("HH:mm"));
@@ -326,62 +326,96 @@ const SkincareBooking = () => {
 
   const today = dayjs().startOf("day");
 
-  const getBookedSlotsForDate = (date: string) => {
-    if (!bookedSlots || !bookings) return [];
-    const bookedSlotsForDate = bookedSlots
+  const formatDate = (dateString: string | undefined | null): string => {
+    if (!dateString) return ""; 
+    return dayjs(dateString).format("YYYY-MM-DD"); 
+  };
+  
+  const getBookedSlotsForDate = (date: string): string[] => {
+    if (!bookedSlots || !bookings || bookedSlots.length === 0 || bookings.length === 0) {
+      console.warn("⚠️ API data not ready yet!");
+      return [];
+    }
+  
+    console.log("🛠 Raw API Booked Slots:", bookedSlots);
+    console.log("🛠 Raw API Bookings:", bookings);
+  
+    const bookedTimes = bookedSlots
       .filter((slot) => {
         const booking = bookings.find((b) => b.bookingId === slot.bookingId);
-        return booking?.date === date;
+  
+        if (!booking) {
+          console.warn("⚠️ No matching booking for slot:", slot);
+          return false;
+        }
+  
+        const normalizedBookingDate = booking.date.split("T")[0]; // Extract YYYY-MM-DD
+        const normalizedSlotTime = dayjs(slot.time, ["h:mm A", "HH:mm"]).format("HH:mm");
+  
+        console.log("📌 Checking Booking:", booking);
+        console.log("📆 Booking Date (API):", booking.date);
+        console.log("📆 Normalized Date:", normalizedBookingDate);
+        console.log("⏰ Slot Time:", slot.time, "| Status:", slot.status);
+  
+        const isBooked = 
+          normalizedBookingDate === date &&
+          slot.status === "Booked" &&
+          slot.time; // Ensure slot has a valid time
+  
+        if (isBooked) {
+          console.log("✅ Booked Slot Found:", normalizedSlotTime);
+        }
+  
+        return isBooked;
       })
-      .map((slot) => slot.time);
-    return bookedSlotsForDate;
+      .map((slot) => dayjs(slot.time, ["h:mm A", "HH:mm"]).format("HH:mm"));
+  
+    console.log("🔴 Final Booked Slots for", date, ":", bookedTimes);
+    return bookedTimes;
   };
-
+  
+  
+  const getMorningAndAfternoonRange = (date: string) => {
+    const bookedSlotsForDate = getBookedSlotsForDate(date);
+    
+   
+    const availableSlots = slots.filter((slot) => !bookedSlotsForDate.includes(slot));
+  
+   
+    const morningSlots = availableSlots.filter((slot) => dayjs(slot, "HH:mm").hour() < 12);
+    const morningRange =
+      morningSlots.length > 0
+        ? `${morningSlots[0]} - ${morningSlots[morningSlots.length - 1]}`
+        : "Không có";
+  
+   
+    const afternoonSlots = availableSlots.filter((slot) => dayjs(slot, "HH:mm").hour() >= 13);
+    const afternoonRange =
+      afternoonSlots.length > 0
+        ? `${afternoonSlots[0]} - ${afternoonSlots[afternoonSlots.length - 1]}`
+        : "Không có";
+  
+    return { morningRange, afternoonRange };
+  };
+  
   const dateCellRender = (value: Dayjs) => {
     const date = value.format("YYYY-MM-DD");
-    const bookedSlotsForDate = getBookedSlotsForDate(date);
-
-    const morningSlots = slots.filter(
-      (slot) => dayjs(slot, "HH:mm").hour() < 12
-    );
-    const afternoonSlots = slots.filter(
-      (slot) => dayjs(slot, "HH:mm").hour() >= 12
-    );
-
+    const { morningRange, afternoonRange } = getMorningAndAfternoonRange(date);
+  
     return (
       <div>
-        <div>
-          <strong>Sáng:</strong>
-          <Space direction="vertical" style={{ width: "100%" }}>
-            {morningSlots.map((slot) => (
-              <Badge
-                key={slot}
-                status={bookedSlotsForDate.includes(slot) ? "error" : "success"}
-                text={
-                  bookedSlotsForDate.includes(slot)
-                    ? `Booked - ${slot}`
-                    : `Available - ${slot}`
-                }
-              />
-            ))}
-          </Space>
-        </div>
-        <div style={{ marginTop: "10px" }}>
-          <strong>Chiều:</strong>
-          <Space direction="vertical" style={{ width: "100%" }}>
-            {afternoonSlots.map((slot) => (
-              <Badge
-                key={slot}
-                status={bookedSlotsForDate.includes(slot) ? "error" : "success"}
-                text={
-                  bookedSlotsForDate.includes(slot)
-                    ? `Booked - ${slot}`
-                    : `Available - ${slot}`
-                }
-              />
-            ))}
-          </Space>
-        </div>
+        {morningRange !== "Không có" && (
+          <div>
+          
+            <div>{morningRange}</div> 
+          </div>
+        )}
+        {afternoonRange !== "Không có" && (
+          <div style={{ marginTop: "5px" }}>
+          
+            <div>{afternoonRange}</div> 
+          </div>
+        )}
       </div>
     );
   };
@@ -449,75 +483,78 @@ const SkincareBooking = () => {
                   Ngày đã chọn: {selectedDate}
                 </Text>
                 <div style={{ marginTop: "20px" }}>
-                  {therapists?.map((expert) => (
-                    <Card
-                      key={expert.skintherapistId}
-                      style={{
-                        marginBottom: "10px",
-                        backgroundColor: "#f9f9f9",
-                        padding: "16px",
-                        borderRadius: "12px",
-                        transition: "all 0.3s ease-in-out",
-                      }}
-                      hoverable
-                    >
-                      <Row align="middle">
-                        <Col>
-                          <img
-                            src={expert.image}
-                            alt={expert.name}
-                            style={{
-                              width: "80px",
-                              height: "80px",
-                              borderRadius: "50%",
-                              objectFit: "cover",
-                            }}
-                          />
-                          <Title
-                            level={4}
-                            style={{ marginTop: "10px", color: "#3A5A40" }}
-                          >
-                            {expert.name}
-                          </Title>
-                          <Text style={{ color: "#6B705C" }}>
-                            {expert.expertise}
-                          </Text>
+                {therapists?.map((expert) => (
+  <Card
+    key={expert.skintherapistId}
+    style={{
+      marginBottom: "10px",
+      backgroundColor: "#f9f9f9",
+      padding: "16px",
+      borderRadius: "12px",
+      transition: "all 0.3s ease-in-out",
+      boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+      cursor: "pointer",
+    }}
+    hoverable
+    onMouseOver={(e) => {
+      e.currentTarget.style.transform = "scale(1.05)";
+      e.currentTarget.style.boxShadow = "0 6px 15px rgba(0,0,0,0.15)";
+    }}
+    onMouseOut={(e) => {
+      e.currentTarget.style.transform = "scale(1)";
+      e.currentTarget.style.boxShadow = "0 4px 10px rgba(0,0,0,0.1)";
+    }}
+  >
+    <Row justify="center" align="middle">
+      <Col span={24} style={{ textAlign: "center" }}>
+        <img
+          src={expert.image}
+          alt={expert.name}
+          style={{
+            width: "80px",
+            height: "80px",
+            borderRadius: "50%",
+            objectFit: "cover",
+          }}
+        />
+        <Title level={4} style={{ marginTop: "10px", color: "#3A5A40" }}>
+          {expert.name}
+        </Title>
+        <Text style={{ color: "#6B705C" }}>{expert.expertise}</Text>
+      </Col>
+    </Row>
 
-                          <div style={{ marginTop: "10px" }}>
-                            <Space>
-                              {slots.map((time) => (
-                                <Button
-                                  key={time}
-                                  type={
-                                    selectedExpert === expert.skintherapistId &&
-                                    selectedTime === time
-                                      ? "primary"
-                                      : "default"
-                                  }
-                                  onClick={() =>
-                                    handleSelectExpert(
-                                      expert.skintherapistId,
-                                      time
-                                    )
-                                  }
-                                  disabled={getBookedSlotsForDate(
-                                    selectedDate
-                                  ).includes(time)}
-                                  style={{
-                                    borderRadius: "20px",
-                                    fontSize: "14px",
-                                    padding: "8px 16px",
-                                  }}
-                                >
-                                  {time}
-                                </Button>
-                              ))}
-                            </Space>
-                          </div>
-                        </Col>
-                      </Row>
-                    </Card>
-                  ))}
+  
+    <Row gutter={[8, 8]} justify="center" style={{ marginTop: "10px" }}>
+  {slots.map((time) => {
+    const isBooked = getBookedSlotsForDate(selectedDate).includes(time);
+
+    return (
+      <Col key={time} xs={8} sm={8} md={8}>
+        <Button
+          type={selectedExpert === expert.skintherapistId && selectedTime === time ? "primary" : "default"}
+          onClick={() => handleSelectExpert(expert.skintherapistId, time)}
+          disabled={isBooked} 
+          style={{
+            width: "100%",
+            borderRadius: "20px",
+            fontSize: "14px",
+            padding: "8px 16px",
+            transition: "all 0.3s ease-in-out",
+            backgroundColor: isBooked ? "#ff4d4f" : "white", 
+            color: isBooked ? "white" : "#3A5A40",
+            border: isBooked ? "1px solid #ff7875" : "1px solid #A7C957",
+            cursor: isBooked ? "not-allowed" : "pointer",
+          }}
+        >
+          {time}
+        </Button>
+      </Col>
+    );
+  })}
+</Row>
+  </Card>
+))}
                 </div>
               </div>
             ) : (
