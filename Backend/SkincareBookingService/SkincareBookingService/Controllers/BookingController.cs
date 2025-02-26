@@ -13,6 +13,18 @@ public class BookingController : ControllerBase
         _bookingService = bookingService;
     }
 
+    [HttpPost("create-booking")]
+    public async Task<IActionResult> CreateBooking([FromBody] PostBookingDTO booking, int slotId)
+    {
+        if (booking == null)
+            return BadRequest();
+
+        if (await _bookingService.CreateBooking(booking, slotId))
+            return Ok();
+
+        return BadRequest();
+    }
+
     [HttpGet("getAllBookings")]
     public async Task<IActionResult> GetBookings()
     {
@@ -122,18 +134,20 @@ public class BookingController : ControllerBase
             return NotFound(new { message = "Booking not found." });
         }
     }
-    [HttpPost("create-booking")]
-    public async Task<IActionResult> CreateBooking([FromBody] PostBookingDTO booking, int slotId)
+
+    [HttpPut("serviceName/{bookingId}")]
+    public async Task<IActionResult> UpdateBookingService(int bookingId, string serviceName)
     {
-        if (booking == null)
-            return BadRequest();
-
-        if(await _bookingService.CreateBooking(booking, slotId))
-            return Ok();
-        
-        return BadRequest();
+        var result = await _bookingService.UpdateBookingServiceAsync(bookingId, serviceName);
+        if (result)
+        {
+            return Ok(new { message = "Booking service updated successfully." });
+        }
+        else
+        {
+            return NotFound(new { message = "Booking not found." });
+        }
     }
-
 }
 
 
