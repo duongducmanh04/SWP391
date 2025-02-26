@@ -1,4 +1,5 @@
-﻿using SkincareBookingService.Core.Constants;
+﻿using SkincareBookingService.BLL.DTOs;
+using SkincareBookingService.Core.Constants;
 using SkincareBookingService.DAL.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace SkincareBookingService.BLL.Interfaces
 {
     public interface IBookingService
     {
+        Task<BookingDTO> CreateBookingAsync(BookingDTO bookingDTO);
         Task<List<Booking>> GetBookingsAsync();
 
         Task<List<Booking>> GetBookingsByStatusAsync(string status);
@@ -24,7 +26,10 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<bool> UpdateStatusToCancelledAsync(int bookingId);
 
-
         Task<bool> UpdateStatusToFinishedAsync(int bookingId);
+
+        Task<bool> UpdateBookingServiceAsync(int bookingId, string serviceName);
+
+        Task<bool> DeleteBookingAsync(int bookingId);
     }
 }

@@ -1,10 +1,8 @@
-﻿using SkincareBookingService.BLL.Interfaces;
+﻿using SkincareBookingService.BLL.DTOs;
+using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.Core.Constants;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SkincareBookingService.BLL.Services
 {
@@ -68,6 +66,66 @@ namespace SkincareBookingService.BLL.Services
         {
             var booking = await _bookingRepository.GetByIdAsync(bookingId);
             return booking;
+        }
+
+        public async Task<BookingDTO> CreateBookingAsync(BookingDTO bookingDTO)
+        {
+            var booking = new Booking
+            {
+                CustomerId = bookingDTO.CustomerId,
+                Location = bookingDTO.Location,
+                Date = bookingDTO.Date,
+                CreateAt = bookingDTO.CreateAt ?? DateTime.UtcNow,
+                Status = bookingDTO.Status,
+                Amount = bookingDTO.Amount,
+                SkintherapistId = bookingDTO.SkintherapistId,
+                UpdateAt = bookingDTO.UpdateAt,
+                ServiceName = bookingDTO.ServiceName
+            };
+
+            await _bookingRepository.AddAsync(booking);
+
+            var createdBookingDTO = new BookingDTO
+            {
+                BookingId = booking.BookingId,
+                CustomerId = booking.CustomerId,
+                Location = booking.Location,
+                Date = booking.Date,
+                CreateAt = booking.CreateAt,
+                Status = booking.Status,
+                Amount = booking.Amount,
+                SkintherapistId = booking.SkintherapistId,
+                UpdateAt = booking.UpdateAt,
+                ServiceName = booking.ServiceName,
+                // Assuming the related navigation properties are loaded, otherwise you may need to load them.
+                CustomerName = booking.Customer?.Name,
+                SkintherapistName = booking.Skintherapist?.Name
+            };
+
+            await _bookingRepository.SaveChangesAsync();
+            return createdBookingDTO;
+        }
+
+        public async Task<bool> DeleteBookingAsync(int bookingId)
+        {
+            var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            if (booking == null) return false;
+
+            await _bookingRepository.DeleteAsync(booking);
+            await _bookingRepository.SaveChangesAsync();
+            return true;
+
+        }
+
+        public async Task<bool> UpdateBookingServiceAsync(int bookingId, string serviceName)
+        {
+            var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            if (booking == null) return false;
+
+            booking.ServiceName = serviceName;
+            await _bookingRepository.UpdateAsync(booking);
+            await _bookingRepository.SaveChangesAsync();
+            return true;
         }
     }
 }

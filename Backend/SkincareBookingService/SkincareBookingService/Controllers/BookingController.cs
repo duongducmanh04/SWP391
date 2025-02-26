@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.Interfaces;
 
 [Route("api/[controller]")]
@@ -10,6 +11,18 @@ public class BookingController : ControllerBase
     public BookingController(IBookingService bookingService)
     {
         _bookingService = bookingService;
+    }
+
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateBooking([FromBody] BookingDTO bookingDTO)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var createdBooking = await _bookingService.CreateBookingAsync(bookingDTO);
+        return CreatedAtAction(nameof(GetBookingById), new { bookingId = createdBooking.BookingId }, createdBooking);
     }
 
     [HttpGet("getAllBookings")]
@@ -122,6 +135,33 @@ public class BookingController : ControllerBase
         }
     }
 
+    [HttpPut("updateService/{bookingId}/{serviceName}")]
+    public async Task<IActionResult> UpdateBookingService(int bookingId, string serviceName)
+    {
+        var result = await _bookingService.UpdateBookingServiceAsync(bookingId, serviceName);
+        if (result)
+        {
+            return Ok(new { message = "Booking service updated successfully." });
+        }
+        else
+        {
+            return NotFound(new { message = "Booking not found." });
+        }
+    }
+
+    [HttpDelete("delete/{bookingId}")]
+    public async Task<IActionResult> DeleteBooking(int bookingId)
+    {
+        var result = await _bookingService.DeleteBookingAsync(bookingId);
+        if (result)
+        {
+            return Ok(new { message = "Booking deleted successfully." });
+        }
+        else
+        {
+            return NotFound(new { message = "Booking not found." });
+        }
+    }
 
 
 }
