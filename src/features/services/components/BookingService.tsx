@@ -3,9 +3,12 @@ import { Card, Typography, Row, Col, Calendar, Button, message } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { Dayjs } from "dayjs";
 import dayjs from "dayjs";
+import { useLocation } from "react-router-dom";
 import { useBookedSlot } from "../hooks/useGetBookedSlot";
 import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
 import { useBookingss } from "../../booking/hooks/useGetBooking";
+import { useCreateBooking } from "../../booking/hooks/useCreateBooking";
+import useAuthStore from "../../authentication/hooks/useAuthStore";
 
 const { Title, Text } = Typography;
 
@@ -26,6 +29,10 @@ const SkincareBooking = () => {
   const [selectedExpert, setSelectedExpert] = useState<number | null>(null);
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [slots] = useState<string[]>(generateSlots());
+  const location = useLocation();
+  const { amount, serviceName } = location.state || {};
+  const { mutate: createBooking } = useCreateBooking();
+  const { user } = useAuthStore();
   const { data: therapists } = useTherapists();
   const { data: bookings } = useBookingss();
   const { data: bookedSlots } = useBookedSlot();
@@ -140,6 +147,106 @@ const SkincareBooking = () => {
   const handleSelectExpert = (id: number, time: string) => {
     setSelectedExpert(id);
     setSelectedTime(time);
+  };
+
+  // const handleConfirmBooking = async () => {
+  //   if (!selectedDate || !selectedExpert || !selectedTime) {
+  //     message.warning("Vui lòng chọn đầy đủ thông tin trước khi đặt lịch!");
+  //     return;
+  //   }
+
+  //   const bookingData = {
+  //     customerId: user?.accountId ?? 0,
+  //     location: "New York",
+  //     date: new Date(selectedDate),
+  //     amount: amount ?? 0,
+  //     skintherapistId: selectedExpert,
+  //     serviceName: serviceName ?? "",
+  //   };
+
+  //   console.log("Data create booking:", bookingData);
+
+  //   try {
+  //     createBooking(bookingData);
+  //     message.success("Đặt lịch thành công!");
+  //   } catch (err) {
+  //     console.error("Lỗi khi đặt lịch:", err);
+  //     message.error("Đặt lịch thất bại, vui lòng thử lại!");
+  //   }
+  // };
+
+  const handleConfirmBooking = async () => {
+    if (
+      !selectedDate ||
+      !selectedExpert ||
+      !selectedTime ||
+      !amount ||
+      !serviceName
+    ) {
+      message.warning("Vui lòng chọn đầy đủ thông tin trước khi đặt lịch!");
+      return;
+    }
+
+    const customerId = user?.accountId;
+
+    if (!customerId) {
+      message.error(
+        "Lỗi: Không thể xác định khách hàng. Vui lòng đăng nhập lại!"
+      );
+      return;
+    }
+
+    const bookingData = {
+      customerId: customerId,
+      location: "New York",
+      date: new Date(selectedDate),
+      amount: Number(amount),
+      skintherapistId: Number(selectedExpert),
+      serviceName: serviceName,
+    };
+
+    // const customerId = user.accountId;
+    // if (typeof customerId !== "number" || isNaN(customerId)) {
+    //   console.error(
+    //     "Invalid customer ID:",
+    //     customerId,
+    //     "Type:",
+    //     typeof customerId
+    //   );
+    //   message.error(
+    //     "Lỗi: Không thể xác định khách hàng. Vui lòng đăng nhập lại!"
+    //   );
+    //   return;
+    // }
+
+    // console.log("User from auth store:", user);
+    // console.log("Customer ID:", customerId, "Type:", typeof customerId);
+
+    // const bookingData = {
+    //   customerId: Number(customerId),
+    //   location: "New York",
+    //   date: new Date(selectedDate),
+    //   amount: Number(amount),
+    //   skintherapistId: Number(selectedExpert),
+    //   serviceName: serviceName,
+    // };
+
+    console.log("Data booking create:", bookingData);
+
+    try {
+      await createBooking(bookingData, {
+        onSuccess: () => {
+          message.success("Đặt lịch thành công!");
+        },
+        onError: (error) => {
+          console.error("Lỗi khi đặt lịch:", error);
+          message.error("Đặt lịch thất bại, vui lòng thử lại!");
+        },
+      });
+    } catch (err) {
+      console.error("Bắt lỗi ngoài cùng:", err);
+      message.error("Đặt lịch thất bại, vui lòng thử lại!");
+    }
   };
 
   return (
@@ -320,7 +427,8 @@ const SkincareBooking = () => {
                   <Button
                     type="primary"
                     icon={<CheckCircleOutlined />}
-                    onClick={() => message.success("Đặt lịch thành công")}
+                    // onClick={() => message.success("Đặt lịch thành công")}
+                    onClick={handleConfirmBooking}
                     style={{
                       backgroundColor: "#A7C957",
                       border: "none",
