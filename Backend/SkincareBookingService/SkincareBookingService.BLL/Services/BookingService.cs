@@ -99,7 +99,7 @@ namespace SkincareBookingService.BLL.Services
             await _bookingRepository.SaveChangesAsync();
 
             slot.BookingId = newBooking.BookingId;
-            slot.Status = "Booked";
+            slot.Status = SlotStatus.Booked.ToString();
             await _slotRepository.UpdateAsync(slot);
             await _slotRepository.SaveChangesAsync();
             
