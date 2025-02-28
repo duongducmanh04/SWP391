@@ -76,5 +76,36 @@ namespace SkincareBookingService.BLL.Services
 
             return scheduleDTOs;
         }
+
+        public async Task<ScheduleDTO> GetScheduleById(int id)
+        {
+            List<Schedule> schedules = await _scheduleRepository
+                .Query()
+                .Where(s => s.ScheduleId == id)
+                .ToListAsync();
+
+            return await MapScheduleToScheduleDTO(schedules.FirstOrDefault());
+        }
+
+        public async Task<bool> UpdateSkintherapistIDAsync(int scheduleId, int skinTherapistId)
+        {
+            var schedule = await _scheduleRepository.GetByIdAsync(scheduleId);
+            if (schedule == null) return false;
+
+            schedule.SkinTherapistId = skinTherapistId;
+            await _scheduleRepository.UpdateAsync(schedule);
+            await _scheduleRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateSlotIDAsync(int scheduleId, int slotId)
+        {
+            var schedule = await _scheduleRepository.GetByIdAsync(scheduleId);
+            if (schedule == null) return false;
+            schedule.SlotId = slotId;
+            await _scheduleRepository.UpdateAsync(schedule);
+            await _scheduleRepository.SaveChangesAsync();
+            return true;
+        }
     }
 }
