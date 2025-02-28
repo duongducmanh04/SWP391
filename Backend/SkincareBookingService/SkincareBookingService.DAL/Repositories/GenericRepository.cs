@@ -42,16 +42,19 @@ namespace SkincareBookingService.DAL.Repositories
         public async Task AddAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
+            await SaveChangesAsync();
         }
 
         public async Task UpdateAsync(T entity)
         {
             _context.Set<T>().Update(entity);
+            await SaveChangesAsync();
         }
 
         public async Task DeleteAsync(T entity)
         {
             _context.Set<T>().Remove(entity);
+            await SaveChangesAsync();
         }
 
         public async Task SaveChangesAsync()
