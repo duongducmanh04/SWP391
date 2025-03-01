@@ -17,12 +17,17 @@ public class BookingController : ControllerBase
     public async Task<IActionResult> CreateBooking([FromBody] PostBookingDTO booking, int slotId)
     {
         if (booking == null)
-            return BadRequest();
+            return BadRequest(new { message = "Booking data is null." });
 
-        if (await _bookingService.CreateBooking(booking, slotId))
-            return Ok();
-
-        return BadRequest();
+        var result = await _bookingService.CreateBooking(booking, slotId);
+        if (result)
+        {
+            return Ok(new { message = "Booking created successfully." });
+        }
+        else
+        {
+            return BadRequest(new { message = "Failed to create booking. The slot may be already booked or does not exist." });
+        }
     }
 
     [HttpGet("getAllBookings")]
@@ -142,6 +147,20 @@ public class BookingController : ControllerBase
         if (result)
         {
             return Ok(new { message = "Booking service updated successfully." });
+        }
+        else
+        {
+            return NotFound(new { message = "Booking not found." });
+        }
+    }
+
+    [HttpPut("amount/{bookingId}")]
+    public async Task<IActionResult> UpdateBookingAmount(int bookingId, float amount)
+    {
+        var result = await _bookingService.UpdateBookingAmountAsync(bookingId, amount);
+        if (result)
+        {
+            return Ok(new { message = "Booking amount updated successfully." });
         }
         else
         {
