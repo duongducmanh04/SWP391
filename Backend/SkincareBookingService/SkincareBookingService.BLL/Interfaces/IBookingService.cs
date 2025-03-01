@@ -21,6 +21,8 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<bool> UpdateStatusToFinishedAsync(int bookingId);
 
+        Task<bool > UpdateBookingAmountAsync(int bookingId, float amount);
+
         Task<bool> UpdateBookingServiceAsync(int bookingId, string serviceName); 
 
         Task<bool> CreateBooking(PostBookingDTO booking, int slotId);
