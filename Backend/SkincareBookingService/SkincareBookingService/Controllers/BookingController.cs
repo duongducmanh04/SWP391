@@ -7,17 +7,22 @@ using SkincareBookingService.BLL.Interfaces;
 public class BookingController : ControllerBase
 {
     private readonly IBookingService _bookingService;
+    private readonly ISlotService _slotService; 
 
-    public BookingController(IBookingService bookingService)
+    public BookingController(IBookingService bookingService, ISlotService slotService)
     {
         _bookingService = bookingService;
+        _slotService = slotService;
     }
 
     [HttpPost("create-booking")]
     public async Task<IActionResult> CreateBooking([FromBody] PostBookingDTO booking, int slotId)
     {
-        if (booking == null)
-            return BadRequest(new { message = "Booking data is null." });
+        var validationResult = await ValidateBookingRequest(booking, slotId);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
 
         var result = await _bookingService.CreateBooking(booking, slotId);
         if (result)
@@ -28,6 +33,28 @@ public class BookingController : ControllerBase
         {
             return BadRequest(new { message = "Failed to create booking. The slot may be already booked or does not exist." });
         }
+    }
+
+    private async Task<IActionResult> ValidateBookingRequest(PostBookingDTO booking, int slotId)
+    {
+        if (booking == null)
+            return BadRequest(new { message = "Booking data is null." });
+
+        if (slotId <= 0)
+            return BadRequest(new { message = "Invalid slot id." });
+
+        if (booking.CustomerId <= 0 || booking.SkintherapistId <= 0)
+            return BadRequest(new { message = "Invalid customer or skintherapist id." });
+
+        // Assuming you have a method to check if the slot is already booked
+        var slot = await _slotService.GetSlotByIdAsync(slotId);
+        if (slot == null)
+            return BadRequest(new { message = "Slot does not exist." });
+
+        if (slot.Status == "Booked")
+            return BadRequest(new { message = "Slot is already booked." });
+
+        return null;
     }
 
     [HttpGet("getAllBookings")]
@@ -69,7 +96,7 @@ public class BookingController : ControllerBase
     public async Task<IActionResult> UpdateBookingStatusToCheckIn(int bookingId)
     {
         var result = await _bookingService.UpdateBookingStatusToCheckInAsync(bookingId);
-                 
+
         if (result)
         {
             return Ok(new { message = "Booking status updated to 'CheckIn' successfully." });

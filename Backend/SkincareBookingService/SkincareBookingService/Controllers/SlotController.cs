@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.Interfaces;
 
 namespace SkincareBookingService.Controllers
@@ -12,6 +13,17 @@ namespace SkincareBookingService.Controllers
         public SlotController(ISlotService slotService)
         {
             _slotService = slotService;
+        }
+
+        [HttpPost("createSlot")]
+        public async Task<IActionResult> CreateSlot([FromBody] SlotDTO slot)
+        {
+            var result = await _slotService.CreateSlotAsync(slot);
+            if (result)
+            {
+                return Ok("Slot created successfully");
+            }
+            return BadRequest("Failed to create slot");
         }
 
         [HttpGet("getAllSlots")]
@@ -73,6 +85,28 @@ namespace SkincareBookingService.Controllers
         public async Task<IActionResult> UpdateSlotToBooked(int id)
         {
             var result = await _slotService.UpdateSlotToBookedAsync(id);
+            if (!result)
+            {
+                return NotFound("Slot not found");
+            }
+            return Ok("Slot updated successfully");
+        }
+
+        [HttpPut("updateSlotTime/{id}")]
+        public async Task<IActionResult> UpdateSlotTime(int id, [FromBody] string time)
+        {
+            var result = await _slotService.UpdateSlotTimeAsync(id, time);
+            if (!result)
+            {
+                return NotFound("Slot not found");
+            }
+            return Ok("Slot updated successfully");
+        }
+
+        [HttpPut("updateSlotBookingId/{slotId}")]
+        public async Task<IActionResult> UpdateSlotBookingId(int slotId, [FromBody] int bookingId)
+        {
+            var result = await _slotService.UpdateSlotBookingIdAsync(slotId, bookingId);
             if (!result)
             {
                 return NotFound("Slot not found");
