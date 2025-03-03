@@ -1,8 +1,9 @@
 export interface CreateBookingDto {
   customerId: number;
   location: string;
-  date: Date;
+  status : string;
   amount: number;
   skintherapistId: number;
-  serviceName: string;
+  slotId :number;
+  
 }
