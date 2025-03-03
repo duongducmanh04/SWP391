@@ -79,6 +79,16 @@ namespace SkincareBookingService
 
             builder.Services.AddScoped<ISkintypeService, BLL.Services.SkintypeService>();
 
+            builder.Services.AddScoped<IQuizAnswerService, QuizAnswerService>();
+
+            builder.Services.AddScoped<IQuizQuestionService, QuizQuestionService>();
+
+            builder.Services.AddScoped<IQuizQuestionSetService, QuizQuestionSetService>();
+
+            builder.Services.AddScoped<ICustomerSurveyService, CustomerSurveyService>();
+
+            builder.Services.AddScoped<ICustomerSurveyAnswerService, CustomerSurveyAnswerService>();
+
             /*====================================================*/
 
             var app = builder.Build();
