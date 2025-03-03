@@ -21,7 +21,7 @@ namespace SkincareBookingService.BLL.Services
             {
                 Status = slotDto.Status,
                 Time = slotDto.Time,
-                BookingId = slotDto.BookingId
+                BookingId = slotDto.BookingId,
             };
 
             await _slotRepository.AddAsync(slot);
@@ -37,7 +37,7 @@ namespace SkincareBookingService.BLL.Services
                 SlotId = s.SlotId,
                 Status = s.Status,
                 Time = s.Time,
-                BookingId = s.BookingId
+                BookingId = s.BookingId,
             }).ToList();
         }
 
