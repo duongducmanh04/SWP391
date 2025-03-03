@@ -35,7 +35,7 @@ namespace SkincareBookingService.Controllers
             {
                 return NotFound("No slots found");
             }
-            foreach(var slot in slots)
+            foreach (var slot in slots)
             {
                 slot.Date = await _scheduleService.GetDateBySlotId(slot.SlotId);
             }
@@ -50,6 +50,8 @@ namespace SkincareBookingService.Controllers
             {
                 return NotFound("Slot not found");
             }
+
+            slot.Date = await _scheduleService.GetDateBySlotId(slot.SlotId);
             return Ok(slot);
         }
 
@@ -61,6 +63,10 @@ namespace SkincareBookingService.Controllers
             {
                 return NotFound("No available slots found");
             }
+            foreach (var slot in slots)
+            {
+                slot.Date = await _scheduleService.GetDateBySlotId(slot.SlotId);
+            }
             return Ok(slots);
         }
 
@@ -71,6 +77,10 @@ namespace SkincareBookingService.Controllers
             if (slots == null || slots.Count == 0)
             {
                 return NotFound("No booked slots found");
+            }
+            foreach (var slot in slots)
+            {
+                slot.Date = await _scheduleService.GetDateBySlotId(slot.SlotId);
             }
             return Ok(slots);
         }
