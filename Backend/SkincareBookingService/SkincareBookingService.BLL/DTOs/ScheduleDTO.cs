@@ -10,7 +10,7 @@ namespace SkincareBookingService.BLL.DTOs
 
         public int? SlotId { get; set; }
 
-        public DateTime? Date { get; set; }
+        public DateTime Date { get; set; }
 
         public virtual SkinTherapist? SkinTherapist { get; set; }
 

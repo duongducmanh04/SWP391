@@ -9,10 +9,11 @@ namespace SkincareBookingService.Controllers
     public class SlotController : ControllerBase
     {
         private readonly ISlotService _slotService;
-
-        public SlotController(ISlotService slotService)
+        private readonly IScheduleService _scheduleService;
+        public SlotController(ISlotService slotService, IScheduleService scheduleService)
         {
             _slotService = slotService;
+            _scheduleService = scheduleService;
         }
 
         [HttpPost("createSlot")]
@@ -33,6 +34,10 @@ namespace SkincareBookingService.Controllers
             if (slots == null || slots.Count == 0)
             {
                 return NotFound("No slots found");
+            }
+            foreach(var slot in slots)
+            {
+                slot.Date = await _scheduleService.GetDateBySlotId(slot.SlotId);
             }
             return Ok(slots);
         }

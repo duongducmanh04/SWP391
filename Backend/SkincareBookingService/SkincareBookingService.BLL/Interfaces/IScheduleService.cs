@@ -12,5 +12,6 @@ namespace SkincareBookingService.BLL.Interfaces
         Task<bool> UpdateSkintherapistIDAsync (int scheduleId, int skinTherapistId);
 
         Task<bool> UpdateSlotIDAsync(int scheduleId, int slotId);
+        Task<DateTime> GetDateBySlotId(int slotId);
     }
 }
