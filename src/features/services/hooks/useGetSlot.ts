@@ -2,16 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { SlotDto } from "../dto/slot.dto";
 
-const fetchAvailableSlots = async (): Promise<SlotDto[]> => {
+const fetchSlots = async (): Promise<SlotDto[]> => {
   const response = await axios.get<SlotDto[]>(
-    "https://localhost:7071/api/slot/getAvailableSlots"
+    "https://localhost:7071/api/slot/getAllSlots"
   );
   return response.data;
 };
 
-export const useAvailableSlot = () => {
+export const useSlots = () => {
   return useQuery<SlotDto[], Error>({
-    queryKey: ["getAvailableSlots"],
-    queryFn: fetchAvailableSlots,
+    queryKey: ["getAllSlots"],
+    queryFn: fetchSlots,
   });
 };

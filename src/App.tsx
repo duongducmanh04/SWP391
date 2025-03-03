@@ -34,6 +34,8 @@ import BookingListTable from "./features/booking/components/BookingListTable";
 import SkinType from "./pages/SkinTypePage";
 import BookingDetail from "./features/booking/components/BookingDetail";
 import CompleteBookingPage from "./pages/CompleteResult";
+import ScheduleCalendarPage from "./features/schedule/page/SchedulePage";
+import ScheduleCalendarManagementPage from "./features/schedule/page/TherapistSchedulePage";
 
 const App = () => {
   return (
@@ -58,6 +60,14 @@ const App = () => {
             <Route path={PagePath.PROFILE} element={<Profile />} />
             <Route path={PagePath.BOOKING} element={<BookingListTable />} />
             <Route path={PagePath.BOOKING_DETAIL} element={<BookingDetail />} />
+            <Route
+              path={PagePath.SCHEDULE_FOR_STAFF_MANAGEMENT}
+              element={<ScheduleCalendarPage />}
+            />
+            <Route
+              path={PagePath.SCHEDULE_FOR_THERAPIST}
+              element={<ScheduleCalendarManagementPage />}
+            />
           </Route>
           <Route element={<NavbarMenu />}>
             <Route path={PagePath.HOME_PAGE} element={<HomePage />} />
