@@ -498,6 +498,7 @@ public partial class SkincareBookingSystemContext : DbContext
             entity.Property(e => e.Image)
                 .HasMaxLength(255)
                 .HasColumnName("image");
+            entity.Property(e => e.Introduction).HasColumnName("introduction");
             entity.Property(e => e.SkintypeName)
                 .IsRequired()
                 .HasMaxLength(100)

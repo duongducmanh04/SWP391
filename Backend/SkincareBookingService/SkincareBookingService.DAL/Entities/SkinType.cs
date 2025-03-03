@@ -17,7 +17,13 @@ public partial class SkinType
 
     public string Status { get; set; }
 
-    public string ProsAndCons { get; set; }
+    public string Pros { get; set; }
+
+    public string Cons { get; set; }
+
+    public string SkincareGuide { get; set; }
+
+    public string Introduction { get; set; }
 
     public virtual ICollection<CustomerSurvey> CustomerSurveys { get; set; } = new List<CustomerSurvey>();
 
