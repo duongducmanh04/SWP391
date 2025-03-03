@@ -159,10 +159,29 @@ const SidebarMenu = () => {
             icon: <CalendarOutlined />,
             label: <Link to={PagePath.BOOKING}>Lịch đặt hẹn</Link>,
           },
+        ]
+      : []),
+    ...(user?.role === RoleCode.STAFF
+      ? [
           {
-            key: PagePath.SCHEDULE,
+            key: PagePath.SCHEDULE_FOR_STAFF_MANAGEMENT,
             icon: <CalendarOutlined />,
-            label: <Link to={PagePath.SCHEDULE}>Lịch làm việc</Link>,
+            label: (
+              <Link to={PagePath.SCHEDULE_FOR_STAFF_MANAGEMENT}>
+                Lịch làm việc
+              </Link>
+            ),
+          },
+        ]
+      : []),
+    ...(user?.role === RoleCode.THERAPIST
+      ? [
+          {
+            key: PagePath.SCHEDULE_FOR_THERAPIST,
+            icon: <CalendarOutlined />,
+            label: (
+              <Link to={PagePath.SCHEDULE_FOR_THERAPIST}>Lịch làm việc</Link>
+            ),
           },
         ]
       : []),

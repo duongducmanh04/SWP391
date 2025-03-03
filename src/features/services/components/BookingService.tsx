@@ -1,5 +1,14 @@
-import { useState } from "react";
-import { Card, Typography, Row, Col, Calendar, Button, message } from "antd";
+import { useState, useEffect } from "react";
+import {
+  Card,
+  Typography,
+  Row,
+  Col,
+  Calendar,
+  Button,
+  message,
+  Badge,
+} from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { Dayjs } from "dayjs";
 import dayjs from "dayjs";
@@ -25,7 +34,8 @@ const generateSlots = () => {
 };
 
 const SkincareBooking = () => {
-  const [selectedDate, setSelectedDate] = useState<string>("");
+  const today = dayjs().format("YYYY-MM-DD");
+  const [selectedDate, setSelectedDate] = useState<string>(today);
   const [selectedExpert, setSelectedExpert] = useState<number | null>(null);
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [slots] = useState<string[]>(generateSlots());
@@ -37,65 +47,45 @@ const SkincareBooking = () => {
   const { data: bookings } = useBookingss();
   const { data: bookedSlots } = useBookedSlot();
 
-  const today = dayjs().startOf("day");
+  useEffect(() => {
+    setSelectedDate(today);
+  }, [today]);
 
-  const formatDate = (dateString: string | undefined | null): string => {
-    if (!dateString) return "";
-    return dayjs(dateString).format("YYYY-MM-DD");
-  };
-
-  const getBookedSlotsForDate = (date: string): string[] => {
+  const getBookedSlotsForDate = (
+    date: string,
+    therapistId: number
+  ): string[] => {
     if (
       !bookedSlots ||
       !bookings ||
       bookedSlots.length === 0 ||
       bookings.length === 0
     ) {
-      console.warn("⚠️ API data not ready yet!");
       return [];
     }
-
-    console.log("🛠 Raw API Booked Slots:", bookedSlots);
-    console.log("🛠 Raw API Bookings:", bookings);
-
     const bookedTimes = bookedSlots
       .filter((slot) => {
         const booking = bookings.find((b) => b.bookingId === slot.bookingId);
 
-        if (!booking) {
-          console.warn("⚠️ No matching booking for slot:", slot);
-          return false;
-        }
+        if (!booking) return false;
 
-        const normalizedBookingDate = booking.date.split("T")[0]; // Extract YYYY-MM-DD
-        const normalizedSlotTime = dayjs(slot.time, ["h:mm A", "HH:mm"]).format(
-          "HH:mm"
-        );
-
-        console.log("📌 Checking Booking:", booking);
-        console.log("📆 Booking Date (API):", booking.date);
-        console.log("📆 Normalized Date:", normalizedBookingDate);
-        console.log("⏰ Slot Time:", slot.time, "| Status:", slot.status);
-
+        // const normalizedBookingDate = booking.date.split("T")[0];
         const isBooked =
-          normalizedBookingDate === date &&
-          slot.status === "Booked" &&
-          slot.time;
+          // normalizedBookingDate === date &&
+          slot.status === "Booked" && booking.skintherapistId === therapistId;
 
         if (isBooked) {
-          console.log("✅ Booked Slot Found:", normalizedSlotTime);
         }
 
         return isBooked;
       })
       .map((slot) => dayjs(slot.time, ["h:mm A", "HH:mm"]).format("HH:mm"));
 
-    console.log("🔴 Final Booked Slots for", date, ":", bookedTimes);
     return bookedTimes;
   };
 
-  const getMorningAndAfternoonRange = (date: string) => {
-    const bookedSlotsForDate = getBookedSlotsForDate(date);
+  const getMorningAndAfternoonRange = (date: string, therapistId: number) => {
+    const bookedSlotsForDate = getBookedSlotsForDate(date, therapistId);
 
     const availableSlots = slots.filter(
       (slot) => !bookedSlotsForDate.includes(slot)
@@ -122,18 +112,44 @@ const SkincareBooking = () => {
 
   const dateCellRender = (value: Dayjs) => {
     const date = value.format("YYYY-MM-DD");
-    const { morningRange, afternoonRange } = getMorningAndAfternoonRange(date);
+
+    let morningAvailable = true;
+    let afternoonAvailable = true;
+
+    if (selectedExpert) {
+      const therapistAvailability = getMorningAndAfternoonRange(
+        date,
+        selectedExpert
+      );
+      morningAvailable = therapistAvailability.morningRange !== "Không có";
+      afternoonAvailable = therapistAvailability.afternoonRange !== "Không có";
+    }
 
     return (
-      <div>
-        {morningRange !== "Không có" && (
-          <div>
-            <div>{morningRange}</div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "start",
+          paddingLeft: "5px",
+        }}
+      >
+        {morningAvailable && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "4px",
+            }}
+          >
+            <Badge color="#52c41a" />
+            <span style={{ marginLeft: "6px", color: "black" }}>Sáng</span>
           </div>
         )}
-        {afternoonRange !== "Không có" && (
-          <div style={{ marginTop: "5px" }}>
-            <div>{afternoonRange}</div>
+        {afternoonAvailable && (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Badge color="#52c41a" />
+            <span style={{ marginLeft: "6px", color: "black" }}>Chiều</span>
           </div>
         )}
       </div>
@@ -281,9 +297,17 @@ const SkincareBooking = () => {
             }}
           >
             <Calendar
-              cellRender={dateCellRender}
-              disabledDate={disabledDate}
-              onSelect={(value) => setSelectedDate(value.format("YYYY-MM-DD"))}
+              cellRender={(value) => {
+                const date = value.format("YYYY-MM-DD");
+                const isPast = value.isBefore(dayjs(), "day");
+
+                return isPast ? null : dateCellRender(value);
+              }}
+              disabledDate={(current) => current.isBefore(dayjs(), "day")}
+              onSelect={(value) => {
+                const formattedDate = value.format("YYYY-MM-DD");
+                setSelectedDate(formattedDate);
+              }}
             />
           </Card>
         </Col>
@@ -329,16 +353,6 @@ const SkincareBooking = () => {
                     >
                       <Row justify="center" align="middle">
                         <Col span={24} style={{ textAlign: "center" }}>
-                          <img
-                            src={expert.image}
-                            alt={expert.name}
-                            style={{
-                              width: "80px",
-                              height: "80px",
-                              borderRadius: "50%",
-                              objectFit: "cover",
-                            }}
-                          />
                           <Title
                             level={4}
                             style={{ marginTop: "10px", color: "#3A5A40" }}
@@ -356,47 +370,56 @@ const SkincareBooking = () => {
                         justify="center"
                         style={{ marginTop: "10px" }}
                       >
-                        {slots.map((time) => {
-                          const isBooked =
-                            getBookedSlotsForDate(selectedDate).includes(time);
+                        {slots
+                          .filter((time) => {
+                            const hour = dayjs(time, "HH:mm").hour();
+                            return hour < 12 || hour >= 13;
+                          })
+                          .map((time) => {
+                            const isBooked = getBookedSlotsForDate(
+                              selectedDate,
+                              expert.skintherapistId
+                            ).includes(time);
 
-                          return (
-                            <Col key={time} xs={8} sm={8} md={8}>
-                              <Button
-                                type={
-                                  selectedExpert === expert.skintherapistId &&
-                                  selectedTime === time
-                                    ? "primary"
-                                    : "default"
-                                }
-                                onClick={() =>
-                                  handleSelectExpert(
-                                    expert.skintherapistId,
-                                    time
-                                  )
-                                }
-                                disabled={isBooked}
-                                style={{
-                                  width: "100%",
-                                  borderRadius: "20px",
-                                  fontSize: "14px",
-                                  padding: "8px 16px",
-                                  transition: "all 0.3s ease-in-out",
-                                  backgroundColor: isBooked
-                                    ? "#ff4d4f"
-                                    : "white",
-                                  color: isBooked ? "white" : "#3A5A40",
-                                  border: isBooked
-                                    ? "1px solid #ff7875"
-                                    : "1px solid #A7C957",
-                                  cursor: isBooked ? "not-allowed" : "pointer",
-                                }}
-                              >
-                                {time}
-                              </Button>
-                            </Col>
-                          );
-                        })}
+                            return (
+                              <Col key={time} xs={8} sm={8} md={8}>
+                                <Button
+                                  type={
+                                    selectedExpert === expert.skintherapistId &&
+                                    selectedTime === time
+                                      ? "primary"
+                                      : "default"
+                                  }
+                                  onClick={() =>
+                                    handleSelectExpert(
+                                      expert.skintherapistId,
+                                      time
+                                    )
+                                  }
+                                  disabled={isBooked}
+                                  style={{
+                                    width: "100%",
+                                    borderRadius: "20px",
+                                    fontSize: "14px",
+                                    padding: "8px 16px",
+                                    transition: "all 0.3s ease-in-out",
+                                    backgroundColor: isBooked
+                                      ? "#ff4d4f"
+                                      : "white",
+                                    color: isBooked ? "white" : "#3A5A40",
+                                    border: isBooked
+                                      ? "1px solid #ff7875"
+                                      : "1px solid #A7C957",
+                                    cursor: isBooked
+                                      ? "not-allowed"
+                                      : "pointer",
+                                  }}
+                                >
+                                  {time}
+                                </Button>
+                              </Col>
+                            );
+                          })}
                       </Row>
                     </Card>
                   ))}
@@ -427,8 +450,9 @@ const SkincareBooking = () => {
                   <Button
                     type="primary"
                     icon={<CheckCircleOutlined />}
-                    // onClick={() => message.success("Đặt lịch thành công")}
-                    onClick={handleConfirmBooking}
+                    onClick={() => {
+                      message.success("Đặt lịch thành công");
+                    }}
                     style={{
                       backgroundColor: "#A7C957",
                       border: "none",

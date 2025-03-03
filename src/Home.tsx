@@ -41,7 +41,7 @@ const config = {
   colorField: "type",
   label: {
     visible: true,
-    type: "outer",
+    // type: "outer",
     offset: 20,
   },
 };
