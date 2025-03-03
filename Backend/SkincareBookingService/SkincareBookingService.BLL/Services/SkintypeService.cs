@@ -20,10 +20,14 @@ namespace SkincareBookingService.BLL.Services
             return skintypes.Select(s => new SkintypeDTO
             {
                 SkintypeId = s.SkintypeId,
+                SkintypeName = s.SkintypeName,
+                Introduction = s.Introduction,
                 Description = s.Description,
+                SkincareGuide = s.SkincareGuide,
                 Image = s.Image,
                 Status = s.Status,
-                ProsAndCons = s.ProsAndCons,
+                Pros = s.Pros,
+                Cons = s.Cons,
             }).ToList();
         }
     }

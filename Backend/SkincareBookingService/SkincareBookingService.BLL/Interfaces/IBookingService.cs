@@ -23,6 +23,10 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<bool> UpdateBookingServiceAsync(int bookingId, string serviceName); 
 
+        Task<bool> UpdateBookingAmountAsync(int bookingId, decimal amount);
+
+        Task<bool> UpdateBookingSkintherapistAsync(int bookingId, int skintherapistId);
+
         Task<bool> CreateBooking(PostBookingDTO booking, int slotId);
     }
 }
