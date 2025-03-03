@@ -107,5 +107,18 @@ namespace SkincareBookingService.BLL.Services
             await _scheduleRepository.SaveChangesAsync();
             return true;
         }
+
+        public async Task<DateTime> GetDateBySlotId(int slotId)
+        {
+            Schedule? schedule = await _scheduleRepository.Query()
+                .Where(s => s.SlotId == slotId)
+                .FirstOrDefaultAsync();
+            if(schedule == null)
+            {
+                throw new Exception("Schedule not found");
+            }
+
+            return schedule.Date;
+        }
     }
 }
