@@ -43,7 +43,7 @@ const useAuthStore = create<AuthState>((set) => {
         const data = response.data;
         if (data.token) {
           const decoded = jwtDecode<{
-            nameid: string;
+            nameid: number;
             unique_name: string;
             role: string;
           }>(data.token);
