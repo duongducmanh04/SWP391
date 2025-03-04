@@ -4,9 +4,6 @@ using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.Core.Constants;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SkincareBookingService.BLL.Services
 {
@@ -14,11 +11,14 @@ namespace SkincareBookingService.BLL.Services
     {
         private readonly IGenericRepository<Booking> _bookingRepository;
         private readonly IGenericRepository<Slot> _slotRepository;
-
-        public BookingService(IGenericRepository<Booking> bookingRepository, IGenericRepository<Slot> genericRepository)
+        private readonly IGenericRepository<Service> _serviceRepository;
+        private readonly IGenericRepository<Schedule> _scheduleRepository;
+        public BookingService(IGenericRepository<Booking> bookingRepository, IGenericRepository<Slot> genericRepository, IGenericRepository<Service> serviceRepository, IGenericRepository<Schedule> scheduleRepository)
         {
             _bookingRepository = bookingRepository;
             _slotRepository = genericRepository;
+            _serviceRepository = serviceRepository;
+            _scheduleRepository = scheduleRepository;
         }
 
         public async Task<List<Booking>> GetBookingsAsync()
@@ -91,15 +91,27 @@ namespace SkincareBookingService.BLL.Services
             newBooking.CustomerId = booking.CustomerId;
             newBooking.Location = booking.Location;
             newBooking.CreateAt = DateTime.Now;
-            newBooking.Status = booking.Status;
+            newBooking.Status = BookingStatus.Booked.ToString();
             newBooking.Amount = booking.Amount;
             newBooking.SkintherapistId = booking.SkintherapistId;
+            //Add date from slot
+            newBooking.Date = await _scheduleRepository.Query()
+                .Where(s => s.SlotId == slotId)
+                .Select(s => s.Date.Value)
+                .FirstOrDefaultAsync();
+            //Add service name
+            newBooking.ServiceName = await _serviceRepository.Query()
+                .Where(s => s.ServiceId == booking.ServiceId)
+                .Select(s => s.Name)
+                .FirstOrDefaultAsync();
 
             await _bookingRepository.AddAsync(newBooking);
             await _bookingRepository.SaveChangesAsync();
 
+            //update slot
             slot.BookingId = newBooking.BookingId;
             slot.Status = SlotStatus.Booked.ToString();
+
             await _slotRepository.UpdateAsync(slot);
             await _slotRepository.SaveChangesAsync();
             

@@ -7,7 +7,7 @@ using SkincareBookingService.BLL.Interfaces;
 public class BookingController : ControllerBase
 {
     private readonly IBookingService _bookingService;
-    private readonly ISlotService _slotService; 
+    private readonly ISlotService _slotService;
 
     public BookingController(IBookingService bookingService, ISlotService slotService)
     {

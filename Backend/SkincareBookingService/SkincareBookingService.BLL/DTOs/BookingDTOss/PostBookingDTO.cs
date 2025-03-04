@@ -7,5 +7,6 @@
         public string Status { get; set; } = "booked";
         public decimal? Amount { get; set; }
         public int SkintherapistId { get; set; }
+        public int ServiceId { get; set; }
     }
 }
