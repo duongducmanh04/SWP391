@@ -74,6 +74,7 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.PRICE_SERVICE,
         PagePath.QUIZ,
         PagePath.SKIN_TYPE,
+        PagePath.CUSTOMER_INFORMATION,
       ],
       Manager: [],
     };

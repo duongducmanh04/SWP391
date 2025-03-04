@@ -34,6 +34,7 @@ import BookingListTable from "./features/booking/components/BookingListTable";
 import SkinType from "./pages/SkinTypePage";
 import BookingDetail from "./features/booking/components/BookingDetail";
 import CompleteBookingPage from "./pages/CompleteResult";
+import CustomerInformation from "./pages/CustomerInformation";
 
 const App = () => {
   return (
@@ -90,6 +91,10 @@ const App = () => {
             <Route
               path={PagePath.COMPLETE_RESULT}
               element={<CompleteBookingPage />}
+            />
+            <Route
+              path={PagePath.CUSTOMER_INFORMATION}
+              element={<CustomerInformation />}
             />
           </Route>
         </Routes>

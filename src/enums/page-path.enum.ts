@@ -31,6 +31,7 @@ export enum PagePath {
   SCHEDULE = "/Home/Schedule",
   SCHEDULE_DETAIL = "/Home/Schedule/:scheduleId",
   ROOT = "/",
+  CUSTOMER_INFORMATION = "/CustomerInformation",
   // TICKET_MANAGEMENT = "/ticket-management",
   // TIMEKEEPING_DETAIL = "/timekeeping/:code/detail",
   // TIMEKEEPING_MANAGEMENT = "/timekeeping",
