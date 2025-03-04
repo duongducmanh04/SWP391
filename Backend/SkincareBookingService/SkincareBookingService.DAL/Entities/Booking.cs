@@ -27,7 +27,7 @@ public partial class Booking
 
     public string ServiceName { get; set; }
 
-    public int? ServiceId { get; set; }
+    public int ServiceId { get; set; }
 
     public virtual Customer Customer { get; set; }
 
