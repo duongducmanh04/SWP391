@@ -36,7 +36,7 @@ import BookingDetail from "./features/booking/components/BookingDetail";
 import CompleteBookingPage from "./pages/CompleteResult";
 import ScheduleCalendarPage from "./features/schedule/page/SchedulePage";
 import ScheduleCalendarManagementPage from "./features/schedule/page/TherapistSchedulePage";
-
+import CustomerInformation from "./pages/CustomerInformation";
 const App = () => {
   return (
     <Router>
