@@ -125,6 +125,7 @@ public partial class SkincareBookingSystemContext : DbContext
             entity.Property(e => e.Location)
                 .HasMaxLength(255)
                 .HasColumnName("location");
+            entity.Property(e => e.ServiceId).HasColumnName("serviceId");
             entity.Property(e => e.ServiceName)
                 .HasMaxLength(255)
                 .HasColumnName("serviceName");
@@ -277,10 +278,6 @@ public partial class SkincareBookingSystemContext : DbContext
 
             entity.Property(e => e.AnswerId).HasColumnName("answerId");
             entity.Property(e => e.Answer).HasColumnName("answer");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime")
-                .HasColumnName("createdAt");
             entity.Property(e => e.CustomerId).HasColumnName("customerId");
             entity.Property(e => e.QuizquestionId).HasColumnName("quizquestionId");
             entity.Property(e => e.ServiceImpact)
@@ -313,10 +310,6 @@ public partial class SkincareBookingSystemContext : DbContext
             entity.Property(e => e.Content)
                 .IsRequired()
                 .HasColumnName("content");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime")
-                .HasColumnName("createdAt");
             entity.Property(e => e.QuestionsId).HasColumnName("questionsId");
 
             entity.HasOne(d => d.Questions).WithMany(p => p.QuizQuestions)
@@ -331,10 +324,6 @@ public partial class SkincareBookingSystemContext : DbContext
             entity.ToTable("QuizQuestionSet");
 
             entity.Property(e => e.QuestionsId).HasColumnName("questionsId");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime")
-                .HasColumnName("createdAt");
             entity.Property(e => e.Title)
                 .IsRequired()
                 .HasMaxLength(255)

@@ -19,8 +19,6 @@ public partial class QuizAnswer
 
     public string ServiceImpact { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
-
     public virtual Customer Customer { get; set; }
 
     public virtual ICollection<CustomerSurveyAnswer> CustomerSurveyAnswers { get; set; } = new List<CustomerSurveyAnswer>();

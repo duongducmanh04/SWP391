@@ -11,8 +11,6 @@ public partial class QuizQuestionSet
 
     public string Title { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
-
     public virtual ICollection<CustomerSurvey> CustomerSurveys { get; set; } = new List<CustomerSurvey>();
 
     public virtual ICollection<QuizQuestion> QuizQuestions { get; set; } = new List<QuizQuestion>();

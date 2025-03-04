@@ -28,7 +28,6 @@ namespace SkincareBookingService.BLL.Services
                 QuizquestionId = q.QuizquestionId,
                 Content = q.Content,
                 QuestionsId = q.QuestionsId,
-                CreatedAt = q.CreatedAt,
                 QuizAnswers = q.QuizAnswers.Select(a => new QuizAnswerDTO
                 {
                     AnswerId = a.AnswerId,
@@ -36,8 +35,7 @@ namespace SkincareBookingService.BLL.Services
                     QuizquestionId = a.QuizquestionId,
                     SkintypeId = a.SkintypeId,
                     Answer = a.Answer,
-                    ServiceImpact = a.ServiceImpact,
-                    CreatedAt = a.CreatedAt
+                    ServiceImpact = a.ServiceImpact
                 }).ToList()
             }).ToList();
         }
@@ -56,7 +54,6 @@ namespace SkincareBookingService.BLL.Services
                 QuizquestionId = quizQuestion.QuizquestionId,
                 Content = quizQuestion.Content,
                 QuestionsId = quizQuestion.QuestionsId,
-                CreatedAt = quizQuestion.CreatedAt,
                 QuizAnswers = quizQuestion.QuizAnswers.Select(a => new QuizAnswerDTO
                 {
                     AnswerId = a.AnswerId,
@@ -64,8 +61,7 @@ namespace SkincareBookingService.BLL.Services
                     QuizquestionId = a.QuizquestionId,
                     SkintypeId = a.SkintypeId,
                     Answer = a.Answer,
-                    ServiceImpact = a.ServiceImpact,
-                    CreatedAt = a.CreatedAt
+                    ServiceImpact = a.ServiceImpact
                 }).ToList()
             };
         }
