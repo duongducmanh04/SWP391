@@ -56,7 +56,7 @@ namespace SkincareBookingService.BLL.Services
                 scheduleDTO.ScheduleId = schedule.ScheduleId;
                 scheduleDTO.SkinTherapistId = schedule.SkinTherapistId;
                 scheduleDTO.SlotId = schedule.SlotId;
-                scheduleDTO.Date = schedule.Date;
+                scheduleDTO.Date = (DateTime)schedule.Date;
                 scheduleDTO.SkinTherapist = schedule.SkinTherapist;
                 scheduleDTO.Slot = schedule.Slot;
             }
@@ -118,7 +118,7 @@ namespace SkincareBookingService.BLL.Services
                 throw new Exception("Schedule not found");
             }
 
-            return schedule.Date;
+            return (DateTime)schedule.Date;
         }
     }
 }

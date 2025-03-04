@@ -13,8 +13,6 @@ public partial class QuizQuestion
 
     public int? QuestionsId { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
-
     public virtual QuizQuestionSet Questions { get; set; }
 
     public virtual ICollection<QuizAnswer> QuizAnswers { get; set; } = new List<QuizAnswer>();

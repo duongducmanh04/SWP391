@@ -27,6 +27,8 @@ public partial class Booking
 
     public string ServiceName { get; set; }
 
+    public int? ServiceId { get; set; }
+
     public virtual Customer Customer { get; set; }
 
     public virtual SkinTherapist Skintherapist { get; set; }
