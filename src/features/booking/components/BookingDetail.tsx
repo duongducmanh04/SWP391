@@ -30,6 +30,7 @@ import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
 import { TherapistDto } from "../../skin_therapist/dto/get-therapist.dto";
 import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { RoleCode } from "../../../enums/role.enum";
+import { Status } from "../../../enums/status-booking";
 
 const BookingDetail = () => {
   const { bookingId } = useParams();
@@ -291,7 +292,7 @@ const BookingDetail = () => {
           </Card>
         </Col>
       </Row>
-      {user?.role == RoleCode.STAFF && (
+      {booking?.status === Status.BOOKED && user?.role == RoleCode.STAFF && (
         <Card
           title="Chi tiết dịch vụ"
           style={{ marginBottom: 16, marginTop: 16 }}
