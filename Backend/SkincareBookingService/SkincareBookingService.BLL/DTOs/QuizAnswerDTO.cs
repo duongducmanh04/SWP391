@@ -8,6 +8,5 @@
         public int? SkintypeId { get; set; }
         public string Answer { get; set; }
         public string ServiceImpact { get; set; }
-        public DateTime? CreatedAt { get; set; }
     }
 }

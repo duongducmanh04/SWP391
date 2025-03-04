@@ -27,19 +27,16 @@ namespace SkincareBookingService.BLL.Services
             {
                 QuestionsId = q.QuestionsId,
                 Title = q.Title,
-                CreatedAt = q.CreatedAt,
                 QuizQuestions = q.QuizQuestions.Select(qq => new QuizQuestionDTO
                 {
                     QuizquestionId = qq.QuizquestionId,
                     Content = qq.Content,
                     QuestionsId = qq.QuestionsId,
-                    CreatedAt = qq.CreatedAt,
                     QuizAnswers = qq.QuizAnswers.Select(qa => new QuizAnswerDTO
                     {
                         //quizAnswerDTO has similar properties
                         AnswerId = qa.AnswerId,
-                        Answer = qa.Answer,
-                        CreatedAt = qa.CreatedAt
+                        Answer = qa.Answer
                     }).ToList()
                 }).ToList()
             }).ToList();
@@ -58,19 +55,16 @@ namespace SkincareBookingService.BLL.Services
             {
                 QuestionsId = quizQuestionSet.QuestionsId,
                 Title = quizQuestionSet.Title,
-                CreatedAt = quizQuestionSet.CreatedAt,
                 QuizQuestions = quizQuestionSet.QuizQuestions.Select(qq => new QuizQuestionDTO
                 {
                     QuizquestionId = qq.QuizquestionId,
                     Content = qq.Content,
                     QuestionsId = qq.QuestionsId,
-                    CreatedAt = qq.CreatedAt,
                     QuizAnswers = qq.QuizAnswers.Select(qa => new QuizAnswerDTO
                     {
                         //quizAnswerDTO has similar properties
                         AnswerId = qa.AnswerId,
                         Answer = qa.Answer,
-                        CreatedAt = qa.CreatedAt
                     }).ToList()
                 }).ToList()
             };
