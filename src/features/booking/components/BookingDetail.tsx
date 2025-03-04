@@ -40,7 +40,12 @@ const BookingDetail = () => {
   const { mutate: updateCancelled } = useCancelledBooking();
   const { mutate: updateDenied } = useDeniedBooking();
   const { mutate: updateFinished } = useFinishedBooking();
-  const { data: booking, isLoading, isError } = useBookingById(bookingId || "");
+  const {
+    data: booking,
+    isLoading,
+    isError,
+    refetch,
+  } = useBookingById(bookingId || "");
   const { data: service } = useServices();
   const { data: therapists } = useTherapists();
 
@@ -74,23 +79,58 @@ const BookingDetail = () => {
   }
 
   const handleCheckIn = async (bookingId: number) => {
-    updateCheckIn({ BookingId: bookingId });
+    updateCheckIn(
+      { BookingId: bookingId },
+      {
+        onSuccess: () => {
+          refetch();
+        },
+      }
+    );
   };
 
   const handleCompleted = async (bookingId: number) => {
-    updateCompleted({ BookingId: bookingId });
+    updateCompleted(
+      { BookingId: bookingId },
+      {
+        onSuccess: () => {
+          refetch();
+        },
+      }
+    );
   };
 
   const handleCancelled = async (bookingId: number) => {
-    updateCancelled({ BookingId: bookingId });
+    updateCancelled(
+      { BookingId: bookingId },
+      {
+        onSuccess: () => {
+          refetch();
+        },
+      }
+    );
   };
 
   const handleDenied = async (bookingId: number) => {
-    updateDenied({ BookingId: bookingId });
+    updateDenied(
+      { BookingId: bookingId },
+      {
+        onSuccess: () => {
+          refetch();
+        },
+      }
+    );
   };
 
   const handleFinished = async (bookingId: number) => {
-    updateFinished({ BookingId: bookingId });
+    updateFinished(
+      { BookingId: bookingId },
+      {
+        onSuccess: () => {
+          refetch();
+        },
+      }
+    );
   };
 
   const handleServiceChange = (value: string) => {
