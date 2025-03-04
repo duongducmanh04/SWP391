@@ -20,7 +20,9 @@ const ServiceDetail = () => {
   }
 
   const handleNavigate = () => {
-    navigate(PagePath.BOOKING_SERVICE);
+    navigate(PagePath.BOOKING_SERVICE, {
+      state: { amount: service.price, serviceName: service.name },
+    });
   };
 
   return (

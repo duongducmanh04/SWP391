@@ -2,27 +2,29 @@
 import { useEffect, useState } from "react";
 import { Table, Button, Space, Tooltip, Flex, Tabs } from "antd";
 import {
-  CheckCircleOutlined,
-  CloseCircleOutlined,
+  // CheckCircleOutlined,
+  // CloseCircleOutlined,
   EditOutlined,
-  PayCircleOutlined,
+  // PayCircleOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useBookings } from "../hooks/useGetBooked";
 import { useBookingss } from "../hooks/useGetBooking";
 import { useBookingStore } from "../hooks/useBookedStore";
-import { useCheckInBooking } from "../hooks/useCheckInBooking";
-import { useCompletedBooking } from "../hooks/useCompletedBooking";
-import { useCancelledBooking } from "../hooks/useCancelledBooking";
-import { useDeniedBooking } from "../hooks/useDeniedBooking";
+// import { useCheckInBooking } from "../hooks/useCheckInBooking";
+// import { useCompletedBooking } from "../hooks/useCompletedBooking";
+// import { useCancelledBooking } from "../hooks/useCancelledBooking";
+// import { useDeniedBooking } from "../hooks/useDeniedBooking";
 import { Status } from "../../../enums/status-booking";
-import { showActionConfirmModal } from "../../../components/ConfirmModal";
+// import { showActionConfirmModal } from "../../../components/ConfirmModal";
 import { useNavigate } from "react-router-dom";
 import { BookingDto } from "../dto/booking.dto";
 import { ColumnsType } from "antd/es/table";
 import StatusTag from "../../../components/TagStatus";
 import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { RoleCode } from "../../../enums/role.enum";
+import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
+import { TherapistDto } from "../../skin_therapist/dto/get-therapist.dto";
 
 const BookingListTable = () => {
   const {
@@ -35,14 +37,14 @@ const BookingListTable = () => {
     data: bookedData,
     isLoading: isLoadingBooked,
     error: errorBooked,
-    refetch: refetchBooked,
+    // refetch: refetchBooked,
   } = useBookings(Status.BOOKED);
 
   const {
     data: finishedData,
     isLoading: isLoadingFinished,
     error: errorFinished,
-    refetch: refetchFinished,
+    // refetch: refetchFinished,
   } = useBookings(Status.FINISHED);
 
   const {
@@ -69,15 +71,24 @@ const BookingListTable = () => {
     error: errorCompleted,
   } = useBookings(Status.COMPLETED);
 
+  const { data: therapistData } = useTherapists();
+
   const { setBookings } = useBookingStore();
-  const { mutate: updateCheckIn } = useCheckInBooking();
-  const { mutate: updateCompleted } = useCompletedBooking();
-  const { mutate: updateCancelled } = useCancelledBooking();
-  const { mutate: updateDenied } = useDeniedBooking();
+  // const { mutate: updateCheckIn } = useCheckInBooking();
+  // const { mutate: updateCompleted } = useCompletedBooking();
+  // const { mutate: updateCancelled } = useCancelledBooking();
+  // const { mutate: updateDenied } = useDeniedBooking();
   const navigate = useNavigate();
   const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
   const [activeTab, setActiveTab] = useState("all");
   const { user } = useAuthStore();
+
+  const therapistMap = new Map<number, TherapistDto>();
+  if (therapistData) {
+    therapistData.forEach((therapist) => {
+      therapistMap.set(therapist.skintherapistId, therapist);
+    });
+  }
 
   useEffect(() => {
     if (bookingData && !isLoadingBooking && !errorBooking) {
@@ -126,30 +137,30 @@ const BookingListTable = () => {
     setBookings,
   ]);
 
-  const handleConfirmAction = async (
-    action: "checkin" | "checkout" | "cancel" | "deny",
-    bookingId: number
-  ): Promise<void> => {
-    const actionFunctions = {
-      checkin: updateCheckIn,
-      checkout: updateCompleted,
-      cancel: updateCancelled,
-      deny: updateDenied,
-    };
+  // const handleConfirmAction = async (
+  //   action: "checkin" | "checkout" | "cancel" | "deny",
+  //   bookingId: number
+  // ): Promise<void> => {
+  //   const actionFunctions = {
+  //     checkin: updateCheckIn,
+  //     checkout: updateCompleted,
+  //     cancel: updateCancelled,
+  //     deny: updateDenied,
+  //   };
 
-    actionFunctions[action](
-      { BookingId: bookingId },
-      {
-        onSuccess: () => {
-          if (action === "checkin" || action === "cancel") {
-            refetchBooked();
-          } else {
-            refetchFinished();
-          }
-        },
-      }
-    );
-  };
+  //   actionFunctions[action](
+  //     { BookingId: bookingId },
+  //     {
+  //       onSuccess: () => {
+  //         if (action === "checkin" || action === "cancel") {
+  //           refetchBooked();
+  //         } else {
+  //           refetchFinished();
+  //         }
+  //       },
+  //     }
+  //   );
+  // };
 
   const handleTableChange = (pagination: any) => {
     setPagination(pagination);
@@ -175,7 +186,7 @@ const BookingListTable = () => {
       key: "bookingId",
     },
     {
-      title: "Ngày đặt",
+      title: "Ngày đặt làm",
       dataIndex: "date",
       key: "date",
       render: (text: string) => dayjs(text).format("DD/MM/YYYY HH:mm:ss"),
@@ -191,6 +202,15 @@ const BookingListTable = () => {
       key: "serviceName",
     },
     {
+      title: "Chuyên viên",
+      dataIndex: "skintherapistId",
+      key: "skintherapistId",
+      render: (therapistId: number) => {
+        const therapist = therapistMap.get(therapistId);
+        return therapist ? therapist.name : therapistId;
+      },
+    },
+    {
       title: "Tổng tiền",
       dataIndex: "amount",
       key: "amount",
@@ -200,24 +220,13 @@ const BookingListTable = () => {
       dataIndex: "status",
       key: "status",
       render: (status: string) => <StatusTag status={status} />,
-      //   {
-      //   const statusMap: Record<string, JSX.Element> = {
-      //     [Status.BOOKED]: <Tag color="blue">Booked</Tag>,
-      //     [Status.FINISHED]: <Tag color="lime">Finished</Tag>,
-      //     [Status.CHECK_IN]: <Tag color="gold">Check-In</Tag>,
-      //     [Status.COMPLETED]: <Tag color="green">Finished</Tag>,
-      //     [Status.DENIED]: <Tag color="red">Denied</Tag>,
-      //     [Status.CANCELLED]: <Tag color="error">Cancelled</Tag>,
-      //   };
-      //   return statusMap[status] || <Tag color="default">Unknown</Tag>;
-      // },
     },
     {
       title: "Thao tác",
       key: "actions",
       render: (_: unknown, record: { bookingId: number; status: string }) => (
         <Space>
-          {record.status === Status.BOOKED && (
+          {/* {record.status === Status.BOOKED && (
             <Tooltip title="Check-in">
               <Button
                 type="primary"
@@ -247,14 +256,14 @@ const BookingListTable = () => {
                 }
               />
             </Tooltip>
-          )}
+          )} */}
           <Tooltip title="Chi tiết">
             <Button
               icon={<EditOutlined />}
               onClick={() => handleNavigate(record.bookingId)}
             />
           </Tooltip>
-          {record.status === Status.BOOKED && (
+          {/* {record.status === Status.BOOKED && (
             <Tooltip title="Hủy">
               <Button
                 danger
@@ -269,7 +278,7 @@ const BookingListTable = () => {
                 }
               />
             </Tooltip>
-          )}
+          )} */}
         </Space>
       ),
     },

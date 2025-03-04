@@ -43,13 +43,13 @@ const useAuthStore = create<AuthState>((set) => {
         const data = response.data;
         if (data.token) {
           const decoded = jwtDecode<{
-            accountId: string;
+            nameid: number;
             unique_name: string;
             role: string;
           }>(data.token);
 
           const user = {
-            accountId: parseInt(decoded.accountId, 10),
+            accountId: decoded.nameid,
             username: decoded.unique_name,
             role: decoded.role,
           };

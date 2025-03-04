@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { Card, Button, Radio, message, Typography, Divider, Table } from "antd";
 import { Question, SkinCareProcess } from "../dto/quiz.dto";
 import "../../../style/Quiz.css";
+import { useQuizQuestion } from "../hooks/useGetQuizQuestion";
+import { useQuizAnswer } from "../hooks/useGetQuizAnswer";
 
 const { Title, Text } = Typography;
 
@@ -129,6 +132,16 @@ const skinCareProcesses: SkinCareProcess[] = [
 // ];
 
 const QuizTest = () => {
+  const {
+    data: questionData,
+    isLoading: isLoadingQuestion,
+    error: errorQuestion,
+  } = useQuizQuestion();
+  const {
+    data: answerData,
+    isLoading: isLoadingAnswer,
+    error: errorAnswer,
+  } = useQuizAnswer();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedSkinTypes, setSelectedSkinTypes] = useState<string[]>([]);
   const [resultSkinType, setResultSkinType] = useState<string | null>(null);
@@ -189,7 +202,7 @@ const QuizTest = () => {
             value={selectedSkinTypes[currentQuestionIndex]}
             className="quiz-radio-group"
           >
-            {currentQuestion.options.map((option) => (
+            {currentQuestion.options.map((option: any) => (
               <Radio key={option.text} value={option.skinType}>
                 {option.text}
               </Radio>

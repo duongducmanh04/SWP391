@@ -2,7 +2,8 @@ import { PagePath } from "../enums/page-path.enum";
 import useAuthStore from "../features/authentication/hooks/useAuthStore";
 import { createContext, useEffect, type PropsWithChildren } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { App } from "antd";
+import { message } from "antd";
+import { jwtDecode } from "jwt-decode";
 
 type UserRole = "Customer" | "Manager" | "Staff" | "Therapist" | "Admin";
 
@@ -15,9 +16,26 @@ const AuthGuardContext = createContext<AuthGuardContextType>({});
 export function AuthGuardProvider(props: AuthGuardProviderProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { message } = App.useApp();
   const { children } = props;
-  const { user } = useAuthStore();
+  const { user, logout, token } = useAuthStore();
+
+  useEffect(() => {
+    if (token) {
+      try {
+        const decoded = jwtDecode<{ exp: number }>(token);
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        if (decoded.exp < currentTime) {
+          message.warning("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+          logout();
+          return;
+        }
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        logout();
+      }
+    }
+  }, [token, logout]);
 
   useEffect(() => {
     const publicPages: PagePath[] = [
@@ -57,11 +75,13 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.HOME,
         PagePath.BOOKING,
         PagePath.BOOKING_DETAIL.replace(":bookingId", ""),
+        PagePath.SCHEDULE_FOR_STAFF_MANAGEMENT,
       ],
       Therapist: [
         PagePath.HOME,
         PagePath.BOOKING,
         PagePath.BOOKING_DETAIL.replace(":bookingId", ""),
+        PagePath.SCHEDULE_FOR_THERAPIST,
       ],
       Customer: [
         PagePath.BLOG,
@@ -98,7 +118,7 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
     if (!publicPages.includes(currentPage as PagePath) && !isAllowed) {
       navigate(PagePath.FORBIDDEN, { replace: true });
     }
-  }, [user, location, message, navigate]);
+  }, [user, location, navigate]);
 
   return (
     <AuthGuardContext.Provider value={{}}>{children}</AuthGuardContext.Provider>
