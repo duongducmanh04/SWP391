@@ -89,6 +89,7 @@ namespace SkincareBookingService.BLL.Services
             Booking newBooking = new();
             //add property
             newBooking.CustomerId = booking.CustomerId;
+            newBooking.ServiceId = booking.ServiceId;
             newBooking.Location = booking.Location;
             newBooking.CreateAt = DateTime.Now;
             newBooking.Status = BookingStatus.Booked.ToString();
