@@ -5,5 +5,6 @@ export interface CreateBookingDto {
   amount: number;
   skintherapistId: number;
   slotId :number;
-  
+  serviceId :number;
+
 }

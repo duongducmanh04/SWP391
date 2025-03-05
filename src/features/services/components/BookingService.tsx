@@ -38,7 +38,7 @@ const SkincareBooking = () => {
   const { data: availableSlots } = useAvailableSlot(); 
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
   const { data: customers, isLoading, error } = useGetCustomers(); // ✅ Use custom hook
-
+  const { amount, serviceId } = location.state || {};
  
 
   useEffect(() => {
@@ -56,8 +56,8 @@ const SkincareBooking = () => {
   
     return availableSlots
       .filter((slot: any) => {
-        const slotDate = dayjs(slot.date).format("YYYY-MM-DD"); // Convert to YYYY-MM-DD format
-        return slot.status === "Available" && slotDate === selectedDate; // Match selected date
+        const slotDate = dayjs(slot.date).format("YYYY-MM-DD"); 
+        return slot.status === "Available" && slotDate === selectedDate; 
       })
       .map((slot) => ({
         time: dayjs(slot.time, ["h:mm A", "HH:mm"]).format("HH:mm"),
@@ -75,7 +75,7 @@ const SkincareBooking = () => {
   
 
 
-dayjs.extend(utc); // ✅ Enable UTC handling
+dayjs.extend(utc); 
 
 const handleConfirmBooking = async () => {
   if (!selectedExpert || !selectedTime || !selectedSlotId) { 
@@ -103,7 +103,6 @@ const handleConfirmBooking = async () => {
     return;
   }
 
-  console.log("✅ Matched Customer ID:", matchedCustomer.customerId);
 
   if (!selectedSlotId) {
     message.error("Lỗi: Không tìm thấy slot đã chọn!");
@@ -111,20 +110,24 @@ const handleConfirmBooking = async () => {
     return;
   }
 
+
   const bookingData: CreateBookingDto  = {
     customerId: matchedCustomer.customerId,
     location: "hcm",
-    amount: 50,
+    amount: amount,
+    serviceId : serviceId,
     skintherapistId: selectedExpert,
-    status: "booked",
+    status: "",
     slotId: selectedSlotId,
+
   };
   console.log("📦 Final Booking Data:", bookingData);
 
   console.log("📡 API Request URL:", `https://localhost:7071/api/Booking/create-booking?slotId=${selectedSlotId}`);
   console.log("📦 Request Body:", bookingData);
-  console.log("🛠 Debugging `createBooking()`:");
-  console.log("👉 `createBooking` exists:", typeof createBooking === "function");
+ 
+console.log("👉 `amount`:", amount);
+console.log("👉 `serviceId`:", serviceId);
 
   createBooking(bookingData, {
     onSuccess: (data) => {
@@ -137,6 +140,7 @@ const handleConfirmBooking = async () => {
     },
   });
 };
+
   return (
     <div style={{ backgroundColor: "#F1EBE4", borderRadius: "12px", textAlign: "center" }}>
       <Title level={2} style={{ color: "#3A5A40", fontSize: "32px", fontWeight: "bold", marginBottom: "40px" }}>
