@@ -62,6 +62,7 @@ const SkincareServices = () => {
                   type="primary"
                   icon={<ShoppingCartOutlined />}
                   key="book"
+                  style={{ background: "#af8d70" }}
                   onClick={() => handleNavigate(service.serviceId)}
                 >
                   Chi tiết
