@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SkincareBookingService.BLL.DTOs.CustomerSurveyDTOs;
 using SkincareBookingService.BLL.Interfaces;
 
 namespace SkincareBookingService.Controllers
@@ -32,6 +33,17 @@ namespace SkincareBookingService.Controllers
                 return NotFound("Survey not found");
             }
             return Ok(survey);
+        }
+
+        [HttpGet("recommendSkintype/{customerSurveyId}")]
+        public async Task<IActionResult> RecommendSkintype(int customerSurveyId)
+        {
+            var skinType = await _customerSurveyService.RecommendSkintypeAsync(customerSurveyId);
+            if (skinType == null)
+            {
+                return NotFound("Skin type not found");
+            }
+            return Ok(skinType);
         }
     }
 }
