@@ -1,4 +1,4 @@
-﻿using SkincareBookingService.BLL.DTOs;
+﻿using SkincareBookingService.BLL.DTOs.CustomerSurveyDTOs;
 
 namespace SkincareBookingService.BLL.Interfaces
 {
@@ -7,5 +7,7 @@ namespace SkincareBookingService.BLL.Interfaces
         Task<List<CustomerSurveyDTO>> GetAllCustomerSurveysAsync();
 
         Task<CustomerSurveyDTO> GetCustomerSurveyByIdAsync(int id);
+        Task<string> RecommendSkintypeAsync(int customerSurveyId);
+
     }
 }
