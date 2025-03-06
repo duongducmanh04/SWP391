@@ -11,13 +11,14 @@ namespace SkincareBookingService.BLL.Services
     {
         private readonly IGenericRepository<Schedule> _scheduleRepository;
         private readonly IGenericRepository<SkinTherapistService> _skinTherapistServiceRepository;
-        
+        private readonly IGenericRepository<Slot> _slotRepository;
 
-        public ScheduleService(IGenericRepository<Schedule> scheduleRepository, IGenericRepository<SkinTherapistService> skinTherapistServiceRepository)
+
+        public ScheduleService(IGenericRepository<Schedule> scheduleRepository, IGenericRepository<SkinTherapistService> skinTherapistServiceRepository, IGenericRepository<Slot> slotRepository)
         {
             _scheduleRepository = scheduleRepository;
             _skinTherapistServiceRepository = skinTherapistServiceRepository;
-            
+            _slotRepository = slotRepository;
         }
 
         public async Task<List<ScheduleDTO>> GetAllBySkinTherapistId(int skinTherapistId)
@@ -117,8 +118,8 @@ namespace SkincareBookingService.BLL.Services
             {
                 throw new Exception("Schedule not found");
             }
-
             return (DateTime)schedule.Date;
         }
+        
     }
 }

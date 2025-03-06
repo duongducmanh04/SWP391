@@ -81,9 +81,12 @@ namespace SkincareBookingService.BLL.Services
                 .Where(s => s.SlotId == slotId)
                 .FirstOrDefaultAsync();
 
-            if (slot == null || slot.BookingId != null)
+            //Check slot availability
+            if (slot == null 
+                || slot.BookingId != null 
+                || slot.Status != SlotStatus.Available.ToString())
             {
-                return false;
+                throw new Exception("Invalid slot: Slot is either null, already booked, or not available.");
             }
 
             Booking newBooking = new();
@@ -95,11 +98,15 @@ namespace SkincareBookingService.BLL.Services
             newBooking.Status = BookingStatus.Booked.ToString();
             newBooking.Amount = booking.Amount;
             newBooking.SkintherapistId = booking.SkintherapistId;
+
+            
             //Add date from slot
             newBooking.Date = await _scheduleRepository.Query()
                 .Where(s => s.SlotId == slotId)
                 .Select(s => s.Date.Value)
                 .FirstOrDefaultAsync();
+
+
             //Add service name
             newBooking.ServiceName = await _serviceRepository.Query()
                 .Where(s => s.ServiceId == booking.ServiceId)
