@@ -29,6 +29,8 @@ import { useUpdateServiceAmount } from "../hooks/useUpdateServiceAmount";
 import { useServices } from "../../services/hooks/useGetService";
 import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
 import { TherapistDto } from "../../skin_therapist/dto/get-therapist.dto";
+import { useCustomers } from "../../user/hook/useGetCustomer";
+import { CustomerDto } from "../../user/dto/customer.dto";
 import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { RoleCode } from "../../../enums/role.enum";
 import { Status } from "../../../enums/status-booking";
@@ -53,6 +55,7 @@ const BookingDetail = () => {
   } = useBookingById(bookingId || "");
   const { data: service } = useServices();
   const { data: therapists } = useTherapists();
+  const { data: customers } = useCustomers();
 
   const { mutate: updateServiceName } = useUpdateServiceName();
   const { mutate: updateServiceAmount } = useUpdateServiceAmount();
@@ -80,6 +83,13 @@ const BookingDetail = () => {
   if (therapists) {
     therapists.forEach((therapist) => {
       therapistMap.set(therapist.skintherapistId, therapist);
+    });
+  }
+
+  const customerMap = new Map<number, CustomerDto>();
+  if (customers) {
+    customers.forEach((customer) => {
+      customerMap.set(customer.customerId, customer);
     });
   }
 
@@ -299,9 +309,9 @@ const BookingDetail = () => {
           <Card>
             <Descriptions title="Thông tin chung" bordered column={1}>
               <Descriptions.Item label="Khách hàng">
-                {booking.customerId}
+                {customerMap.get(booking.customerId)?.name}
               </Descriptions.Item>
-              <Descriptions.Item label="Điện thoại">
+              <Descriptions.Item label="Tổng tiền">
                 {booking.amount}
               </Descriptions.Item>
               <Descriptions.Item label="Địa chỉ">

@@ -25,6 +25,8 @@ import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { RoleCode } from "../../../enums/role.enum";
 import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
 import { TherapistDto } from "../../skin_therapist/dto/get-therapist.dto";
+import { useCustomers } from "../../user/hook/useGetCustomer";
+import { CustomerDto } from "../../user/dto/customer.dto";
 
 const BookingListTable = () => {
   const {
@@ -72,6 +74,7 @@ const BookingListTable = () => {
   } = useBookings(Status.COMPLETED);
 
   const { data: therapistData } = useTherapists();
+  const { data: customerData } = useCustomers();
 
   const { setBookings } = useBookingStore();
   // const { mutate: updateCheckIn } = useCheckInBooking();
@@ -87,6 +90,13 @@ const BookingListTable = () => {
   if (therapistData) {
     therapistData.forEach((therapist) => {
       therapistMap.set(therapist.skintherapistId, therapist);
+    });
+  }
+
+  const customerMap = new Map<number, CustomerDto>();
+  if (customerData) {
+    customerData.forEach((customer) => {
+      customerMap.set(customer.customerId, customer);
     });
   }
 
@@ -195,6 +205,10 @@ const BookingListTable = () => {
       title: "Khách hàng",
       dataIndex: "customerId",
       key: "customerId",
+      render: (customerId: number) => {
+        const customer = customerMap.get(customerId);
+        return customer ? customer.name : customerId;
+      },
     },
     {
       title: "Dịch vụ",
