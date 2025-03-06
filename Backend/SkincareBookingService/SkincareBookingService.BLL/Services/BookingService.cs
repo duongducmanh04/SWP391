@@ -148,5 +148,20 @@ namespace SkincareBookingService.BLL.Services
             await _bookingRepository.SaveChangesAsync();
             return true;
         }
+
+        public async Task<List<Booking>> GetBookingByCustomerIdAsync(int customerId)
+        {
+            var bookings = await _bookingRepository
+                .Query()
+                .Where(b => b.CustomerId == customerId)
+                .ToListAsync();
+
+            if (bookings == null || !bookings.Any())
+            {
+                return new List<Booking>();
+            }
+
+            return bookings;
+        }
     }
 }

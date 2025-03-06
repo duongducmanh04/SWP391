@@ -37,5 +37,16 @@ namespace SkincareBookingService.Controllers
             }
             return Ok(customer);
         }
+
+        [HttpGet("getCustomerBookingHistory/{customerId}")]
+        public async Task<IActionResult> GetCustomerBookingHistory(int customerId)
+        {
+            var bookings = await _customerService.GetCustomerBookingHistoryAsync(customerId);
+            if (bookings == null || bookings.Count == 0)
+            {
+                return NotFound("No bookings found");
+            }
+            return Ok(bookings);
+        }
     }
 }
