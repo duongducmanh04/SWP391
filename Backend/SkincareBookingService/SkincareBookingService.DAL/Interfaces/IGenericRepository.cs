@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using SkincareBookingService.DAL.Entities;
+using System.Linq.Expressions;
 
 namespace SkincareBookingService.DAL.Interfaces
 {
@@ -14,5 +15,7 @@ namespace SkincareBookingService.DAL.Interfaces
         Task DeleteAsync(T entity);
         Task SaveChangesAsync();
         Task<IEnumerable<object>> GetListAsync(Func<object, bool> value);
+
+        Task<List<Account>> FindAsync(Expression<Func<Account, bool>> predicate, string include = "");
     }
 }

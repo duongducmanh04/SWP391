@@ -14,6 +14,46 @@ namespace SkincareBookingService.BLL.Services
             _accountRepository = accountRepository;
         }
 
+        public async Task<List<AccountDTO>> GetAccountByIdAndRoleAsync(int accountId, string role)
+        {
+            // Chuyển role về dạng chữ hoa chữ cái đầu để khớp với DB
+            role = char.ToUpper(role[0]) + role.Substring(1).ToLower();
+
+            var accounts = await _accountRepository
+                .FindAsync(a => a.AccountId == accountId && a.Role == role, include: "Customers,SkinTherapists");
+
+            return accounts.Select(a => new AccountDTO
+            {
+                AccountId = a.AccountId,
+                AccountName = a.AccountName,
+                Role = a.Role,
+                Active = a.Active,
+                Customer = a.Role == "Customer" ? a.Customers?.Select(c => new CustomerDTO
+                {
+                    CustomerId = c.CustomerId,
+                    Name = c.Name,
+                    SkintypeId = c.SkintypeId,
+                    AccountId = c.AccountId,
+                    PhoneNumber = c.PhoneNumber,
+                    Image = c.Image,
+                    Email = c.Email
+                }).ToList() : null,
+
+                SkinTherapists = a.Role == "Skintherapist" ? a.SkinTherapists?.Select(st => new SkinTherapistDTO
+                {
+                    SkintherapistId = st.SkintherapistId,
+                    Name = st.Name,
+                    Speciality = st.Speciality,
+                    Email = st.Email,
+                    Experience = st.Experience,
+                    Image = st.Image,
+                    AccountId = st.AccountId,
+                    Degree = st.Degree
+                }).ToList() : null
+            }).ToList();
+        }
+
+
         public async Task<AccountDTO> GetAccountByIdAsync(int accountId)
         {
             var account = (await _accountRepository.FindAsync(a => a.AccountId == accountId)).FirstOrDefault();

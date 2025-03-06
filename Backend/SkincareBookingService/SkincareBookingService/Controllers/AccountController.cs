@@ -48,5 +48,20 @@ namespace SkincareBookingService.Controllers
             }
             return Ok(accounts);
         }
+
+        [HttpGet("getAccountByIdAndRole/{accountId}/{role}")]
+        public async Task<IActionResult> GetAccountByIdAndRole(int accountId, string role)
+        {
+            var accounts = await _accountService.GetAccountByIdAndRoleAsync(accountId, role);
+            if (accountId <= 0)
+            {
+                return NotFound("AccountId should be >0");
+            }
+            else if (accounts == null || accounts.Count == 0)
+            {
+                return NotFound("No accounts found with that id and role");
+            }
+            return Ok(accounts);
+        }
     }
 }
