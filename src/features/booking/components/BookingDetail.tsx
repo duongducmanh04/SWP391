@@ -6,6 +6,7 @@ import {
   Row,
   Col,
   Breadcrumb,
+  Typography,
   message,
   Select,
   Button,
@@ -31,6 +32,8 @@ import { TherapistDto } from "../../skin_therapist/dto/get-therapist.dto";
 import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { RoleCode } from "../../../enums/role.enum";
 import { Status } from "../../../enums/status-booking";
+import TextArea from "antd/es/input/TextArea";
+const { Title } = Typography;
 
 const BookingDetail = () => {
   const { bookingId } = useParams();
@@ -330,6 +333,12 @@ const BookingDetail = () => {
               {booking.status}
             </p>
           </Card>
+          {user?.role == RoleCode.THERAPIST && (
+            <Card style={{ marginTop: "10px" }}>
+              <Title level={4}>Ghi chú</Title>
+              <TextArea rows={4}></TextArea>
+            </Card>
+          )}
         </Col>
       </Row>
       {booking?.status === Status.BOOKED && user?.role == RoleCode.STAFF && (
