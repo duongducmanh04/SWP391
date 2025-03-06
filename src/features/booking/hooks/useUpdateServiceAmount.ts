@@ -15,7 +15,7 @@ export const useUpdateServiceAmount = () => {
       amount,
     }: MutationVariables): Promise<void> => {
       await axios.put(
-        `https://localhost:7071/api/Booking/amount/${bookingId}?amount=${amount}`
+        `http://skincare-sbs.southeastasia.azurecontainer.io:8080/api/Booking/amount/${bookingId}?amount=${amount}`
       );
     },
     onSuccess: () => {

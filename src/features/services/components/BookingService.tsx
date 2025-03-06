@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -11,11 +13,17 @@ import {
 } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
 import { useCreateBooking } from "../../booking/hooks/useCreateBooking";
 import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { useAvailableSlot } from "../hooks/useAvailableSlot";
+import utc from "dayjs/plugin/utc";
+import { useCustomers } from "../../user/hook/useGetCustomer";
+import { CreateBookingDto } from "../../booking/dto/create-booking.dto";
+import { PagePath } from "../../../enums/page-path.enum";
+
+dayjs.extend(utc);
 
 const { Title, Text } = Typography;
 
@@ -25,23 +33,35 @@ const SkincareBooking = () => {
   const [selectedExpert, setSelectedExpert] = useState<number | null>(null);
   const [selectedTime, setSelectedTime] = useState<string>("");
   const location = useLocation();
-  const { amount, serviceName } = location.state || {};
+  const navigate = useNavigate();
   const { mutate: createBooking } = useCreateBooking();
   const { user } = useAuthStore();
   const { data: therapists } = useTherapists();
   const { data: availableSlots } = useAvailableSlot();
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
+  const { data: customers, isLoading, error } = useCustomers();
+  const { amount, serviceId } = location.state || {};
+
   useEffect(() => {
     setSelectedDate(today);
   }, [today]);
 
+  if (isLoading) return <p>Loading customers...</p>;
+  if (error) {
+    console.error("Error fetching customers:", error);
+    return <p>Error loading customers.</p>;
+  }
+
   const getAvailableSlotsForTherapist = (
-    therapistId: number
+    _therapistId: number
   ): { time: string; slotId: number }[] => {
     if (!availableSlots || availableSlots.length === 0) return [];
 
     return availableSlots
-      .filter((slot) => slot.status === "Available")
+      .filter((slot: any) => {
+        const slotDate = dayjs(slot.date).format("YYYY-MM-DD");
+        return slot.status === "Available" && slotDate === selectedDate;
+      })
       .map((slot) => ({
         time: dayjs(slot.time, ["h:mm A", "HH:mm"]).format("HH:mm"),
         slotId: slot.slotId,
@@ -53,33 +73,61 @@ const SkincareBooking = () => {
     setSelectedTime(time);
     setSelectedSlotId(slotId);
   };
+
+  dayjs.extend(utc);
+
   const handleConfirmBooking = async () => {
     if (!selectedExpert || !selectedTime || !selectedSlotId) {
-      // ✅ Ensure slotId is selected
       message.warning("Vui lòng chọn chuyên viên, thời gian và slot!");
       return;
     }
 
-    const bookingData = {
-      customerId: Number(user?.accountId) || 1,
+    if (!user || !user.accountId) {
+      message.error("Lỗi: Không tìm thấy thông tin tài khoản!");
+      console.error("User object is missing:", user);
+      return;
+    }
+
+    if (!customers || customers.length === 0) {
+      message.error("Lỗi: Danh sách khách hàng trống hoặc chưa tải xong!");
+      console.error("Customers not loaded or empty:", customers);
+      return;
+    }
+
+    const matchedCustomer = customers.find(
+      (c) => Number(c.accountId) === Number(user.accountId)
+    );
+
+    if (!matchedCustomer) {
+      message.error("Lỗi: Không tìm thấy khách hàng phù hợp!");
+      console.error("No matching customer for accountId:", user.accountId);
+      return;
+    }
+
+    if (!selectedSlotId) {
+      message.error("Lỗi: Không tìm thấy slot đã chọn!");
+      console.error("Missing slotId:", selectedSlotId);
+      return;
+    }
+
+    const bookingData: CreateBookingDto = {
+      customerId: matchedCustomer.customerId,
       location: "hcm",
-      amount: Number(amount),
-      serviceName: serviceName,
-      skintherapistId: Number(selectedExpert),
-      date: new Date(selectedDate),
-      slotId: selectedSlotId, // ✅ Include slotId
+      amount: amount,
+      serviceId: serviceId,
+      skintherapistId: selectedExpert,
+      status: "",
+      slotId: selectedSlotId,
     };
 
-    console.log("📌 Final Booking Data Sent to API:", bookingData);
-
-    try {
-      await createBooking(bookingData, {
-        onSuccess: () => message.success("Đặt lịch thành công!"),
-      });
-    } catch (err) {
-      console.error("❌ Unexpected Error:", err);
-      message.error("Đặt lịch thất bại, vui lòng thử lại!");
-    }
+    createBooking(bookingData, {
+      onSuccess: () => {
+        navigate(PagePath.COMPLETE_RESULT);
+      },
+      onError: () => {
+        message.error("Đặt lịch thất bại, vui lòng thử lại!");
+      },
+    });
   };
 
   return (
@@ -148,10 +196,6 @@ const SkincareBooking = () => {
                 </Text>
                 <div style={{ marginTop: "20px" }}>
                   {therapists?.map((expert) => {
-                    const availableTimes = getAvailableSlotsForTherapist(
-                      expert.skintherapistId
-                    );
-
                     return (
                       <Card
                         key={expert.skintherapistId}
@@ -191,7 +235,12 @@ const SkincareBooking = () => {
                           {getAvailableSlotsForTherapist(
                             expert.skintherapistId
                           ).map(({ time, slotId }) => (
-                            <Col key={time} xs={8} sm={8} md={8}>
+                            <Col
+                              key={`${expert.skintherapistId}-${slotId}`}
+                              xs={8}
+                              sm={8}
+                              md={8}
+                            >
                               <Button
                                 type={
                                   selectedExpert === expert.skintherapistId &&

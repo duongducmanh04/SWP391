@@ -31,7 +31,7 @@ import { AuthGuardProvider } from "./contexts/AuthGuardContext";
 import SkinTherapistListPage from "./features/skin_therapist/page/SkinTherapistListPage";
 import SkinTherapistDetailPage from "./features/skin_therapist/page/SkinTherapistDetailPage";
 import BookingListTable from "./features/booking/components/BookingListTable";
-import SkinType from "./pages/SkinTypePage";
+import SkinType from "./features/skin_type/components/SkinTypeList";
 import BookingDetail from "./features/booking/components/BookingDetail";
 import CompleteBookingPage from "./pages/CompleteResult";
 import ScheduleCalendarPage from "./features/schedule/page/SchedulePage";
