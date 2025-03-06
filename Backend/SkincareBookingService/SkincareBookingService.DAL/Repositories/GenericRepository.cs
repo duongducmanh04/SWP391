@@ -61,5 +61,10 @@ namespace SkincareBookingService.DAL.Repositories
         {
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<object>> GetListAsync(Func<object, bool> value)
+        {
+            return await Task.Run(() => _context.Set<T>().Cast<object>().Where(value).ToList());
+        }
     }
 }

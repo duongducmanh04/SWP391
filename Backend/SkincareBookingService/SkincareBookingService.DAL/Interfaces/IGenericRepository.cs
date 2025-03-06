@@ -13,5 +13,6 @@ namespace SkincareBookingService.DAL.Interfaces
         Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);
         Task SaveChangesAsync();
+        Task<IEnumerable<object>> GetListAsync(Func<object, bool> value);
     }
 }

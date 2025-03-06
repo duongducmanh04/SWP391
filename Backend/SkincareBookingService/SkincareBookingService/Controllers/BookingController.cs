@@ -92,6 +92,22 @@ public class BookingController : ControllerBase
         return Ok(booking);
     }
 
+    [HttpGet("getBookingByCustomerId/{customerId}")]
+    public async Task<IActionResult> GetBookingByCustomerId(int customerId)
+    {
+        if (customerId <= 0)
+        {
+            return BadRequest(new { message = "Invalid customer id." });
+        }
+
+        var bookings = await _bookingService.GetBookingByCustomerIdAsync(customerId);
+        if (bookings == null || bookings.Count == 0)
+        {
+            return NotFound(new { message = "No bookings found for that customer" });
+        }
+        return Ok(bookings);
+    }
+
     [HttpPut("checkin/{bookingId}")]
     public async Task<IActionResult> UpdateBookingStatusToCheckIn(int bookingId)
     {
