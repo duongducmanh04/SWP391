@@ -12,7 +12,7 @@ import {
   Button,
   Table,
 } from "antd";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useBookingById } from "../hooks/useGetBookingId";
 import dayjs from "dayjs";
 import StatusTag from "../../../components/TagStatus";
@@ -33,11 +33,13 @@ import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { RoleCode } from "../../../enums/role.enum";
 import { Status } from "../../../enums/status-booking";
 import TextArea from "antd/es/input/TextArea";
+import { PagePath } from "../../../enums/page-path.enum";
 const { Title } = Typography;
 
 const BookingDetail = () => {
   const { bookingId } = useParams();
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const { mutate: updateCheckIn } = useCheckInBooking();
   const { mutate: updateCompleted } = useCompletedBooking();
   const { mutate: updateCancelled } = useCancelledBooking();
@@ -87,6 +89,7 @@ const BookingDetail = () => {
       {
         onSuccess: () => {
           refetch();
+          navigate(PagePath.BOOKING);
         },
       }
     );
@@ -131,6 +134,7 @@ const BookingDetail = () => {
       {
         onSuccess: () => {
           refetch();
+          navigate(PagePath.BOOKING);
         },
       }
     );
