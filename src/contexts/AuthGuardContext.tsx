@@ -50,6 +50,7 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
       PagePath.PRICE_SERVICE,
       PagePath.SKIN_SERVICE,
       PagePath.SKIN_TYPE,
+      
     ];
 
     if (!user || !user.role) {
@@ -94,6 +95,9 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.PRICE_SERVICE,
         PagePath.QUIZ,
         PagePath.SKIN_TYPE,
+        PagePath.BOOKING_INFO_CONFIRM,
+        PagePath.COMPLETE_RESULT,
+
       ],
       Manager: [],
     };

@@ -36,7 +36,7 @@ import BookingDetail from "./features/booking/components/BookingDetail";
 import CompleteBookingPage from "./pages/CompleteResult";
 import ScheduleCalendarPage from "./features/schedule/page/SchedulePage";
 import ScheduleCalendarManagementPage from "./features/schedule/page/TherapistSchedulePage";
-
+import BookingInfoConfirm from "./pages/BookingInfoConfirm";
 const App = () => {
   return (
     <Router>
@@ -101,6 +101,9 @@ const App = () => {
               path={PagePath.COMPLETE_RESULT}
               element={<CompleteBookingPage />}
             />
+             <Route path={PagePath.BOOKING_INFO_CONFIRM}
+              element={<BookingInfoConfirm />} 
+              />
           </Route>
         </Routes>
       </AuthGuardProvider>
