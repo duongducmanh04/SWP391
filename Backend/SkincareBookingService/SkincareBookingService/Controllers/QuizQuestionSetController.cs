@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.Interfaces;
 
 namespace SkincareBookingService.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class QuizQuestionSetController : ControllerBase
     {
         private readonly IQuizQuestionSetService _quizQuestionSetService;
@@ -12,7 +15,7 @@ namespace SkincareBookingService.Controllers
             _quizQuestionSetService = quizQuestionSetService;
         }
 
-        [HttpGet("getAllQuizQuestionSets")]
+        [HttpGet]
         public async Task<IActionResult> GetAllQuizQuestionSets()
         {
             var quizQuestionSets = await _quizQuestionSetService.GetAllQuestionsAsync();
@@ -23,7 +26,7 @@ namespace SkincareBookingService.Controllers
             return Ok(quizQuestionSets);
         }
 
-        [HttpGet("getQuizQuestionSetById/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetQuizQuestionSetById(int id)
         {
             var quizQuestionSet = await _quizQuestionSetService.GetQuestionByIdAsync(id);
@@ -32,6 +35,28 @@ namespace SkincareBookingService.Controllers
                 return NotFound("Quiz question set not found");
             }
             return Ok(quizQuestionSet);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create(QuizQuestionSetPostDto dto)
+        {
+            var result = await _quizQuestionSetService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetQuizQuestionSetById), new { id = result.QuestionsId }, result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, QuizQuestionSetPutDto dto)
+        {
+            var success = await _quizQuestionSetService.UpdateAsync(id, dto);
+            if (!success) return NotFound();
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var success = await _quizQuestionSetService.DeleteAsync(id);
+            if (!success) return NotFound();
+            return NoContent();
         }
     }
 }

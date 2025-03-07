@@ -69,5 +69,31 @@ namespace SkincareBookingService.BLL.Services
                 }).ToList()
             };
         }
+
+        public async Task<QuizQuestionSetGetDto> CreateAsync(QuizQuestionSetPostDto dto)
+        {
+            var questionSet = new QuizQuestionSet { Title = dto.Title };
+            await _quizQuestionSetRepository.AddAsync(questionSet);
+            return new QuizQuestionSetGetDto { QuestionsId = questionSet.QuestionsId, Title = questionSet.Title };
+        }
+
+        public async Task<bool> UpdateAsync(int id, QuizQuestionSetPutDto dto)
+        {
+            var questionSet = await _quizQuestionSetRepository.GetByIdAsync(id);
+            if (questionSet == null) return false;
+
+            questionSet.Title = dto.Title;
+            await _quizQuestionSetRepository.UpdateAsync(questionSet);
+            return true;
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var questionSet = await _quizQuestionSetRepository.GetByIdAsync(id);
+            if (questionSet == null) return false;
+
+            await _quizQuestionSetRepository.DeleteAsync(questionSet);
+            return true;
+        }
     }
 }
