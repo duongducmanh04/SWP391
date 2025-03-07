@@ -33,7 +33,7 @@ namespace SkincareBookingService.BLL.Services
             }).ToList();
         }
 
-        public async Task<List<BookingDTO>> GetCustomerBookingHistoryAsync(int customerId)
+        /*public async Task<List<BookingDTO>> GetCustomerBookingHistoryAsync(int customerId)
         {
             // Lấy tất cả các booking có CustomerId tương ứng
             var bookings = await _bookingRepository.FindAsync(b => b.CustomerId == customerId);
@@ -60,7 +60,7 @@ namespace SkincareBookingService.BLL.Services
             }).ToList();
 
             return bookingDTOs;
-        }
+        }*/
 
 
 

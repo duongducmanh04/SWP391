@@ -66,5 +66,21 @@ namespace SkincareBookingService.DAL.Repositories
         {
             return await Task.Run(() => _context.Set<T>().Cast<object>().Where(value).ToList());
         }
+
+        public async Task<List<Account>> FindAsync(Expression<Func<Account, bool>> predicate, string include = "")
+        {
+            IQueryable<Account> query = _context.Accounts.Where(predicate);
+
+            if (!string.IsNullOrEmpty(include))
+            {
+                foreach (var inc in include.Split(','))
+                {
+                    query = query.Include(inc.Trim());
+                }
+            }
+
+            return await query.ToListAsync();
+        }
+
     }
 }

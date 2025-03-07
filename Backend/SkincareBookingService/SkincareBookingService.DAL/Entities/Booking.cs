@@ -9,7 +9,7 @@ public partial class Booking
 {
     public int BookingId { get; set; }
 
-    public int? CustomerId { get; set; }
+    public int CustomerId { get; set; }
 
     public string Location { get; set; }
 
@@ -21,7 +21,7 @@ public partial class Booking
 
     public decimal? Amount { get; set; }
 
-    public int? SkintherapistId { get; set; }
+    public int SkintherapistId { get; set; }
 
     public DateTime? UpdateAt { get; set; }
 
