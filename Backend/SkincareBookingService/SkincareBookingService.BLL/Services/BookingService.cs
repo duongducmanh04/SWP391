@@ -181,8 +181,6 @@ namespace SkincareBookingService.BLL.Services
 
             return result;
         }
-
-
         private async Task<BookingDTO> MapEntityToDTO(Booking booking)
         {
             BookingDTO bookingDto = new();
