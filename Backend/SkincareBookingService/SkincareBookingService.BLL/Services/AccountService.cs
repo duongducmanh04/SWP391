@@ -16,7 +16,7 @@ namespace SkincareBookingService.BLL.Services
 
         public async Task<List<AccountDTO>> GetAccountByIdAndRoleAsync(int accountId, string role)
         {
-            // Chuyển role về dạng chữ hoa chữ cái đầu để khớp với DB
+            
             role = char.ToUpper(role[0]) + role.Substring(1).ToLower();
 
             var accounts = await _accountRepository
@@ -33,7 +33,6 @@ namespace SkincareBookingService.BLL.Services
                     CustomerId = c.CustomerId,
                     Name = c.Name,
                     SkintypeId = c.SkintypeId,
-                    AccountId = c.AccountId,
                     PhoneNumber = c.PhoneNumber,
                     Image = c.Image,
                     Email = c.Email
@@ -47,7 +46,6 @@ namespace SkincareBookingService.BLL.Services
                     Email = st.Email,
                     Experience = st.Experience,
                     Image = st.Image,
-                    AccountId = st.AccountId,
                     Degree = st.Degree
                 }).ToList() : null
             }).ToList();

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SkincareBookingService.BLL.DTOs;
+using SkincareBookingService.BLL.DTOs.AuthenticationDTOs;
 using SkincareBookingService.BLL.Interfaces;
 
 namespace SkincareBookingService.Controllers
@@ -44,6 +44,22 @@ namespace SkincareBookingService.Controllers
                 tokenExpiration = expiration.ToString("yyyy-MM-ddTHH:mm:ssZ") // Hiển thị thời gian hết hạn
             });
 
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
+        {
+            if (string.IsNullOrEmpty(registerDTO.AccountName) || string.IsNullOrEmpty(registerDTO.Password))
+            {
+                return BadRequest(new { message = "Please enter account and password!" });
+            }
+            var account = await _authService.RegisterAsync(registerDTO.AccountName, registerDTO.Password);
+            return Ok(new
+            {
+                message = "Register Successfully!",
+                accountId = account.AccountId,
+                role = account.Role
+            });
         }
     }
 }
