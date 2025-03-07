@@ -1,15 +1,19 @@
-import { Card, Typography,  Button, Descriptions, Space } from "antd";
+import { Card, Typography, Button, Descriptions, Space, message } from "antd";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PagePath } from "../enums/page-path.enum";
+import { useCreateBooking } from "../features/booking/hooks/useCreateBooking";
 
 const { Title, Text } = Typography;
 
 const BookingInfoConfirm = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const bookingMutation = useCreateBooking(); // ✅ Get mutation object
+  const { mutate: createBooking, isPending } = bookingMutation; // ✅ Use correct property
   
-  // ✅ Store booking details in state (or restore from sessionStorage)
+
+  // ✅ Store booking details
   const [bookingDetails, setBookingDetails] = useState(location.state || null);
 
   useEffect(() => {
@@ -25,7 +29,6 @@ const BookingInfoConfirm = () => {
 
   console.log("🔍 BookingInfoConfirm - Received state:", bookingDetails);
 
-  // 🚨 If no booking details found, show an error message
   if (!bookingDetails) {
     return (
       <div style={{ textAlign: "center", marginTop: "50px" }}>
@@ -36,7 +39,33 @@ const BookingInfoConfirm = () => {
     );
   }
 
-  const { serviceName, amount, selectedDate, selectedTime, therapistName, bookingLocation } = bookingDetails;
+  const { serviceName, amount, selectedDate, selectedTime, therapistName, bookingLocation, customerId, selectedSlotId, selectedExpert, serviceId } = bookingDetails;
+
+  // ✅ Function to confirm booking (Send API request)
+  const handleConfirm = () => {
+    const bookingData = {
+      customerId: customerId,
+      location: bookingLocation,
+      amount: amount,
+      serviceId: serviceId,
+      skintherapistId: selectedExpert,
+      status: "",
+      slotId: selectedSlotId,
+    };
+
+    console.log("📦 Sending Booking Data:", bookingData);
+
+    createBooking(bookingData, {
+      onSuccess: () => {
+        message.success("Đặt lịch thành công!");
+        navigate(PagePath.COMPLETE_RESULT); // ✅ Redirect to final success page
+      },
+      onError: (err: Error) => {
+        console.error("❌ API Error:", err);
+        message.error("Đặt lịch thất bại, vui lòng thử lại!");
+      },
+    });
+  };
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "#f8f9fa" }}>
@@ -57,12 +86,7 @@ const BookingInfoConfirm = () => {
         <Space direction="horizontal" style={{ width: "100%", justifyContent: "center", marginTop: "20px" }}>
           <Button 
             type="default"
-            style={{
-              borderRadius: "6px",
-              padding: "8px 20px",
-              fontSize: "16px",
-              fontWeight: "bold"
-            }}
+            style={{ borderRadius: "6px", padding: "8px 20px", fontSize: "16px", fontWeight: "bold" }}
             onClick={() => navigate(-1)} // ✅ Go back
           >
             🔙 Quay lại
@@ -70,14 +94,9 @@ const BookingInfoConfirm = () => {
 
           <Button
             type="primary"
-            style={{
-              backgroundColor: "#1677ff",
-              borderRadius: "6px",
-              padding: "8px 20px",
-              fontSize: "16px",
-              fontWeight: "bold"
-            }}
-            onClick={() => navigate(PagePath.COMPLETE_RESULT)} // ✅ Confirm & Redirect
+            style={{ backgroundColor: "#1677ff", borderRadius: "6px", padding: "8px 20px", fontSize: "16px", fontWeight: "bold" }}
+            onClick={handleConfirm} // ✅ Now sends API request here
+            loading={isPending} // ✅ Show loading if API is in progress
           >
             ✅ Xác nhận
           </Button>

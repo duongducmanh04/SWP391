@@ -12,12 +12,10 @@ import { CheckCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useLocation } from "react-router-dom";
 import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
-import { useCreateBooking } from "../../booking/hooks/useCreateBooking";
 import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { useAvailableSlot } from "../hooks/useAvailableSlot";
 import utc from "dayjs/plugin/utc";
 import { useGetCustomers } from "../hooks/useGetCustomers";
-import { CreateBookingDto } from "../../booking/dto/create-booking.dto";
 import { useGetSchedule } from "../hooks/useGetSchedule";
 import { useNavigate } from "react-router-dom";
 import { PagePath } from "../../../enums/page-path.enum"; 
@@ -34,7 +32,6 @@ const SkincareBooking = () => {
   const [selectedExpert, setSelectedExpert] = useState<number | null>(null);
   const [selectedTime, setSelectedTime] = useState<string>("");
   const location = useLocation();
-  const { mutate: createBooking } = useCreateBooking();
   const { user } = useAuthStore();
   const { data: therapists =[] } = useTherapists();
   const { data: availableSlots } = useAvailableSlot(); 
@@ -120,7 +117,7 @@ const SkincareBooking = () => {
 
 dayjs.extend(utc); 
 
-const handleConfirmBooking = async () => {
+const handleConfirmBooking = () => {
   if (!selectedExpert || !selectedTime || !selectedSlotId) { 
     message.warning("Vui lòng chọn chuyên viên, thời gian và slot!");
     return;
@@ -151,53 +148,28 @@ const handleConfirmBooking = async () => {
     console.error("❌ Missing slotId:", selectedSlotId);
     return;
   }
+
+  // ✅ Find therapist name
   const selectedTherapist = therapists.find(t => t.skintherapistId === selectedExpert);
-const therapistName = selectedTherapist ? selectedTherapist.name : "Không rõ";
+  const therapistName = selectedTherapist ? selectedTherapist.name : "Không rõ";
 
-if (!selectedTherapist) {
-  console.warn("⚠️ Không tìm thấy thông tin chuyên viên!", selectedExpert);
-}
-
-  // ✅ Construct booking data
-  const bookingData: CreateBookingDto = {
-    customerId: matchedCustomer.customerId,
-    location: "hcm",
-    amount: amount,
-    serviceId: serviceId,
-    skintherapistId: selectedExpert,
-    status: "",
-    slotId: selectedSlotId,
-  };
-
-  console.log("📦 Final Booking Data:", bookingData);
-  console.log("📡 API Request URL:", `https://localhost:7071/api/Booking/create-booking?slotId=${selectedSlotId}`);
-  console.log("📦 Request Body:", bookingData);
-  console.log("👉 `amount`:", amount);
-  console.log("👉 `serviceId`:", serviceId);
-  console.log("🩺 Mapped Therapist Name:", therapistName);
-
-  createBooking(bookingData, {
-    onSuccess: () => {
-      message.success("Đặt lịch thành công!"); 
-
-     
-      navigate(PagePath.BOOKING_INFO_CONFIRM, { 
-        state: { 
-          serviceName: serviceName, 
-          amount: amount,
-          selectedDate: selectedDate,
-          selectedTime: selectedTime,
-          therapistName:  therapistName,
-          bookingLocation: "HCM" 
-        }
-      });
-    },
-    onError: (err: Error) => {
-      console.error("❌ API Error:", err);
-      message.error("Đặt lịch thất bại, vui lòng thử lại!");
-    },
+  // ✅ Save booking details but do NOT send API request yet
+  navigate(PagePath.BOOKING_INFO_CONFIRM, { 
+    state: { 
+      serviceName: serviceName, 
+      amount: amount,
+      selectedDate: selectedDate,
+      selectedTime: selectedTime,
+      therapistName: therapistName,
+      bookingLocation: "HCM",
+      customerId: matchedCustomer.customerId,
+      selectedSlotId: selectedSlotId,
+      selectedExpert: selectedExpert,
+      serviceId: serviceId,
+    }
   });
 };
+
 
 
   return (
