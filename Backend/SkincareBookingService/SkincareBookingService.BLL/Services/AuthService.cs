@@ -17,5 +17,20 @@ namespace SkincareBookingService.BLL.Services
         {
             return await _accountRepository.FirstOrDefaultAsync(a => a.AccountName == accountName && a.Password == password);
         }
+
+        public async Task<Account> RegisterAsync(string accountName, string password)
+        {
+            var account = new Account
+            {
+                AccountName = accountName,
+                Password = password,
+                Role = "Customer",
+                Active = true
+            };
+
+            await _accountRepository.AddAsync(account);
+            await _accountRepository.SaveChangesAsync();
+            return account;
+        }
     }
 }
