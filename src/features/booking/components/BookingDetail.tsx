@@ -6,12 +6,13 @@ import {
   Row,
   Col,
   Breadcrumb,
+  Typography,
   message,
   Select,
   Button,
   Table,
 } from "antd";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useBookingById } from "../hooks/useGetBookingId";
 import dayjs from "dayjs";
 import StatusTag from "../../../components/TagStatus";
@@ -28,20 +29,33 @@ import { useUpdateServiceAmount } from "../hooks/useUpdateServiceAmount";
 import { useServices } from "../../services/hooks/useGetService";
 import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
 import { TherapistDto } from "../../skin_therapist/dto/get-therapist.dto";
+import { useCustomers } from "../../user/hook/useGetCustomer";
+import { CustomerDto } from "../../user/dto/customer.dto";
 import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { RoleCode } from "../../../enums/role.enum";
+import { Status } from "../../../enums/status-booking";
+import TextArea from "antd/es/input/TextArea";
+import { PagePath } from "../../../enums/page-path.enum";
+const { Title } = Typography;
 
 const BookingDetail = () => {
   const { bookingId } = useParams();
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const { mutate: updateCheckIn } = useCheckInBooking();
   const { mutate: updateCompleted } = useCompletedBooking();
   const { mutate: updateCancelled } = useCancelledBooking();
   const { mutate: updateDenied } = useDeniedBooking();
   const { mutate: updateFinished } = useFinishedBooking();
-  const { data: booking, isLoading, isError } = useBookingById(bookingId || "");
+  const {
+    data: booking,
+    isLoading,
+    isError,
+    refetch,
+  } = useBookingById(bookingId || "");
   const { data: service } = useServices();
   const { data: therapists } = useTherapists();
+  const { data: customers } = useCustomers();
 
   const { mutate: updateServiceName } = useUpdateServiceName();
   const { mutate: updateServiceAmount } = useUpdateServiceAmount();
@@ -72,24 +86,68 @@ const BookingDetail = () => {
     });
   }
 
+  const customerMap = new Map<number, CustomerDto>();
+  if (customers) {
+    customers.forEach((customer) => {
+      customerMap.set(customer.customerId, customer);
+    });
+  }
+
   const handleCheckIn = async (bookingId: number) => {
-    updateCheckIn({ BookingId: bookingId });
+    updateCheckIn(
+      { BookingId: bookingId },
+      {
+        onSuccess: () => {
+          refetch();
+          navigate(PagePath.BOOKING);
+        },
+      }
+    );
   };
 
   const handleCompleted = async (bookingId: number) => {
-    updateCompleted({ BookingId: bookingId });
+    updateCompleted(
+      { BookingId: bookingId },
+      {
+        onSuccess: () => {
+          refetch();
+        },
+      }
+    );
   };
 
   const handleCancelled = async (bookingId: number) => {
-    updateCancelled({ BookingId: bookingId });
+    updateCancelled(
+      { BookingId: bookingId },
+      {
+        onSuccess: () => {
+          refetch();
+        },
+      }
+    );
   };
 
   const handleDenied = async (bookingId: number) => {
-    updateDenied({ BookingId: bookingId });
+    updateDenied(
+      { BookingId: bookingId },
+      {
+        onSuccess: () => {
+          refetch();
+        },
+      }
+    );
   };
 
   const handleFinished = async (bookingId: number) => {
-    updateFinished({ BookingId: bookingId });
+    updateFinished(
+      { BookingId: bookingId },
+      {
+        onSuccess: () => {
+          refetch();
+          navigate(PagePath.BOOKING);
+        },
+      }
+    );
   };
 
   const handleServiceChange = (value: string) => {
@@ -251,9 +309,9 @@ const BookingDetail = () => {
           <Card>
             <Descriptions title="Thông tin chung" bordered column={1}>
               <Descriptions.Item label="Khách hàng">
-                {booking.customerId}
+                {customerMap.get(booking.customerId)?.name}
               </Descriptions.Item>
-              <Descriptions.Item label="Điện thoại">
+              <Descriptions.Item label="Tổng tiền">
                 {booking.amount}
               </Descriptions.Item>
               <Descriptions.Item label="Địa chỉ">
@@ -289,9 +347,15 @@ const BookingDetail = () => {
               {booking.status}
             </p>
           </Card>
+          {user?.role == RoleCode.THERAPIST && (
+            <Card style={{ marginTop: "10px" }}>
+              <Title level={4}>Ghi chú</Title>
+              <TextArea rows={4}></TextArea>
+            </Card>
+          )}
         </Col>
       </Row>
-      {user?.role == RoleCode.STAFF && (
+      {booking?.status === Status.BOOKED && user?.role == RoleCode.STAFF && (
         <Card
           title="Chi tiết dịch vụ"
           style={{ marginBottom: 16, marginTop: 16 }}

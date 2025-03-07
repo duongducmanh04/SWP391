@@ -5,7 +5,7 @@ import { SlotDto } from "../dto/slot.dto";
 // API call to get booked slots
 const fetchBookedSlots = async (): Promise<SlotDto[]> => {
   const response = await axios.get<SlotDto[]>(
-    "https://localhost:7071/api/slot/getBookedSlots"
+    "http://skincare-sbs.southeastasia.azurecontainer.io:8080/api/slot/getBookedSlots"
   );
   return response.data;
 };

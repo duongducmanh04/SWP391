@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { SkinDto } from "../dto/Skin.dto";
+import { SkinDto } from "../dto/skin.dto";
 
 const fetchSkinTypes = async (): Promise<SkinDto[]> => {
   const response = await axios.get<SkinDto[]>(
