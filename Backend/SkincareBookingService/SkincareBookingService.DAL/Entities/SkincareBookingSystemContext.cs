@@ -125,6 +125,9 @@ public partial class SkincareBookingSystemContext : DbContext
             entity.Property(e => e.Location)
                 .HasMaxLength(255)
                 .HasColumnName("location");
+            entity.Property(e => e.Note)
+                .HasMaxLength(255)
+                .HasColumnName("note");
             entity.Property(e => e.ServiceId).HasColumnName("serviceId");
             entity.Property(e => e.ServiceName)
                 .HasMaxLength(255)
