@@ -38,7 +38,7 @@ namespace SkincareBookingService.Controllers
             return Ok(customer);
         }
 
-        [HttpGet("getCustomerBookingHistory/{customerId}")]
+       /* [HttpGet("getCustomerBookingHistory/{customerId}")]
         public async Task<IActionResult> GetCustomerBookingHistory(int customerId)
         {
             var bookings = await _customerService.GetCustomerBookingHistoryAsync(customerId);
@@ -47,6 +47,6 @@ namespace SkincareBookingService.Controllers
                 return NotFound("No bookings found");
             }
             return Ok(bookings);
-        }
+        }*/
     }
 }

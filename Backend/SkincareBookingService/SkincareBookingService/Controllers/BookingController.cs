@@ -210,6 +210,18 @@ public class BookingController : ControllerBase
             return NotFound(new { message = "Booking not found." });
         }
     }
+
+    [HttpGet("previousBooking/{customerId}")]
+    public async Task<IActionResult> GetPreviousBookings(int customerId)
+    {
+        if(customerId == null || customerId <= 0)
+        {
+            return BadRequest("Invalid customer id");
+        }
+
+        var result = await _bookingService.GetBookingsByCustomerId(customerId);
+        return Ok(result);
+    }
 }
 
 

@@ -13,12 +13,14 @@ namespace SkincareBookingService.BLL.Services
         private readonly IGenericRepository<Slot> _slotRepository;
         private readonly IGenericRepository<Service> _serviceRepository;
         private readonly IGenericRepository<Schedule> _scheduleRepository;
-        public BookingService(IGenericRepository<Booking> bookingRepository, IGenericRepository<Slot> genericRepository, IGenericRepository<Service> serviceRepository, IGenericRepository<Schedule> scheduleRepository)
+        private readonly IGenericRepository<SkinTherapist> _skinTherapistRepository;
+        public BookingService(IGenericRepository<Booking> bookingRepository, IGenericRepository<Slot> genericRepository, IGenericRepository<Service> serviceRepository, IGenericRepository<Schedule> scheduleRepository, IGenericRepository<SkinTherapist> skinTherapistRepository)
         {
             _bookingRepository = bookingRepository;
             _slotRepository = genericRepository;
             _serviceRepository = serviceRepository;
             _scheduleRepository = scheduleRepository;
+            _skinTherapistRepository = skinTherapistRepository;
         }
 
         public async Task<List<Booking>> GetBookingsAsync()
@@ -98,15 +100,11 @@ namespace SkincareBookingService.BLL.Services
             newBooking.Status = BookingStatus.Booked.ToString();
             newBooking.Amount = booking.Amount;
             newBooking.SkintherapistId = booking.SkintherapistId;
-
-            
             //Add date from slot
             newBooking.Date = await _scheduleRepository.Query()
                 .Where(s => s.SlotId == slotId)
                 .Select(s => s.Date.Value)
                 .FirstOrDefaultAsync();
-
-
             //Add service name
             newBooking.ServiceName = await _serviceRepository.Query()
                 .Where(s => s.ServiceId == booking.ServiceId)
@@ -162,6 +160,50 @@ namespace SkincareBookingService.BLL.Services
             }
 
             return bookings;
+        }
+
+        public async Task<List<BookingDTO>> GetBookingsByCustomerId(int customerId)
+        {
+            if(customerId == null || customerId <= 0)
+            {
+                throw new Exception("Invalid customer id");
+            }
+
+            List<Booking> bookings = await _bookingRepository.Query()
+                .Where(b => b.CustomerId == customerId)
+                .ToListAsync();
+
+            List<BookingDTO> result = new List<BookingDTO>();
+            foreach(var booking in bookings)
+            {
+                result.Add(await MapEntityToDTO(booking));
+            }
+
+            return result;
+        }
+
+
+        private async Task<BookingDTO> MapEntityToDTO(Booking booking)
+        {
+            BookingDTO bookingDto = new();
+            bookingDto.Location = booking.Location;
+            bookingDto.BookingId = booking.BookingId;
+            bookingDto.CustomerId = booking.CustomerId;
+            bookingDto.Date = booking.Date;
+            bookingDto.CreateAt = booking.CreateAt;
+            bookingDto.Status = booking.Status;
+            bookingDto.Amount = booking.Amount;
+            bookingDto.SkintherapistId = booking.SkintherapistId;
+            bookingDto.UpdateAt = booking.UpdateAt;
+            bookingDto.ServiceName = _serviceRepository.Query()
+                .Where(s => s.ServiceId == booking.ServiceId)
+                .Select(s => s.Name)
+                .ToString();
+            bookingDto.SkintherapistName = _skinTherapistRepository.Query()
+                .Where(st => st.SkintherapistId == booking.SkintherapistId)
+                .Select(st => st.Name).ToString();
+
+            return bookingDto;
         }
     }
 }
