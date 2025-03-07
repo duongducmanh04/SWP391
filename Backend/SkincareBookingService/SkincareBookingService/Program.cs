@@ -91,6 +91,8 @@ namespace SkincareBookingService
 
             builder.Services.AddScoped<ISkintypeServiceService, SkintypeServiceService>();
 
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
+
             /*====================================================*/
 
             var app = builder.Build();
