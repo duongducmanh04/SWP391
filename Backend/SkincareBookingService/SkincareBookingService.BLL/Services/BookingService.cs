@@ -14,13 +14,15 @@ namespace SkincareBookingService.BLL.Services
         private readonly IGenericRepository<Service> _serviceRepository;
         private readonly IGenericRepository<Schedule> _scheduleRepository;
         private readonly IGenericRepository<SkinTherapist> _skinTherapistRepository;
-        public BookingService(IGenericRepository<Booking> bookingRepository, IGenericRepository<Slot> genericRepository, IGenericRepository<Service> serviceRepository, IGenericRepository<Schedule> scheduleRepository, IGenericRepository<SkinTherapist> skinTherapistRepository)
+        private readonly IGenericRepository<Customer> _customerRepository;
+        public BookingService(IGenericRepository<Booking> bookingRepository, IGenericRepository<Slot> genericRepository, IGenericRepository<Service> serviceRepository, IGenericRepository<Schedule> scheduleRepository, IGenericRepository<SkinTherapist> skinTherapistRepository, IGenericRepository<Customer> customerRepository)
         {
             _bookingRepository = bookingRepository;
             _slotRepository = genericRepository;
             _serviceRepository = serviceRepository;
             _scheduleRepository = scheduleRepository;
             _skinTherapistRepository = skinTherapistRepository;
+            _customerRepository = customerRepository;
         }
 
         public async Task<List<Booking>> GetBookingsAsync()
@@ -193,13 +195,18 @@ namespace SkincareBookingService.BLL.Services
             bookingDto.Amount = booking.Amount;
             bookingDto.SkintherapistId = booking.SkintherapistId;
             bookingDto.UpdateAt = booking.UpdateAt;
-            bookingDto.ServiceName = _serviceRepository.Query()
+            bookingDto.ServiceName = await _serviceRepository.Query()
                 .Where(s => s.ServiceId == booking.ServiceId)
                 .Select(s => s.Name)
-                .ToString();
-            bookingDto.SkintherapistName = _skinTherapistRepository.Query()
+                .FirstOrDefaultAsync();
+            bookingDto.CustomerName = await _customerRepository.Query()
+                .Where(c => c.CustomerId == booking.CustomerId)
+                .Select(c => c.Name)
+                .FirstOrDefaultAsync();
+            bookingDto.SkintherapistName = await _skinTherapistRepository.Query()
                 .Where(st => st.SkintherapistId == booking.SkintherapistId)
-                .Select(st => st.Name).ToString();
+                .Select(st => st.Name)
+                .FirstOrDefaultAsync();
 
             return bookingDto;
         }
