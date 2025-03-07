@@ -171,6 +171,10 @@ public class BookingController : ControllerBase
     [HttpPut("cancelled/{bookingId}")]
     public async Task<IActionResult> UpdateBookingStatusToCancelled(int bookingId)
     {
+        if(bookingId <= 0 || bookingId == null)
+        {
+            return BadRequest(new { message = "Invalid booking id." });
+        }
         var result = await _bookingService.UpdateStatusToCancelledAsync(bookingId);
 
         if (result)
