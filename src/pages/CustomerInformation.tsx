@@ -5,15 +5,24 @@ import {
   ClockCircleOutlined,
   LockOutlined,
 } from "@ant-design/icons";
-import { useCustomers } from "../features/user/hook/useGetCustomer"; // Import custom hook
+import { useGetCustomerProfile } from "../features/user/hook/useGetCustomerProfile";
+import { useBookingHistory } from "../features/booking/hooks/useBookingHistory";
 
 const { Sider, Content } = Layout;
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("personal");
+  const accountId = 7; // Có thể lấy từ auth state
+  const role = "Customer";
 
-  // Fetch danh sách khách hàng từ API
-  const { data: customers, isLoading, isError, error } = useCustomers();
+  // Fetch dữ liệu khách hàng
+  const {
+    data: customer,
+    isLoading,
+    isError,
+    error,
+  } = useGetCustomerProfile(accountId, role);
+  const { data: bookings, isLoading: isBookingLoading } = useBookingHistory();
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#f5f1eb" }}>
@@ -51,45 +60,53 @@ const ProfilePage = () => {
                   message={error?.message || "Lỗi tải dữ liệu"}
                   type="error"
                 />
-              ) : (
+              ) : customer ? (
                 <>
-                  {activeTab === "personal" && customers && (
-                    <List
-                      itemLayout="horizontal"
-                      dataSource={customers}
-                      renderItem={(customer) => (
-                        <List.Item>
-                          <List.Item.Meta
-                            avatar={
-                              <Avatar
-                                size={64}
-                                src={customer.image}
-                                icon={
-                                  !customer.image ? <UserOutlined /> : undefined
-                                }
-                              />
-                            }
-                            title={<b>{customer.name}</b>}
-                            description={
-                              <>
-                                <p>Email: {customer.email}</p>
-                                <p>Số điện thoại: {customer.phoneNumber}</p>
-                                <p>Loại da (ID): {customer.skintypeId}</p>
-                                <p>Account ID={customer.accountId}</p>
-                              </>
-                            }
-                          />
-                        </List.Item>
-                      )}
-                    />
+                  {activeTab === "personal" && (
+                    <div style={{ textAlign: "center" }}>
+                      <Avatar
+                        size={100}
+                        src={customer.image}
+                        icon={!customer.image ? <UserOutlined /> : undefined}
+                      />
+                      <h3 style={{ marginTop: 10 }}>{customer.name}</h3>
+                      <p>
+                        <strong>Email:</strong> {customer.email}
+                      </p>
+                      <p>
+                        <strong>Số điện thoại:</strong> {customer.phoneNumber}
+                      </p>
+                      <p>
+                        <strong>Tên tài khoản:</strong> {customer.accountName}
+                      </p>
+                    </div>
                   )}
-                  {activeTab === "schedule" && (
-                    <p>Lịch sử đặt lịch của khách hàng</p>
-                  )}
+                  {activeTab === "schedule" &&
+                    (isBookingLoading ? (
+                      <Spin tip="Đang tải lịch sử đặt lịch..." />
+                    ) : (
+                      <List
+                        itemLayout="horizontal"
+                        dataSource={bookings}
+                        renderItem={(booking) => (
+                          <List.Item>
+                            <List.Item.Meta
+                              title={`Dịch vụ: ${booking.serviceName}`}
+                              description={`Thời gian: ${booking.date} - Trạng thái: ${booking.status}`}
+                            />
+                          </List.Item>
+                        )}
+                      />
+                    ))}
                   {activeTab === "password" && (
                     <p>Thay đổi mật khẩu của khách hàng</p>
                   )}
                 </>
+              ) : (
+                <Alert
+                  message="Không tìm thấy dữ liệu khách hàng"
+                  type="warning"
+                />
               )}
             </Card>
           </Content>

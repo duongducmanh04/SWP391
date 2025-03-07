@@ -62,6 +62,37 @@
         }
       }
     },
+    "/getAccountByIdAndRole/{accountId}/{role}": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "role",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/auth/login": {
       "post": {
         "tags": [
@@ -390,22 +421,10 @@
         }
       }
     },
-    "/getAllCustomers": {
+    "/api/Booking/previousBooking/{customerId}": {
       "get": {
         "tags": [
-          "Customer"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/getCustomerById/{customerId}": {
-      "get": {
-        "tags": [
-          "Customer"
+          "Booking"
         ],
         "parameters": [
           {
@@ -425,7 +444,19 @@
         }
       }
     },
-    "/getCustomerBookingHistory/{customerId}": {
+    "/getAllCustomers": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/getCustomerById/{customerId}": {
       "get": {
         "tags": [
           "Customer"
@@ -789,6 +820,41 @@
       "get": {
         "tags": [
           "Skintype"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/getSkintypeServices": {
+      "get": {
+        "tags": [
+          "SkintypeService"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/getSkintypeServiceById/{id}": {
+      "get": {
+        "tags": [
+          "SkintypeService"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
         ],
         "responses": {
           "200": {
