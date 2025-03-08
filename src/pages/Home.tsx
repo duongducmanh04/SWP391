@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { Pie, Line } from "@ant-design/charts";
 import { Card, Col, Flex, Row, Space, Typography } from "antd";
 import * as Icon from "@ant-design/icons";
+import { useDashboardSummary } from "../features/dashboard/hooks/useGetDashboardSummary";
+import { useTotalBookingsInMonth } from "../features/dashboard/hooks/useTotalBookingInMonth";
+import { useTotalRevenueInMonth } from "../features/dashboard/hooks/useTotalRevenueInMonth";
 
 const data = [
   {
@@ -61,6 +64,7 @@ const Home = () => {
         console.log("fetch data failed", error);
       });
   };
+
   const config2 = {
     title: {
       visible: true,
@@ -80,6 +84,13 @@ const Home = () => {
       tickCount: 5,
     },
   };
+
+  const { data: dashboardSummaryData, isLoading: isLoadingDashboardSummary } =
+    useDashboardSummary();
+
+  const { data: totalBookingsData } = useTotalBookingsInMonth();
+  const { data: totalRevenueData } = useTotalRevenueInMonth();
+
   return (
     <>
       <Row gutter={[16, 16]}>
@@ -88,7 +99,7 @@ const Home = () => {
             <Row justify="space-between">
               <Col xs={16}>
                 <Typography.Text type="secondary" strong={true}>
-                  Today's Sales
+                  Tổng doanh thu
                 </Typography.Text>
                 <Space size="small" align="baseline">
                   <Typography.Title
@@ -96,11 +107,15 @@ const Home = () => {
                     style={{ margin: 0 }}
                     ellipsis={true}
                   >
-                    $53,000
+                    {isLoadingDashboardSummary
+                      ? "Đang tải"
+                      : dashboardSummaryData?.totalRevenue ?? 0}
                   </Typography.Title>
-                  <Typography.Text type="success" strong={true} ellipsis={true}>
-                    +30%
-                  </Typography.Text>
+                  <Typography.Text
+                    type="success"
+                    strong={true}
+                    ellipsis={true}
+                  ></Typography.Text>
                 </Space>
               </Col>
               <Col xs={6} style={{ textAlign: "center" }}>
@@ -114,20 +129,21 @@ const Home = () => {
         <Col xs={24} md={12} xl={6}>
           <Card style={{ height: "100%" }}>
             <Row>
-              <Col xs={16}>
+              <Col xs={19}>
                 <Typography.Text type="secondary" strong={true}>
-                  Today's Users
+                  Tổng doanh thu trong tháng
                 </Typography.Text>
                 <Space size="small" align="baseline">
                   <Typography.Title level={3} style={{ margin: 0 }}>
-                    $3,200
+                    {totalRevenueData}
                   </Typography.Title>
-                  <Typography.Text type="success" strong={true}>
-                    +20%
-                  </Typography.Text>
+                  <Typography.Text
+                    type="success"
+                    strong={true}
+                  ></Typography.Text>
                 </Space>
               </Col>
-              <Col xs={6} style={{ textAlign: "center" }}>
+              <Col xs={5} style={{ textAlign: "center" }}>
                 <Icon.RocketTwoTone
                   style={{ fontSize: "60px", color: "#1890ff" }}
                 />
@@ -138,17 +154,18 @@ const Home = () => {
         <Col xs={24} md={12} xl={6}>
           <Card style={{ height: "100%" }}>
             <Row>
-              <Col xs={15}>
+              <Col xs={18}>
                 <Typography.Text type="secondary" strong={true}>
-                  New Clients
+                  Tổng số đặt trong tháng
                 </Typography.Text>
                 <Space size="small" align="baseline">
                   <Typography.Title level={3} style={{ margin: 0 }}>
-                    $1,200
+                    {totalBookingsData}
                   </Typography.Title>
-                  <Typography.Text type="danger" strong={true}>
-                    -15%
-                  </Typography.Text>
+                  <Typography.Text
+                    type="danger"
+                    strong={true}
+                  ></Typography.Text>
                 </Space>
               </Col>
               <Col xs={6} style={{ textAlign: "center" }}>
@@ -162,17 +179,21 @@ const Home = () => {
         <Col xs={24} md={12} xl={6}>
           <Card style={{ height: "100%" }}>
             <Row>
-              <Col xs={16}>
+              <Col xs={16} style={{ display: "flex", flexDirection: "column" }}>
                 <Typography.Text type="secondary" strong={true}>
-                  New Orders
+                  Tổng số đặt
                 </Typography.Text>
                 <Space size="small" align="baseline">
-                  <Typography.Title level={3} style={{ margin: 0 }}>
-                    $13,200
+                  <Typography.Title level={3} style={{ margin: 0, width: 40 }}>
+                    {isLoadingDashboardSummary
+                      ? "Đang tải"
+                      : dashboardSummaryData?.totalBookings ?? 0}
                   </Typography.Title>
-                  <Typography.Text type="warning" strong={true}>
-                    +1%
-                  </Typography.Text>
+                  <Typography.Text
+                    type="warning"
+                    strong={true}
+                    ellipsis={true}
+                  ></Typography.Text>
                 </Space>
               </Col>
               <Col xs={6} style={{ textAlign: "center" }}>
