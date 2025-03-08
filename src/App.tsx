@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import Login from "./features/authentication/components/Login";
 import Register from "./features/authentication/components/Register";
-import Home from "./Home";
+import Home from "./pages/Home";
 import WorkVolume from "./features/work_volume/WorkVolume";
 import UserListPage from "./features/user/pages/UserListPage";
 import UserDetail from "./features/user/components/UserListDetail";

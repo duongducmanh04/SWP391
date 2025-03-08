@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { message } from "antd";
 import { jwtDecode } from "jwt-decode";
 
-type UserRole = "Customer" | "Manager" | "Staff" | "Therapist" | "Admin";
+type UserRole = "Customer" | "Manager" | "Staff" | "Skintherapist" | "Admin";
 
 type AuthGuardContextType = Record<string, unknown>;
 
@@ -77,7 +77,7 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.BOOKING_DETAIL.replace(":bookingId", ""),
         PagePath.SCHEDULE_FOR_STAFF_MANAGEMENT,
       ],
-      Therapist: [
+      Skintherapist: [
         PagePath.HOME,
         PagePath.BOOKING,
         PagePath.BOOKING_DETAIL.replace(":bookingId", ""),
