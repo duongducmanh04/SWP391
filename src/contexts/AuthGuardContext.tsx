@@ -86,7 +86,6 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
       Customer: [
         PagePath.BLOG,
         PagePath.BLOG_DETAIL,
-        PagePath.RESULT_COMPLETE,
         PagePath.BOOKING_SERVICE,
         PagePath.SKIN_SERVICE,
         PagePath.SKIN_SERVICE_DETAIL.replace(":serviceId", ""),
@@ -94,6 +93,8 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.PRICE_SERVICE,
         PagePath.QUIZ,
         PagePath.SKIN_TYPE,
+        PagePath.BOOKING_INFO_CONFIRM,
+        PagePath.COMPLETE_RESULT,
       ],
       Manager: [],
     };

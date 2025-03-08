@@ -20,7 +20,6 @@ import SkincareServices from "./features/services/components/SkinService";
 import BlogPage from "./features/blog/components/Blog";
 import BlogDetail from "./features/blog/components/BlogDetail";
 import NavbarMenu from "./components/NavBarMenu";
-import Complete from "./pages/CompleteResult";
 import ServiceDetail from "./features/services/components/SkinServiceDetail";
 import SkincareBooking from "./features/services/components/BookingService";
 import PricingTable from "./pages/PricingPage";
@@ -36,6 +35,7 @@ import BookingDetail from "./features/booking/components/BookingDetail";
 import CompleteBookingPage from "./pages/CompleteResult";
 import ScheduleCalendarPage from "./features/schedule/page/SchedulePage";
 import ScheduleCalendarManagementPage from "./features/schedule/page/TherapistSchedulePage";
+import BookingInfoConfirm from "./features/services/components/BookingInfoConfirm";
 
 const App = () => {
   return (
@@ -94,9 +94,12 @@ const App = () => {
               path={PagePath.BOOKING_SERVICE}
               element={<SkincareBooking />}
             />
-            <Route path={PagePath.RESULT_COMPLETE} element={<Complete />} />
             <Route path={PagePath.PRICE_SERVICE} element={<PricingTable />} />
             <Route path={PagePath.SKIN_TYPE} element={<SkinType />} />
+            <Route
+              path={PagePath.BOOKING_INFO_CONFIRM}
+              element={<BookingInfoConfirm />}
+            />
             <Route
               path={PagePath.COMPLETE_RESULT}
               element={<CompleteBookingPage />}
