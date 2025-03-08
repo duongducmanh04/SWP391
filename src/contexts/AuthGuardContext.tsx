@@ -84,6 +84,7 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.SCHEDULE_FOR_THERAPIST,
       ],
       Customer: [
+        PagePath.CUSTOMER_PROFILE,
         PagePath.BLOG,
         PagePath.BLOG_DETAIL,
         PagePath.BOOKING_SERVICE,

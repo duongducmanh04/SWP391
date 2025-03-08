@@ -34,7 +34,7 @@ const NavbarMenu = () => {
 
   const handleMenu = (key: string) => {
     if (key === "account") {
-      navigate("/Home/Profile");
+      navigate("/Homepage/Profile");
     } else if (key === "logout") {
       logout();
       navigate(PagePath.LOGIN);
