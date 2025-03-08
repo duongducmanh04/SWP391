@@ -9,7 +9,23 @@
     "Parameters": [
       {
         "Name": "loginDTO",
-        "Type": "SkincareBookingService.BLL.DTOs.LoginDTO",
+        "Type": "SkincareBookingService.BLL.DTOs.AuthenticationDTOs.LoginDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.AuthController",
+    "Method": "Register",
+    "RelativePath": "api/auth/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "registerDTO",
+        "Type": "SkincareBookingService.BLL.DTOs.AuthenticationDTOs.RegisterDTO",
         "IsRequired": true
       }
     ],
@@ -228,6 +244,85 @@
         "Name": "serviceName",
         "Type": "System.String",
         "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.QuizQuestionSetController",
+    "Method": "GetAllQuizQuestionSets",
+    "RelativePath": "api/QuizQuestionSet",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.QuizQuestionSetController",
+    "Method": "Create",
+    "RelativePath": "api/QuizQuestionSet",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "SkincareBookingService.BLL.DTOs.QuizQuestionSetPostDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.QuizQuestionSetController",
+    "Method": "GetQuizQuestionSetById",
+    "RelativePath": "api/QuizQuestionSet/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.QuizQuestionSetController",
+    "Method": "Update",
+    "RelativePath": "api/QuizQuestionSet/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "SkincareBookingService.BLL.DTOs.QuizQuestionSetPutDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.QuizQuestionSetController",
+    "Method": "Delete",
+    "RelativePath": "api/QuizQuestionSet/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": []
@@ -550,16 +645,6 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "SkincareBookingService.Controllers.QuizQuestionSetController",
-    "Method": "GetAllQuizQuestionSets",
-    "RelativePath": "getAllQuizQuestionSets",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
     "ContainingType": "SkincareBookingService.Controllers.CustomerSurveyController",
     "Method": "GetAllSurveys",
     "RelativePath": "getAllSurveys",
@@ -602,6 +687,16 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "SkincareBookingService.Controllers.DashboardController",
+    "Method": "GetDashboardSummary",
+    "RelativePath": "getDashboardSummary",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "SkincareBookingService.Controllers.QuizAnswerController",
     "Method": "GetQuizAnswerById",
     "RelativePath": "getQuizAnswerById/{id}",
@@ -621,22 +716,6 @@
     "ContainingType": "SkincareBookingService.Controllers.QuizQuestionController",
     "Method": "GetQuizQuestionById",
     "RelativePath": "getQuizQuestionById/{id}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "SkincareBookingService.Controllers.QuizQuestionSetController",
-    "Method": "GetQuizQuestionSetById",
-    "RelativePath": "getQuizQuestionSetById/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -685,6 +764,48 @@
     "Parameters": [
       {
         "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.DashboardController",
+    "Method": "GetTotalBookingsInMonth",
+    "RelativePath": "getTotalBookingsInMonth/{year}/{month}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "month",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.DashboardController",
+    "Method": "GetTotalRevenueInMonth",
+    "RelativePath": "getTotalRevenueInMonth/{year}/{month}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "month",
         "Type": "System.Int32",
         "IsRequired": true
       }
