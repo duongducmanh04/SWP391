@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SkincareBookingService.BLL.Interfaces;
+using SkincareBookingService.BLL.Services;
 
 namespace SkincareBookingService.Controllers
 {
@@ -30,6 +31,20 @@ namespace SkincareBookingService.Controllers
         {
             var totalRevenue = await _dashboardService.GetTotalRevenueInMonthAsync(year, month);
             return Ok(totalRevenue);
+        }
+
+        [HttpGet("getMonthlyBookingRevenue/{year}")]
+        public async Task<IActionResult> GetMonthlyBookingRevenue(int year)
+        {
+            var monthlyData = await _dashboardService.GetMonthlyBookingRevenueAsync(year);
+            return Ok(monthlyData);
+        }
+
+        [HttpGet("getRoleCounts")]
+        public async Task<IActionResult> GetRoleCounts()
+        {
+            var roleCounts = await _dashboardService.GetRoleCountsAsync();
+            return Ok(roleCounts);
         }
     }
 }
