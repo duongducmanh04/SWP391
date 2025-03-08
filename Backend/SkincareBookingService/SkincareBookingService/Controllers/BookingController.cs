@@ -215,6 +215,20 @@ public class BookingController : ControllerBase
         }
     }
 
+    [HttpPut("note/{bookingId}")]
+    public async Task<IActionResult> UpdateBookingNote(int bookingId, string note)
+    {
+        var result = await _bookingService.UpdateBookingNoteAsync(bookingId, note);
+        if (result)
+        {
+            return Ok(new { message = "Booking note updated successfully." });
+        }
+        else
+        {
+            return NotFound(new { message = "Booking not found." });
+        }
+    }
+
     [HttpGet("previousBooking/{customerId}")]
     public async Task<IActionResult> GetPreviousBookings(int customerId)
     {
