@@ -36,6 +36,7 @@ import CompleteBookingPage from "./pages/CompleteResult";
 import ScheduleCalendarPage from "./features/schedule/page/SchedulePage";
 import ScheduleCalendarManagementPage from "./features/schedule/page/TherapistSchedulePage";
 import BookingInfoConfirm from "./features/services/components/BookingInfoConfirm";
+import CustomerProfile from "./pages/CUstomerProfilePage";
 
 const App = () => {
   return (
@@ -103,6 +104,10 @@ const App = () => {
             <Route
               path={PagePath.COMPLETE_RESULT}
               element={<CompleteBookingPage />}
+            />
+            <Route
+              path={PagePath.CUSTOMER_PROFILE}
+              element={<CustomerProfile />}
             />
           </Route>
         </Routes>
