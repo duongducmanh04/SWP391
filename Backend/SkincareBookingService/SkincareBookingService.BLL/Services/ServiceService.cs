@@ -45,5 +45,73 @@ namespace SkincareBookingService.BLL.Services
                 Image = service.Image
             };
         }
+
+        public async Task<bool> UpdateServiceNameAsync(int serviceId, string name)
+        {
+            var service = await _serviceRepository.GetByIdAsync(serviceId);
+            if (service == null) return false;
+
+            service.Name = name;
+            await _serviceRepository.UpdateAsync(service);
+            await _serviceRepository.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UpdateServiceDescriptionAsync(int serviceId, string description)
+        {
+            var service = await _serviceRepository.GetByIdAsync(serviceId);
+            if (service == null) return false;
+
+            service.Description = description;
+            await _serviceRepository.UpdateAsync(service);
+            await _serviceRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateServicePriceAsync(int serviceId, decimal price)
+        {
+            var service = await _serviceRepository.GetByIdAsync(serviceId);
+            if (service == null) return false;
+
+            service.Price = price;
+            await _serviceRepository.UpdateAsync(service);
+            await _serviceRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateServiceImageAsync(int serviceId, string image)
+        {
+            var service = await _serviceRepository.GetByIdAsync(serviceId);
+            if (service == null) return false;
+
+            service.Image = image;
+            await _serviceRepository.UpdateAsync(service);
+            await _serviceRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateServiceDurationAsync(int serviceId, int duration)
+        {
+            var service = await _serviceRepository.GetByIdAsync(serviceId);
+            if (service == null) return false;
+
+            service.Duration = duration;
+            await _serviceRepository.UpdateAsync(service);
+            await _serviceRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateServiceProcedureDescriptionAsync(int serviceId, string procedureDescription)
+        {
+            var service = await _serviceRepository.GetByIdAsync(serviceId);
+            if (service == null) return false;
+
+            service.ProcedureDescription = procedureDescription;
+            await _serviceRepository.UpdateAsync(service);
+            await _serviceRepository.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

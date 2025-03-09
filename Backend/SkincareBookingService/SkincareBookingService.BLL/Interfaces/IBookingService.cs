@@ -29,6 +29,12 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<bool> UpdateBookingNoteAsync(int bookingId, string note);
 
+        Task<bool> UpdateBookingDateAsync(int bookingId, DateTime date);
+
+        Task<bool> UpdateBookingLocationAsync(int bookingId, string location);
+
+        Task<bool> UpdateBookingSkintherapistAsync(int bookingId, int skintherapistId);
+
         Task<bool> CreateBooking(PostBookingDTO booking, int slotId);
 
         Task<List<BookingDTO>> GetBookingsByCustomerId(int customerId);

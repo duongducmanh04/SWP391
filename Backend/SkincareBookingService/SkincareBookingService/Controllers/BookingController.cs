@@ -215,6 +215,48 @@ public class BookingController : ControllerBase
         }
     }
 
+    [HttpPut("date/{bookingId}")]
+    public async Task<IActionResult> UpdateBookingDate(int bookingId, DateTime date)
+    {
+        var result = await _bookingService.UpdateBookingDateAsync(bookingId, date);
+        if (result)
+        {
+            return Ok(new { message = "Booking date updated successfully." });
+        }
+        else
+        {
+            return NotFound(new { message = "Booking not found." });
+        }
+    }
+
+    [HttpPut("location/{bookingId}")]
+    public async Task<IActionResult> UpdateBookingLocation(int bookingId, string location)
+    {
+        var result = await _bookingService.UpdateBookingLocationAsync(bookingId, location);
+        if (result)
+        {
+            return Ok(new { message = "Booking location updated successfully." });
+        }
+        else
+        {
+            return NotFound(new { message = "Booking not found." });
+        }
+    }
+
+    [HttpPut("skintherapist/{bookingId}")]
+    public async Task<IActionResult> UpdateBookingSkintherapist(int bookingId, int skintherapistId)
+    {
+        var result = await _bookingService.UpdateBookingSkintherapistAsync(bookingId, skintherapistId);
+        if (result)
+        {
+            return Ok(new { message = "Booking skintherapist updated successfully." });
+        }
+        else
+        {
+            return NotFound(new { message = "Booking not found." });
+        }
+    }
+
     [HttpPut("note/{bookingId}")]
     public async Task<IActionResult> UpdateBookingNote(int bookingId, string note)
     {

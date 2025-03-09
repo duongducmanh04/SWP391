@@ -32,5 +32,71 @@ namespace SkincareBookingService.Controllers
             }
             return Ok(service);
         }
+
+        [HttpPut("updateServiceName/{serviceId}")]
+        public async Task<IActionResult> UpdateServiceName(int serviceId, [FromBody] string name)
+        {
+            var result = await _serviceService.UpdateServiceNameAsync(serviceId, name);
+            if (result)
+            {
+                return Ok(new { message = "Service name updated successfully." });
+            }
+            return BadRequest(new { message = "Failed to update service name." });
+        }
+
+        [HttpPut("updateServiceDescription/{serviceId}")]
+        public async Task<IActionResult> UpdateServiceDescription(int serviceId, [FromBody] string description)
+        {
+            var result = await _serviceService.UpdateServiceDescriptionAsync(serviceId, description);
+            if (result)
+            {
+                return Ok(new { message = "Service description updated successfully." });
+            }
+            return BadRequest(new { message = "Failed to update service description." });
+        }
+
+        [HttpPut("updateServicePrice/{serviceId}")]
+        public async Task<IActionResult> UpdateServicePrice(int serviceId, [FromBody] decimal price)
+        {
+            var result = await _serviceService.UpdateServicePriceAsync(serviceId, price);
+            if (result)
+            {
+                return Ok(new { message = "Service price updated successfully." });
+            }
+            return BadRequest(new { message = "Failed to update service price." });
+        }
+
+        [HttpPut("updateServiceImage/{serviceId}")]
+        public async Task<IActionResult> UpdateServiceImage(int serviceId, [FromBody] string image)
+        {
+            var result = await _serviceService.UpdateServiceImageAsync(serviceId, image);
+            if (result)
+            {
+                return Ok(new { message = "Service image updated successfully." });
+            }
+            return BadRequest(new { message = "Failed to update service image." });
+        }
+
+        [HttpPut("updateServiceDuration/{serviceId}")]
+        public async Task<IActionResult> UpdateServiceDuration(int serviceId, [FromBody] int duration)
+        {
+            var result = await _serviceService.UpdateServiceDurationAsync(serviceId, duration);
+            if (result)
+            {
+                return Ok(new { message = "Service duration updated successfully." });
+            }
+            return BadRequest(new { message = "Failed to update service duration." });
+        }
+
+        [HttpPut("updateServiceProcedureDescription/{serviceId}")]
+        public async Task<IActionResult> UpdateServiceProcedureDescription(int serviceId, [FromBody] string procedureDescription)
+        {
+            var result = await _serviceService.UpdateServiceProcedureDescriptionAsync(serviceId, procedureDescription);
+            if (result)
+            {
+                return Ok(new { message = "Service procedure description updated successfully." });
+            }
+            return BadRequest(new { message = "Failed to update service procedure description." });
+        }
     }
 }
