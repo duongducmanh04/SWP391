@@ -5,6 +5,7 @@ import { QuizQuestionDto } from "../dto/quiz-question.dto";
 import { QuizAnswerDto } from "../dto/quiz-answer.dto";
 import { useQuizQuestion } from "../hooks/useGetQuizQuestion";
 import { useQuizAnswer } from "../hooks/useGetQuizAnswer";
+import "../../../style/Quiz.css";
 
 const { Title, Text } = Typography;
 
