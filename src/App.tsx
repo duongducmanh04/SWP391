@@ -36,7 +36,7 @@ import CompleteBookingPage from "./pages/CompleteResult";
 import ScheduleCalendarPage from "./features/schedule/page/SchedulePage";
 import ScheduleCalendarManagementPage from "./features/schedule/page/TherapistSchedulePage";
 import BookingInfoConfirm from "./features/services/components/BookingInfoConfirm";
-import CustomerProfile from "./pages/CUstomerProfilePage";
+import CustomerProfile from "./pages/CustomerProfilePage";
 
 const App = () => {
   return (

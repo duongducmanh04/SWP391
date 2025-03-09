@@ -56,7 +56,6 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
       if (!publicPages.includes(location.pathname as PagePath)) {
         navigate(PagePath.LOGIN, { replace: true });
         // message.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
-        // message.error("Bạn phải đăng nhập để truy cập trang này");
       }
       return;
     }
@@ -69,18 +68,18 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.HOME,
         PagePath.WORK_VOLUME,
         PagePath.PROFILE,
-        PagePath.PROFILE_DETAIL,
       ],
       Staff: [
         PagePath.HOME,
         PagePath.BOOKING,
-        PagePath.BOOKING_DETAIL.replace(":bookingId", ""),
+        // PagePath.BOOKING_DETAIL.replace(":bookingId", ""),
+        PagePath.BOOKING_DETAIL,
         PagePath.SCHEDULE_FOR_STAFF_MANAGEMENT,
       ],
       Skintherapist: [
         PagePath.HOME,
         PagePath.BOOKING,
-        PagePath.BOOKING_DETAIL.replace(":bookingId", ""),
+        PagePath.BOOKING_DETAIL,
         PagePath.SCHEDULE_FOR_THERAPIST,
       ],
       Customer: [
@@ -89,36 +88,39 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.BLOG_DETAIL,
         PagePath.BOOKING_SERVICE,
         PagePath.SKIN_SERVICE,
-        PagePath.SKIN_SERVICE_DETAIL.replace(":serviceId", ""),
+        // PagePath.SKIN_SERVICE_DETAIL.replace(":serviceId", ""),
+        PagePath.SKIN_SERVICE_DETAIL,
         PagePath.SKIN_THERAPIST,
+        PagePath.SKIN_THERAPIST_DETAIL,
         PagePath.PRICE_SERVICE,
         PagePath.QUIZ,
         PagePath.SKIN_TYPE,
         PagePath.BOOKING_INFO_CONFIRM,
         PagePath.COMPLETE_RESULT,
+        PagePath.CUSTOMER_BOOKING_DETAIL,
       ],
       Manager: [],
     };
 
-    // const currentPage = location.pathname as PagePath;
+    const currentPage = location.pathname as PagePath;
 
-    // if (!publicPages.includes(currentPage) && restrictedPages[role]?.length) {
-    //   const allowedPages = restrictedPages[role] || [];
+    if (!publicPages.includes(currentPage) && restrictedPages[role]?.length) {
+      const allowedPages = restrictedPages[role] || [];
 
-    //   if (!allowedPages.includes(currentPage)) {
-    //     navigate(PagePath.FORBIDDEN, { replace: true });
-    //     // message.error("Bạn không có quyền truy cập trang này");
-    //   }
-    // }
-    const currentPage = location.pathname;
-
-    const isAllowed = restrictedPages[role]?.some((allowedPath) =>
-      currentPage.startsWith(allowedPath)
-    );
-
-    if (!publicPages.includes(currentPage as PagePath) && !isAllowed) {
-      navigate(PagePath.FORBIDDEN, { replace: true });
+      if (!allowedPages.includes(currentPage)) {
+        navigate(PagePath.FORBIDDEN, { replace: true });
+        // message.error("Bạn không có quyền truy cập trang này");
+      }
     }
+    // const currentPage = location.pathname;
+
+    // const isAllowed = restrictedPages[role]?.some((allowedPath) =>
+    //   currentPage.startsWith(allowedPath)
+    // );
+
+    // if (!publicPages.includes(currentPage as PagePath) && !isAllowed) {
+    //   navigate(PagePath.FORBIDDEN, { replace: true });
+    // }
   }, [user, location, navigate]);
 
   return (
