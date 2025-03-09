@@ -9,6 +9,15 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<CustomerDTO> GetCustomerByIdAsync(int id);
 
-        /*Task<List<BookingDTO>> GetCustomerBookingHistoryAsync(int customerId);*/
+        Task<CustomerDTO> CreateCustomerAsync(CustomerDTO customer);
+
+        Task<bool> UpdateCustomerNameAsync(int customerId, string name);
+
+        Task<bool> UpdateCustomerEmailAsync(int customerId, string email);
+
+        Task<bool> UpdateCustomerPhoneNumberAsync(int customerId, string phoneNumber);
+
+        Task<bool> UpdateCustomerSkintypeAsync(int customerId, int skintypeId);
+
     }
 }
