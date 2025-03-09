@@ -13,6 +13,20 @@ namespace SkincareBookingService.Controllers
             _customerSurveyService = customerSurveyService;
         }
 
+        [HttpPost("submit")]
+        public async Task<IActionResult> SubmitSurvey([FromBody] SubmitSurveyDTO request)
+        {
+            if (request == null || request.Answers == null || request.Answers.Count == 0)
+                return BadRequest("Danh sách câu trả lời không hợp lệ!");
+
+            int surveyId = await _customerSurveyService.SubmitSurveyAsync(request);
+
+            var recommendedSkinType = await _customerSurveyService.RecommendSkintypeAsync(surveyId);
+
+            return Ok(new { surveyId, recommendedSkinType });
+        }
+
+
         [HttpGet("getAllSurveys")]
         public async Task<IActionResult> GetAllSurveys()
         {
