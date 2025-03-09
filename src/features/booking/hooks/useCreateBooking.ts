@@ -14,7 +14,7 @@ export const useCreateBooking = () => {
       }
 
       const response = await axios.post<BookingResponse>(
-        `http://skincare-sbs.southeastasia.azurecontainer.io:8080/api/Booking/create-booking?slotId=${createBooking.slotId}`,
+        `https://localhost:7071/api/Booking/create-booking?slotId=${createBooking.slotId}`,
         createBooking,
         { headers: { "Content-Type": "application/json" } }
       );

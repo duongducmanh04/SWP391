@@ -1,11 +1,13 @@
 import { Card, Typography, Row, Col, Image, Divider, Spin } from "antd";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useTherapistById } from "../hooks/useGetTherapistId";
 
 const { Title, Text } = Typography;
 
 const SkinTherapistDetail = () => {
-  const { skintherapistId } = useParams();
+  // const { skintherapistId } = useParams();
+  const location = useLocation();
+  const { skintherapistId } = location.state || {};
   const {
     data: therapist,
     isLoading,

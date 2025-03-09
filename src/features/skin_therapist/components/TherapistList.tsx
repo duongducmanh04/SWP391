@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTherapists } from "../hooks/useGetTherapist";
 import { useTherapistStore } from "../hooks/useTherapistStore";
+import { PagePath } from "../../../enums/page-path.enum";
 
 const { Title, Text } = Typography;
 
@@ -16,8 +17,15 @@ const SkinTherapistList = () => {
 
   const { setTherapists } = useTherapistStore();
 
-  const handleNavigate = (id: number) => {
-    navigate(`/Homepage/SkinTherapist/${id}`);
+  // const handleNavigate = (id: number) => {
+  //   navigate(`/Homepage/SkinTherapist/${id}`);
+  // };
+  const handleNavigate = (skintherapistId: number) => {
+    navigate(PagePath.SKIN_THERAPIST_DETAIL, {
+      state: {
+        skintherapistId: skintherapistId,
+      },
+    });
   };
 
   useEffect(() => {
