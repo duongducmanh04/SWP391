@@ -7,5 +7,11 @@ namespace SkincareBookingService.BLL.Interfaces
         Task<List<SkintypeServiceDTO>> GetSkintypeServicesAsync();
 
         Task<SkintypeServiceDTO> GetSkintypeServiceByIdAsync(int id);
+
+        Task<SkintypeServiceDTO> GetSkintypeServiceByServiceIdAsync(int serviceId);
+
+        Task<SkintypeServiceDTO> GetSkintypeServiceBySkintypeIdAsync(int skintypeId);
+
+        Task<SkintypeServiceDTO> AddSkintypeServiceAsync(SkintypeServiceDTO skintypeServiceDTO);
     }
 }
