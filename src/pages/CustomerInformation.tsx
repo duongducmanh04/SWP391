@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Layout, Menu, Card, Spin, Alert, Avatar, List } from "antd";
+import { useNavigate } from "react-router-dom";
+import { Layout, Menu, Card, Spin, Alert, Avatar, List, Button } from "antd";
 import {
   UserOutlined,
   ClockCircleOutlined,
@@ -7,27 +8,44 @@ import {
 } from "@ant-design/icons";
 import { useGetCustomerProfile } from "../features/user/hook/useGetCustomerProfile";
 import { useBookingHistory } from "../features/booking/hooks/useBookingHistory";
+import { useGetCustomerId } from "../features/user/hook/useGetCustomerId";
+import { BookingDto } from "../features/booking/dto/booking.dto";
 
 const { Sider, Content } = Layout;
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("personal");
-  const accountId = 7; // Có thể lấy từ auth state
+  const navigate = useNavigate();
+  const accountId = 7;
   const role = "Customer";
 
-  // Fetch dữ liệu khách hàng
+  const {
+    customerId,
+    isLoading: isCustomerIdLoading,
+    error: customerIdError,
+  } = useGetCustomerId();
   const {
     data: customer,
-    isLoading,
-    isError,
-    error,
+    isLoading: isCustomerLoading,
+    isError: isCustomerError,
+    error: customerError,
   } = useGetCustomerProfile(accountId, role);
-  const { data: bookings, isLoading: isBookingLoading } = useBookingHistory();
+  const {
+    data: bookings,
+    isLoading: isBookingLoading,
+    isError: isBookingError,
+    error: bookingError,
+  } = useBookingHistory();
+
+  const handleNavigateToBookingDetail = (bookingId: number) => {
+    const url = `/CustomerBookingDetail/${bookingId}`;
+    console.log("🔍 Điều hướng đến:", url);
+    navigate(url);
+  };
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#f5f1eb" }}>
       <Layout>
-        {/* Sidebar */}
         <Sider width={250} theme="light" style={{ background: "#fff" }}>
           <Menu
             mode="inline"
@@ -47,17 +65,29 @@ const ProfilePage = () => {
           </Menu>
         </Sider>
 
-        {/* Main Content */}
         <Layout style={{ padding: "24px", background: "#f5f1eb" }}>
           <Content
             style={{ padding: "24px", background: "#fff", borderRadius: "8px" }}
           >
             <Card title="Hồ sơ khách hàng" bordered={false}>
-              {isLoading ? (
-                <Spin tip="Đang tải dữ liệu khách hàng..." />
-              ) : isError ? (
+              {isCustomerIdLoading ? (
+                <Spin tip="Đang tải thông tin khách hàng..." />
+              ) : customerIdError ? (
                 <Alert
-                  message={error?.message || "Lỗi tải dữ liệu"}
+                  message={`Lỗi: ${customerIdError.message}`}
+                  type="error"
+                />
+              ) : (
+                <p>Customer ID: {customerId}</p>
+              )}
+
+              {isCustomerLoading ? (
+                <Spin tip="Đang tải dữ liệu khách hàng..." />
+              ) : isCustomerError ? (
+                <Alert
+                  message={
+                    customerError?.message || "Lỗi tải dữ liệu khách hàng"
+                  }
                   type="error"
                 />
               ) : customer ? (
@@ -81,23 +111,58 @@ const ProfilePage = () => {
                       </p>
                     </div>
                   )}
-                  {activeTab === "schedule" &&
-                    (isBookingLoading ? (
-                      <Spin tip="Đang tải lịch sử đặt lịch..." />
-                    ) : (
-                      <List
-                        itemLayout="horizontal"
-                        dataSource={bookings}
-                        renderItem={(booking) => (
-                          <List.Item>
-                            <List.Item.Meta
-                              title={`Dịch vụ: ${booking.serviceName}`}
-                              description={`Thời gian: ${booking.date} - Trạng thái: ${booking.status}`}
-                            />
-                          </List.Item>
-                        )}
-                      />
-                    ))}
+
+                  {activeTab === "schedule" && (
+                    <>
+                      {isBookingLoading ? (
+                        <Spin tip="Đang tải lịch sử đặt lịch..." />
+                      ) : isBookingError ? (
+                        <Alert
+                          message={
+                            bookingError?.message || "Lỗi tải lịch sử đặt lịch"
+                          }
+                          type="error"
+                        />
+                      ) : bookings && bookings.length > 0 ? (
+                        <List
+                          itemLayout="horizontal"
+                          dataSource={bookings}
+                          renderItem={(booking: BookingDto) => (
+                            <List.Item
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                handleNavigateToBookingDetail(booking.bookingId)
+                              } // Điều hướng khi click cả item
+                              actions={[
+                                <Button
+                                  type="primary"
+                                  onClick={(e) => {
+                                    e.stopPropagation(); // Ngăn chặn sự kiện click từ lan ra ngoài
+                                    handleNavigateToBookingDetail(
+                                      booking.bookingId
+                                    );
+                                  }}
+                                >
+                                  Xem Chi Tiết
+                                </Button>,
+                              ]}
+                            >
+                              <List.Item.Meta
+                                title={`Dịch vụ: ${booking.serviceName}`}
+                                description={`Ngày: ${booking.date} | Trạng thái: ${booking.status} | Địa điểm: ${booking.location}`}
+                              />
+                            </List.Item>
+                          )}
+                        />
+                      ) : (
+                        <Alert
+                          message="Không có lịch sử đặt lịch."
+                          type="warning"
+                        />
+                      )}
+                    </>
+                  )}
+
                   {activeTab === "password" && (
                     <p>Thay đổi mật khẩu của khách hàng</p>
                   )}

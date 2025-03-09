@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SkincareBookingService.DAL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f48deb192aec87123805e7fb670388e9febab7ff")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0f6bbeddf95e3d7e198a57e8fc6393c8eda3e462")]
 [assembly: System.Reflection.AssemblyProductAttribute("SkincareBookingService.DAL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SkincareBookingService.DAL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

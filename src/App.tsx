@@ -37,6 +37,7 @@ import CompleteBookingPage from "./pages/CompleteResult";
 import ScheduleCalendarPage from "./features/schedule/page/SchedulePage";
 import ScheduleCalendarManagementPage from "./features/schedule/page/TherapistSchedulePage";
 import CustomerInformation from "./pages/CustomerInformation";
+import CustomerBookingDetail from "./pages/CustomerBookingDetail";
 const App = () => {
   return (
     <Router>
@@ -104,6 +105,10 @@ const App = () => {
             <Route
               path={PagePath.CUSTOMER_INFORMATION}
               element={<CustomerInformation />}
+            />
+            <Route
+              path="/CustomerBookingDetail/:bookingId"
+              element={<CustomerBookingDetail />}
             />
           </Route>
         </Routes>
