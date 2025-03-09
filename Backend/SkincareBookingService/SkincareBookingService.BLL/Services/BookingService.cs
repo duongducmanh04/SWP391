@@ -221,5 +221,38 @@ namespace SkincareBookingService.BLL.Services
             await _bookingRepository.SaveChangesAsync();
             return true;
         }
+
+        public async Task<bool> UpdateBookingDateAsync(int bookingId, DateTime date)
+        {
+            var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            if (booking == null) return false;
+
+            booking.Date = date;
+            await _bookingRepository.UpdateAsync(booking);
+            await _bookingRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateBookingLocationAsync(int bookingId, string location)
+        {
+            var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            if (booking == null) return false;
+
+            booking.Location = location;
+            await _bookingRepository.UpdateAsync(booking);
+            await _bookingRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateBookingSkintherapistAsync(int bookingId, int skintherapistId)
+        {
+            var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            if (booking == null) return false;
+
+            booking.SkintherapistId = skintherapistId;
+            await _bookingRepository.UpdateAsync(booking);
+            await _bookingRepository.SaveChangesAsync();
+            return true;
+        }
     }
 }
