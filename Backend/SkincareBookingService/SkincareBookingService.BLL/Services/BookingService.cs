@@ -210,5 +210,77 @@ namespace SkincareBookingService.BLL.Services
 
             return bookingDto;
         }
+
+        public async Task<bool> UpdateBookingNoteAsync(int bookingId, string note)
+        {
+            var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            if (booking == null) return false;
+
+            booking.Note = note;
+            await _bookingRepository.UpdateAsync(booking);
+            await _bookingRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateBookingDateAsync(int bookingId, DateTime date)
+        {
+            var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            if (booking == null) return false;
+
+            booking.Date = date;
+            await _bookingRepository.UpdateAsync(booking);
+            await _bookingRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateBookingLocationAsync(int bookingId, string location)
+        {
+            var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            if (booking == null) return false;
+
+            booking.Location = location;
+            await _bookingRepository.UpdateAsync(booking);
+            await _bookingRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateBookingSkintherapistAsync(int bookingId, int skintherapistId)
+        {
+            var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            if (booking == null) return false;
+
+            booking.SkintherapistId = skintherapistId;
+            await _bookingRepository.UpdateAsync(booking);
+            await _bookingRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<Booking>> GetBookingBySkintherapistIdAsync(int skintherapistId)
+        {
+            var bookings = await _bookingRepository
+                .Query()
+                .Where(b => b.SkintherapistId == skintherapistId)
+                .ToListAsync();
+
+            if (bookings == null || !bookings.Any())
+            {
+                return new List<Booking>();
+            }
+            return bookings;
+        }
+
+        public async Task<List<Booking>> GetBookingByServiceIdAsync(int serviceId)
+        {
+            var bookings = await _bookingRepository
+                .Query()
+                .Where(b => b.ServiceId == serviceId)
+                .ToListAsync();
+
+            if (bookings == null || !bookings.Any())
+            {
+                return new List<Booking>();
+            }
+            return bookings;
+        }
     }
 }

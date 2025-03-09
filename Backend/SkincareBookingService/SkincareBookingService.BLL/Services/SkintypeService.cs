@@ -14,6 +14,28 @@ namespace SkincareBookingService.BLL.Services
             _skintypeRepository = genericRepository;
         }
 
+        public async Task<SkintypeDTO> GetSkintypeByIdAsync(int skintypeId)
+        {
+            var skintype = await _skintypeRepository.GetByIdAsync(skintypeId);
+            if (skintype == null)
+            {
+                return null;
+            }
+
+            return new SkintypeDTO
+            {
+                SkintypeId = skintype.SkintypeId,
+                SkintypeName = skintype.SkintypeName,
+                Description = skintype.Description,
+                Image = skintype.Image,
+                Status = skintype.Status,
+                Pros = skintype.Pros,
+                Cons = skintype.Cons,
+                SkincareGuide = skintype.SkincareGuide,
+                Introduction = skintype.Introduction
+            };
+        }
+
         public async Task<List<SkintypeDTO>> GetSkintypesAsync()
         {
             var skintypes = await _skintypeRepository.GetAllAsync();

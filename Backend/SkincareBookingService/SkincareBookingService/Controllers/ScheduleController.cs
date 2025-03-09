@@ -36,5 +36,27 @@ namespace SkincareBookingService.Controllers
             }
             return Ok(schedules);
         }
+
+        [HttpPut("updateSkintherapistId/{scheduleId}")]
+        public async Task<IActionResult> UpdateSkinTherapistID(int scheduleId, [FromBody] int skinTherapistId)
+        {
+            var result = await _scheduleService.UpdateSkintherapistIDAsync(scheduleId, skinTherapistId);
+            if (result)
+            {
+                return Ok("Skin therapist updated successfully");
+            }
+            return BadRequest("Failed to update skin therapist");
+        }
+
+        [HttpPut("updateSlotId/{scheduleId}")]
+        public async Task<IActionResult> UpdateSlotID(int scheduleId, [FromBody] int slotId)
+        {
+            var result = await _scheduleService.UpdateSlotIDAsync(scheduleId, slotId);
+            if (result)
+            {
+                return Ok("Slot updated successfully");
+            }
+            return BadRequest("Failed to update slot");
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SkincareBookingService.BLL.DTOs.DashboardDTOs;
+﻿using SkincareBookingService.BLL.DTOs;
+using SkincareBookingService.BLL.DTOs.DashboardDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,10 @@ namespace SkincareBookingService.BLL.Interfaces
         Task<int> GetTotalBookingsInMonthAsync(int year, int month);
 
         Task<decimal> GetTotalRevenueInMonthAsync(int year, int month);
+
+        Task<List<MonthlyBookingRevenueDTO>> GetMonthlyBookingRevenueAsync(int year);
+
+        Task<List<RoleCountDTO>> GetRoleCountsAsync();
+
     }
 }

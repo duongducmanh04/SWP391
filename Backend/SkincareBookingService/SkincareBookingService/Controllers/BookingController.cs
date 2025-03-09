@@ -108,6 +108,51 @@ public class BookingController : ControllerBase
         return Ok(bookings);
     }
 
+    [HttpGet("previousBooking/{customerId}")]
+    public async Task<IActionResult> GetPreviousBookings(int customerId)
+    {
+        if (customerId == null || customerId <= 0)
+        {
+            return BadRequest("Invalid customer id");
+        }
+
+        var result = await _bookingService.GetBookingsByCustomerId(customerId);
+        return Ok(result);
+    }
+
+    [HttpGet("getBookingBySkintherapistId/{skintherapistId}")]
+    public async Task<IActionResult> GetBookingBySkintherapistId(int skintherapistId)
+    {
+        if (skintherapistId <= 0)
+        {
+            return BadRequest(new { message = "Invalid skintherapist id." });
+        }
+        var bookings = await _bookingService.GetBookingBySkintherapistIdAsync(skintherapistId);
+        if (bookings == null || bookings.Count == 0)
+        {
+            return NotFound(new { message = "No bookings found for that skintherapist" });
+        }
+        return Ok(bookings);
+    }
+
+    [HttpGet("getBookingByServiceId/{serviceId}")]
+    public async Task<IActionResult> GetBookingByServiceId(int serviceId)
+    {
+        if (serviceId <= 0)
+        {
+            return BadRequest(new { message = "Invalid service id." });
+        }
+        var bookings = await _bookingService.GetBookingByServiceIdAsync(serviceId);
+        if (bookings == null || bookings.Count == 0)
+        {
+            return NotFound(new { message = "No bookings found for that service" });
+        }
+        return Ok(bookings);
+    }
+
+
+    // ===================== UPDATE METHODS =====================
+
     [HttpPut("checkin/{bookingId}")]
     public async Task<IActionResult> UpdateBookingStatusToCheckIn(int bookingId)
     {
@@ -215,16 +260,60 @@ public class BookingController : ControllerBase
         }
     }
 
-    [HttpGet("previousBooking/{customerId}")]
-    public async Task<IActionResult> GetPreviousBookings(int customerId)
+    [HttpPut("date/{bookingId}")]
+    public async Task<IActionResult> UpdateBookingDate(int bookingId, DateTime date)
     {
-        if(customerId == null || customerId <= 0)
+        var result = await _bookingService.UpdateBookingDateAsync(bookingId, date);
+        if (result)
         {
-            return BadRequest("Invalid customer id");
+            return Ok(new { message = "Booking date updated successfully." });
         }
+        else
+        {
+            return NotFound(new { message = "Booking not found." });
+        }
+    }
 
-        var result = await _bookingService.GetBookingsByCustomerId(customerId);
-        return Ok(result);
+    [HttpPut("location/{bookingId}")]
+    public async Task<IActionResult> UpdateBookingLocation(int bookingId, string location)
+    {
+        var result = await _bookingService.UpdateBookingLocationAsync(bookingId, location);
+        if (result)
+        {
+            return Ok(new { message = "Booking location updated successfully." });
+        }
+        else
+        {
+            return NotFound(new { message = "Booking not found." });
+        }
+    }
+
+    [HttpPut("skintherapist/{bookingId}")]
+    public async Task<IActionResult> UpdateBookingSkintherapist(int bookingId, int skintherapistId)
+    {
+        var result = await _bookingService.UpdateBookingSkintherapistAsync(bookingId, skintherapistId);
+        if (result)
+        {
+            return Ok(new { message = "Booking skintherapist updated successfully." });
+        }
+        else
+        {
+            return NotFound(new { message = "Booking not found." });
+        }
+    }
+
+    [HttpPut("note/{bookingId}")]
+    public async Task<IActionResult> UpdateBookingNote(int bookingId, string note)
+    {
+        var result = await _bookingService.UpdateBookingNoteAsync(bookingId, note);
+        if (result)
+        {
+            return Ok(new { message = "Booking note updated successfully." });
+        }
+        else
+        {
+            return NotFound(new { message = "Booking not found." });
+        }
     }
 }
 

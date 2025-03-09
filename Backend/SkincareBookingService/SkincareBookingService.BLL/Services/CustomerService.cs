@@ -17,6 +17,41 @@ namespace SkincareBookingService.BLL.Services
             _bookingRepository = bookingRepository;
         }
 
+        public async Task<CustomerDTO> CreateCustomerAsync(CustomerDTO customer)
+        {
+            var customerDTO = new CustomerDTO();
+
+            var newCustomer = new Customer
+            {
+                Name = customer.Name,
+                SkintypeId = customer.SkintypeId,
+                AccountId = customer.AccountId,
+                Email = customer.Email,
+                PhoneNumber = customer.PhoneNumber,
+                Image = customer.Image,
+            };
+
+            await _customerRepository.AddAsync(newCustomer);
+            await _customerRepository.SaveChangesAsync();
+
+            var createdCustomer = await _customerRepository.FirstOrDefaultAsync(c => c.Email == newCustomer.Email);
+
+            if (createdCustomer == null)
+            {
+                return null;
+            }
+            return new CustomerDTO
+            {
+                CustomerId = createdCustomer.CustomerId,
+                Name = createdCustomer.Name,
+                SkintypeId = createdCustomer.SkintypeId,
+                AccountId = createdCustomer.AccountId,
+                Email = createdCustomer.Email,
+                PhoneNumber = createdCustomer.PhoneNumber,
+                Image = createdCustomer.Image,
+            };
+        }
+
         public async Task<List<CustomerDTO>> GetAllCustomersAsync()
         {
             var customers = await _customerRepository.GetAllAsync();
@@ -32,37 +67,6 @@ namespace SkincareBookingService.BLL.Services
                 Image = c.Image,
             }).ToList();
         }
-
-        /*public async Task<List<BookingDTO>> GetCustomerBookingHistoryAsync(int customerId)
-        {
-            // Lấy tất cả các booking có CustomerId tương ứng
-            var bookings = await _bookingRepository.FindAsync(b => b.CustomerId == customerId);
-
-            if (bookings == null || !bookings.Any())
-            {
-                return new List<BookingDTO>();
-            }
-
-            // Map sang DTO
-            var bookingDTOs = bookings.Select(b => new BookingDTO
-            {
-                BookingId = b.BookingId,
-                CustomerId = b.CustomerId ?? 0,
-                Location = b.Location,
-                Date = b.Date,
-                CreateAt = b.CreateAt,
-                Status = b.Status,
-                Amount = b.Amount,
-                SkintherapistId = b.SkintherapistId ?? 0,
-                UpdateAt = b.UpdateAt,
-                ServiceName = b.ServiceName,
-                CustomerName = b.Customer?.Name ?? null // Lấy tên khách hàng (tránh lỗi null)
-            }).ToList();
-
-            return bookingDTOs;
-        }*/
-
-
 
         public async Task<CustomerDTO> GetCustomerByIdAsync(int id)
         {
@@ -83,6 +87,63 @@ namespace SkincareBookingService.BLL.Services
                 PhoneNumber = customer.PhoneNumber,
                 Image = customer.Image,
             };
+        }
+
+        public async Task<bool> UpdateCustomerEmailAsync(int customerId, string email)
+        {
+            var customer = await _customerRepository.FirstOrDefaultAsync(c => c.CustomerId == customerId);
+
+            if (customer == null)
+            {
+                return false;
+            }
+
+            customer.Email = email;
+            await _customerRepository.SaveChangesAsync();
+            return true;
+
+        }
+
+        public async Task<bool> UpdateCustomerNameAsync(int customerId, string name)
+        {
+            var customer = await _customerRepository.FirstOrDefaultAsync(c => c.CustomerId == customerId);
+
+            if (customer == null)
+            {
+                return false;
+            }
+
+            customer.Name = name;
+            await _customerRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateCustomerPhoneNumberAsync(int customerId, string phoneNumber)
+        {
+            var customer = await _customerRepository.FirstOrDefaultAsync(c => c.CustomerId == customerId);
+
+            if (customer == null)
+            {
+                return false;
+            }
+
+            customer.PhoneNumber = phoneNumber;
+            await _customerRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateCustomerSkintypeAsync(int customerId, int skintypeId)
+        {
+            var customer = await _customerRepository.FirstOrDefaultAsync(c => c.CustomerId == customerId);
+
+            if (customer == null)
+            {
+                return false;
+            }
+
+            customer.SkintypeId = skintypeId;
+            await _customerRepository.SaveChangesAsync();
+            return true;
         }
     }
 }
