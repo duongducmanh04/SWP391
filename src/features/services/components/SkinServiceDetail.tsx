@@ -1,6 +1,6 @@
 import { Card, Typography, Row, Col, Image, Button, Divider, Spin } from "antd";
 import { DollarOutlined } from "@ant-design/icons";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useServiceById } from "../hooks/useGetServiceId";
 import { PagePath } from "../../../enums/page-path.enum";
 
@@ -8,7 +8,9 @@ const { Title, Text } = Typography;
 
 const ServiceDetail = () => {
   const navigate = useNavigate();
-  const { serviceId } = useParams();
+  // const { serviceId } = useParams();
+  const location = useLocation();
+  const { serviceId } = location.state || {};
   const { data: service, isLoading, isError } = useServiceById(serviceId || "");
 
   if (isLoading) {

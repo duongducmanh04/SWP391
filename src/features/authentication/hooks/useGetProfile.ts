@@ -53,6 +53,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { SkintherapistProfileDto } from "../dto/profile.dto";
 
 interface MutationVariables {
   accountId: number;
@@ -62,17 +63,18 @@ interface MutationVariables {
 export const useGetProfile = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, MutationVariables>({
+  return useMutation<SkintherapistProfileDto, Error, MutationVariables>({
     mutationFn: async ({
       accountId,
       role,
-    }: MutationVariables): Promise<void> => {
-      await axios.put(
+    }: MutationVariables): Promise<SkintherapistProfileDto> => {
+      const response = await axios.get<SkintherapistProfileDto>(
         `https://localhost:7071/getAccountByIdAndRole/${accountId}/${role}`
       );
+      return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cancelled"] });
+      queryClient.invalidateQueries({ queryKey: ["getAccountByIdAndRole"] });
     },
   });
 };

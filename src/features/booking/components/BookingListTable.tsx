@@ -27,6 +27,7 @@ import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
 import { TherapistDto } from "../../skin_therapist/dto/get-therapist.dto";
 import { useCustomers } from "../../user/hook/useGetCustomer";
 import { CustomerDto } from "../../user/dto/customer.dto";
+import { PagePath } from "../../../enums/page-path.enum";
 
 const BookingListTable = () => {
   const {
@@ -176,8 +177,16 @@ const BookingListTable = () => {
     setPagination(pagination);
   };
 
+  // const handleNavigate = (bookingId: number) => {
+  //   navigate(`/Home/Booking/${bookingId}`);
+  // };
+
   const handleNavigate = (bookingId: number) => {
-    navigate(`/Home/Booking/${bookingId}`);
+    navigate(PagePath.BOOKING_DETAIL, {
+      state: {
+        bookingId: bookingId,
+      },
+    });
   };
 
   const columns: ColumnsType<BookingDto> = [

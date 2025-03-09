@@ -33,7 +33,7 @@ export default function ProfileChangePassword() {
   return (
     <>
       <Form form={form} layout="vertical" autoComplete="new-password">
-        <Col className="mb-4">
+        <Col className="mb-4" style={{ width: "-webkit-fill-available" }}>
           <Form.Item
             name="oldPassword"
             label="Mật khẩu cũ"
@@ -49,7 +49,7 @@ export default function ProfileChangePassword() {
             />
           </Form.Item>
         </Col>
-        <Col className="mb-6">
+        <Col className="mb-6" style={{ width: "-webkit-fill-available" }}>
           <Form.Item
             name="newPassword"
             label="Mật khẩu mới"
@@ -65,7 +65,7 @@ export default function ProfileChangePassword() {
             />
           </Form.Item>
         </Col>
-        <Col className="mb-6">
+        <Col className="mb-6" style={{ width: "-webkit-fill-available" }}>
           <Form.Item
             name="repeatNewPassword"
             label="Nhập lại mật khẩu mới"
@@ -96,7 +96,10 @@ export default function ProfileChangePassword() {
         </Col>
       </Form>
       <div className="absolute bottom-4 left-0 right-0 px-6">
-        <Flex className="w-full justify-between  gap-4">
+        <Flex
+          className="w-full justify-between gap-4"
+          style={{ justifyContent: "space-between" }}
+        >
           <Button
             className="border-none bg-light-f2f5f8"
             onClick={() => {

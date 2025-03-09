@@ -4,6 +4,7 @@ import { HeartOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useServices } from "../hooks/useGetService";
 import { useServiceStore } from "../hooks/useServiceStore";
+import { PagePath } from "../../../enums/page-path.enum";
 
 const { Title, Text } = Typography;
 
@@ -17,8 +18,15 @@ const SkincareServices = () => {
 
   const { setServices } = useServiceStore();
 
+  // const handleNavigate = (serviceId: number) => {
+  //   navigate(`/Homepage/Service/${serviceId}`);
+  // };
   const handleNavigate = (serviceId: number) => {
-    navigate(`/Homepage/Service/${serviceId}`);
+    navigate(PagePath.SKIN_SERVICE_DETAIL, {
+      state: {
+        serviceId: serviceId,
+      },
+    });
   };
 
   useEffect(() => {
