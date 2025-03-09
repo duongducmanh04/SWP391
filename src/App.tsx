@@ -105,10 +105,6 @@ const App = () => {
               path={PagePath.COMPLETE_RESULT}
               element={<CompleteBookingPage />}
             />
-            <Route
-              path={PagePath.CUSTOMER_PROFILE}
-              element={<CustomerProfile />}
-            />
           </Route>
         </Routes>
       </AuthGuardProvider>
