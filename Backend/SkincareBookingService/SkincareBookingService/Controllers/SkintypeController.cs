@@ -24,5 +24,16 @@ namespace SkincareBookingService.Controllers
             }
             return Ok(skintypes);
         }
+
+        [HttpGet("getSkintypeById/{skintypeId}")]
+        public async Task<IActionResult> GetSkintypeById(int skintypeId)
+        {
+            var skintype = await _skintypeService.GetSkintypeByIdAsync(skintypeId);
+            if (skintype == null)
+            {
+                return NotFound("Skintype not found");
+            }
+            return Ok(skintype);
+        }
     }
 }

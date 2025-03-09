@@ -108,6 +108,51 @@ public class BookingController : ControllerBase
         return Ok(bookings);
     }
 
+    [HttpGet("previousBooking/{customerId}")]
+    public async Task<IActionResult> GetPreviousBookings(int customerId)
+    {
+        if (customerId == null || customerId <= 0)
+        {
+            return BadRequest("Invalid customer id");
+        }
+
+        var result = await _bookingService.GetBookingsByCustomerId(customerId);
+        return Ok(result);
+    }
+
+    [HttpGet("getBookingBySkintherapistId/{skintherapistId}")]
+    public async Task<IActionResult> GetBookingBySkintherapistId(int skintherapistId)
+    {
+        if (skintherapistId <= 0)
+        {
+            return BadRequest(new { message = "Invalid skintherapist id." });
+        }
+        var bookings = await _bookingService.GetBookingBySkintherapistIdAsync(skintherapistId);
+        if (bookings == null || bookings.Count == 0)
+        {
+            return NotFound(new { message = "No bookings found for that skintherapist" });
+        }
+        return Ok(bookings);
+    }
+
+    [HttpGet("getBookingByServiceId/{serviceId}")]
+    public async Task<IActionResult> GetBookingByServiceId(int serviceId)
+    {
+        if (serviceId <= 0)
+        {
+            return BadRequest(new { message = "Invalid service id." });
+        }
+        var bookings = await _bookingService.GetBookingByServiceIdAsync(serviceId);
+        if (bookings == null || bookings.Count == 0)
+        {
+            return NotFound(new { message = "No bookings found for that service" });
+        }
+        return Ok(bookings);
+    }
+
+
+    // ===================== UPDATE METHODS =====================
+
     [HttpPut("checkin/{bookingId}")]
     public async Task<IActionResult> UpdateBookingStatusToCheckIn(int bookingId)
     {
@@ -269,18 +314,6 @@ public class BookingController : ControllerBase
         {
             return NotFound(new { message = "Booking not found." });
         }
-    }
-
-    [HttpGet("previousBooking/{customerId}")]
-    public async Task<IActionResult> GetPreviousBookings(int customerId)
-    {
-        if(customerId == null || customerId <= 0)
-        {
-            return BadRequest("Invalid customer id");
-        }
-
-        var result = await _bookingService.GetBookingsByCustomerId(customerId);
-        return Ok(result);
     }
 }
 

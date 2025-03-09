@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.Interfaces;
 
 namespace SkincareBookingService.Controllers
@@ -10,6 +11,17 @@ namespace SkincareBookingService.Controllers
         public CustomerController(ICustomerService customerService)
         {
             _customerService = customerService;
+        }
+
+        [HttpPost("createCustomer")]
+        public async Task<IActionResult> CreateCustomer([FromBody] CustomerDTO customer)
+        {
+            var result = await _customerService.CreateCustomerAsync(customer);
+            if (result != null)
+            {
+                return Ok("Customer created successfully");
+            }
+            return BadRequest("Failed to create customer");
         }
 
         [HttpGet("getAllCustomers")]
@@ -38,15 +50,48 @@ namespace SkincareBookingService.Controllers
             return Ok(customer);
         }
 
-       /* [HttpGet("getCustomerBookingHistory/{customerId}")]
-        public async Task<IActionResult> GetCustomerBookingHistory(int customerId)
+        [HttpPut("updateCustomerName/{customerId}")]
+        public async Task<IActionResult> UpdateCustomerName(int customerId, [FromBody] string name)
         {
-            var bookings = await _customerService.GetCustomerBookingHistoryAsync(customerId);
-            if (bookings == null || bookings.Count == 0)
+            var result = await _customerService.UpdateCustomerNameAsync(customerId, name);
+            if (result)
             {
-                return NotFound("No bookings found");
+                return Ok(new { message = "Customer name updated successfully." });
             }
-            return Ok(bookings);
-        }*/
+            return BadRequest(new { message = "Failed to update customer name." });
+        }
+
+        [HttpPut("updateCustomerEmail/{customerId}")]
+        public async Task<IActionResult> UpdateCustomerEmail(int customerId, [FromBody] string email)
+        {
+            var result = await _customerService.UpdateCustomerEmailAsync(customerId, email);
+            if (result)
+            {
+                return Ok(new { message = "Customer email updated successfully." });
+            }
+            return BadRequest(new { message = "Failed to update customer email." });
+        }
+
+        [HttpPut("updateCustomerPhoneNumber/{customerId}")]
+        public async Task<IActionResult> UpdateCustomerPhoneNumber(int customerId, [FromBody] string phoneNumber)
+        {
+            var result = await _customerService.UpdateCustomerPhoneNumberAsync(customerId, phoneNumber);
+            if (result)
+            {
+                return Ok(new { message = "Customer phone number updated successfully." });
+            }
+            return BadRequest(new { message = "Failed to update customer phone number." });
+        }
+
+        [HttpPut("updateCustomerSkintype/{customerId}")]
+        public async Task<IActionResult> UpdateCustomerSkintype(int customerId, [FromBody] int skintypeId)
+        {
+            var result = await _customerService.UpdateCustomerSkintypeAsync(customerId, skintypeId);
+            if (result)
+            {
+                return Ok(new { message = "Customer skintype updated successfully." });
+            }
+            return BadRequest(new { message = "Failed to update customer skintype." });
+        }
     }
 }

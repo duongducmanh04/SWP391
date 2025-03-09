@@ -13,6 +13,10 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<List<Booking>> GetBookingByCustomerIdAsync(int customerId);
 
+        Task<List<Booking>> GetBookingBySkintherapistIdAsync(int skintherapistId);
+
+        Task<List<Booking>> GetBookingByServiceIdAsync(int serviceId);
+
         Task<bool> UpdateBookingStatusToCheckInAsync(int bookingId);
 
         Task<bool> UpdateStatusToCompletedAsync(int bookingId);
