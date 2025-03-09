@@ -94,5 +94,45 @@ namespace SkincareBookingService.BLL.Services
             return skinType?.SkintypeName ?? "Unknown Skin Type";
         }
 
+        public async Task<int> SubmitSurveyAsync(SubmitSurveyDTO request)
+        {
+            
+            var customerSurvey = new CustomerSurvey
+            {
+                CustomerId = request.CustomerId,
+                Date = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _customerSurveyRepository.AddAsync(customerSurvey);
+            await _customerSurveyRepository.SaveChangesAsync();
+
+            //save answer into customer survey answer
+            foreach (var answer in request.Answers)
+            {
+                var surveyAnswer = new CustomerSurveyAnswer
+                {
+                    CustomersurveyId = customerSurvey.CustomersurveyId,
+                    AnswerId = answer.AnswerId
+                };
+                await _customerSurveyAnswerRepository.AddAsync(surveyAnswer);
+            }
+
+            await _customerSurveyAnswerRepository.SaveChangesAsync();
+
+            var recommendedSkinType = await RecommendSkintypeAsync(customerSurvey.CustomersurveyId);
+
+            //find most choosen skin type
+            var skinTypeEntity = await _skinTypeRepository.FindAsync(st => st.SkintypeName == recommendedSkinType);
+            if (skinTypeEntity != null)
+            {
+                customerSurvey.SkintypeId = skinTypeEntity.FirstOrDefault()?.SkintypeId;
+                await _customerSurveyRepository.SaveChangesAsync();
+            }
+
+            return customerSurvey.CustomersurveyId;
+        }
+
+
     }
 }
