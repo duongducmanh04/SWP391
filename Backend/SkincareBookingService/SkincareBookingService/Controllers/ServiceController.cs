@@ -33,6 +33,17 @@ namespace SkincareBookingService.Controllers
             return Ok(service);
         }
 
+        [HttpGet("getServiceBySkintherapistId/{skintherapistId}")]
+        public async Task<IActionResult> GetServiceBySkintherapistId(int skintherapistId)
+        {
+            var service = await _serviceService.GetServiceBySkintherapistIdAsync(skintherapistId);
+            if (service == null)
+            {
+                return NotFound("Service not found");
+            }
+            return Ok(service);
+        }
+
         [HttpPut("updateServiceName/{serviceId}")]
         public async Task<IActionResult> UpdateServiceName(int serviceId, [FromBody] string name)
         {
