@@ -9,8 +9,6 @@ public partial class QuizAnswer
 {
     public int AnswerId { get; set; }
 
-    public int? CustomerId { get; set; }
-
     public int? QuizquestionId { get; set; }
 
     public int? SkintypeId { get; set; }
@@ -18,8 +16,6 @@ public partial class QuizAnswer
     public string Answer { get; set; }
 
     public string ServiceImpact { get; set; }
-
-    public virtual Customer Customer { get; set; }
 
     public virtual ICollection<CustomerSurveyAnswer> CustomerSurveyAnswers { get; set; } = new List<CustomerSurveyAnswer>();
 

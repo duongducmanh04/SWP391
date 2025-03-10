@@ -23,6 +23,8 @@ public partial class Service
 
     public string ProcedureDescription { get; set; }
 
+    public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
+
     public virtual ICollection<SkinTherapistService> SkinTherapistServices { get; set; } = new List<SkinTherapistService>();
 
     public virtual ICollection<SkintypeService> SkintypeServices { get; set; } = new List<SkintypeService>();

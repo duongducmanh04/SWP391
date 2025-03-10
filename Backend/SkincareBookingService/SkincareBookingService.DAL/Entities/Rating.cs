@@ -15,5 +15,9 @@ public partial class Rating
 
     public int? Stars { get; set; }
 
+    public int? ServiceId { get; set; }
+
     public virtual Customer Customer { get; set; }
+
+    public virtual Service Service { get; set; }
 }

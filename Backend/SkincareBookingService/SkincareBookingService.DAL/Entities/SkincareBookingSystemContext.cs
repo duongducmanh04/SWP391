@@ -25,8 +25,6 @@ public partial class SkincareBookingSystemContext : DbContext
 
     public virtual DbSet<CustomerSurveyAnswer> CustomerSurveyAnswers { get; set; }
 
-    public virtual DbSet<Feedback> Feedbacks { get; set; }
-
     public virtual DbSet<QuizAnswer> QuizAnswers { get; set; }
 
     public virtual DbSet<QuizQuestion> QuizQuestions { get; set; }
@@ -246,34 +244,11 @@ public partial class SkincareBookingSystemContext : DbContext
                 .HasConstraintName("FK__CustomerS__custo__09A971A2");
         });
 
-        modelBuilder.Entity<Feedback>(entity =>
-        {
-            entity.HasKey(e => e.FeedbackId).HasName("PK__Feedback__2613FD242EE76794");
-
-            entity.ToTable("Feedback");
-
-            entity.HasIndex(e => e.CustomerId, "IX_Feedback_customerId");
-
-            entity.Property(e => e.FeedbackId).HasColumnName("feedbackId");
-            entity.Property(e => e.Content).HasColumnName("content");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime")
-                .HasColumnName("createdAt");
-            entity.Property(e => e.CustomerId).HasColumnName("customerId");
-
-            entity.HasOne(d => d.Customer).WithMany(p => p.Feedbacks)
-                .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK__Feedback__custom__73BA3083");
-        });
-
         modelBuilder.Entity<QuizAnswer>(entity =>
         {
             entity.HasKey(e => e.AnswerId).HasName("PK__QuizAnsw__6836B974A01114EA");
 
             entity.ToTable("QuizAnswer");
-
-            entity.HasIndex(e => e.CustomerId, "IX_QuizAnswer_customerId");
 
             entity.HasIndex(e => e.QuizquestionId, "IX_QuizAnswer_quizquestionId");
 
@@ -281,16 +256,11 @@ public partial class SkincareBookingSystemContext : DbContext
 
             entity.Property(e => e.AnswerId).HasColumnName("answerId");
             entity.Property(e => e.Answer).HasColumnName("answer");
-            entity.Property(e => e.CustomerId).HasColumnName("customerId");
             entity.Property(e => e.QuizquestionId).HasColumnName("quizquestionId");
             entity.Property(e => e.ServiceImpact)
                 .HasMaxLength(255)
                 .HasColumnName("serviceImpact");
             entity.Property(e => e.SkintypeId).HasColumnName("skintypeId");
-
-            entity.HasOne(d => d.Customer).WithMany(p => p.QuizAnswers)
-                .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK__QuizAnswe__custo__7E37BEF6");
 
             entity.HasOne(d => d.Quizquestion).WithMany(p => p.QuizAnswers)
                 .HasForeignKey(d => d.QuizquestionId)
@@ -347,11 +317,16 @@ public partial class SkincareBookingSystemContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("createAt");
             entity.Property(e => e.CustomerId).HasColumnName("customerId");
+            entity.Property(e => e.ServiceId).HasColumnName("serviceId");
             entity.Property(e => e.Stars).HasColumnName("stars");
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Ratings)
                 .HasForeignKey(d => d.CustomerId)
                 .HasConstraintName("FK__Rating__customer__6FE99F9F");
+
+            entity.HasOne(d => d.Service).WithMany(p => p.Ratings)
+                .HasForeignKey(d => d.ServiceId)
+                .HasConstraintName("FK_Rating_Service");
         });
 
         modelBuilder.Entity<Schedule>(entity =>
