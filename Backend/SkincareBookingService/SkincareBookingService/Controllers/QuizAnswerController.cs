@@ -4,34 +4,66 @@ using SkincareBookingService.BLL.Interfaces;
 
 namespace SkincareBookingService.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class QuizAnswerController : ControllerBase
     {
-        private readonly IQuizAnswerService _quizAnswerService;
-        public QuizAnswerController(IQuizAnswerService quizAnswerService)
+        private readonly IQuizAnswerService _service;
+
+        public QuizAnswerController(IQuizAnswerService service)
         {
-            _quizAnswerService = quizAnswerService;
+            _service = service;
         }
 
-        [HttpGet("getAllQuizAnswers")]
-        public async Task<IActionResult> GetAllQuizAnswers()
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
         {
-            var quizAnswers = await _quizAnswerService.GetAllQuizAnswers();
-            if (quizAnswers == null || quizAnswers.Count == 0)
-            {
-                return NotFound("No quiz answers found");
-            }
-            return Ok(quizAnswers);
+            return Ok(await _service.GetAllAsync());
         }
 
-        [HttpGet("getQuizAnswerById/{id}")]
-        public async Task<IActionResult> GetQuizAnswerById(int id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            var quizAnswer = await _quizAnswerService.GetQuizAnswerById(id);
-            if (quizAnswer == null)
-            {
-                return NotFound("Quiz answer not found");
-            }
-            return Ok(quizAnswer);
+            var result = await _service.GetByIdAsync(id);
+            if (result == null) return NotFound();
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(QuizAnswerPostDto dto)
+        {
+            var result = await _service.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = result.AnswerId }, result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, QuizAnswerPutDto dto)
+        {
+            var success = await _service.UpdateAsync(id, dto);
+            if (!success) return NotFound();
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var success = await _service.DeleteAsync(id);
+            if (!success) return NotFound();
+            return NoContent();
+        }
+        [HttpGet("/GetByQuizquestionId/{id}")]
+        public async Task<IActionResult> GetByQuizquestionId(int id)
+        {
+            if(id <= 0) return BadRequest("Invalid id");
+
+            return Ok(await _service.GetAnswerByQuizquestionId(id));
+        }
+        [HttpGet("/GetBySkinTypeId/{id}")]
+        public async Task<IActionResult> GetBySkinTypeId(int id)
+        {
+            if (id <= 0) return BadRequest("Invalid id");
+
+            return Ok(await _service.GetAnswerBySkinTypeId(id));
         }
     }
 }
