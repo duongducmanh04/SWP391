@@ -6,10 +6,19 @@ import { PagePath } from "../enums/page-path.enum";
 import { Content } from "antd/es/layout/layout";
 import Footers from "./Footer";
 import useAuthStore from "../features/authentication/hooks/useAuthStore";
+import { useGetCustomerProfile } from "../features/authentication/hooks/useGetCustomerProfile";
 
 const NavbarMenu = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+
+  const { data: profileData } = useGetCustomerProfile(
+    user?.accountId,
+    user?.role
+  );
+
+  const profile = Array.isArray(profileData) ? profileData[0] : undefined;
+  const customers = profile?.customer?.[0] ?? null;
 
   const handleMenuClick = (key: string) => {
     if (key === "service") {
@@ -29,12 +38,12 @@ const NavbarMenu = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate(PagePath.ROOT);
   };
 
   const handleMenu = (key: string) => {
     if (key === "account") {
-      navigate("/Homepage/Profile");
+      navigate(PagePath.CUSTOMER_PROFILE);
     } else if (key === "logout") {
       logout();
       navigate(PagePath.LOGIN);
@@ -94,11 +103,25 @@ const NavbarMenu = () => {
             </>
           ) : (
             <>
-              <span style={{ marginRight: "8px" }}>{user.username}</span>
+              <span style={{ marginRight: "8px", alignContent: "center" }}>
+                {user.username}
+              </span>
               <Dropdown overlay={accountMenu}>
                 <Badge size="small">
-                  <UserOutlined
+                  {/* <UserOutlined
                     style={{ fontSize: "24px", marginLeft: "16px" }}
+                  /> */}
+                  <img
+                    src={customers?.image}
+                    style={{
+                      marginRight: "10px",
+                      width: "35px",
+                      height: "35px",
+                      borderRadius: "50%",
+                      border: "2px solid #1890ff",
+                      objectFit: "cover",
+                    }}
+                    alt="User Avatar"
                   />
                 </Badge>
               </Dropdown>
