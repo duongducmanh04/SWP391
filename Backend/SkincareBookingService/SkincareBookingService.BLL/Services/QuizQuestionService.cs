@@ -31,7 +31,6 @@ namespace SkincareBookingService.BLL.Services
                 QuizAnswers = q.QuizAnswers.Select(a => new QuizAnswerDTO
                 {
                     AnswerId = a.AnswerId,
-                    CustomerId = a.CustomerId,
                     QuizquestionId = a.QuizquestionId,
                     SkintypeId = a.SkintypeId,
                     Answer = a.Answer,
@@ -57,7 +56,6 @@ namespace SkincareBookingService.BLL.Services
                 QuizAnswers = quizQuestion.QuizAnswers.Select(a => new QuizAnswerDTO
                 {
                     AnswerId = a.AnswerId,
-                    CustomerId = a.CustomerId,
                     QuizquestionId = a.QuizquestionId,
                     SkintypeId = a.SkintypeId,
                     Answer = a.Answer,
