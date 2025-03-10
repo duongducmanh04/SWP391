@@ -70,11 +70,11 @@ const Home = () => {
     data: pieData,
     angleField: "value",
     colorField: "type",
-    label: {
-      visible: true,
-      // type: "outer",
-      offset: 20,
-    },
+    // label: {
+    //   visible: true,
+    //   // type: "outer",
+    //   offset: 20,
+    // },
   };
 
   const lineData = monthlyBookingRevenue

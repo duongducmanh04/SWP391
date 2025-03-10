@@ -43,7 +43,7 @@ const SkincareServices = () => {
       >
         Dịch Vụ Chăm Sóc Da Chuyên Nghiệp
       </Title>
-      <Row gutter={[16, 16]} justify="center">
+      <Row gutter={[16, 16]} justify="start">
         {serviceData?.map((service) => (
           <Col
             key={service.serviceId}
@@ -76,6 +76,7 @@ const SkincareServices = () => {
                   Chi tiết
                 </Button>,
               ]}
+              style={{ width: "-webkit-fill-available" }}
             >
               <Title level={4}>{service.name}</Title>
               <Text>{service.description}</Text>
