@@ -39,10 +39,6 @@
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Feedback]",
-         "ObjectType": 0
-      },
-      {
          "Name": "[dbo].[QuizAnswer]",
          "ObjectType": 0
       },
