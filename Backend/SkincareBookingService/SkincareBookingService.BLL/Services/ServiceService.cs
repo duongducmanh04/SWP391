@@ -1,4 +1,5 @@
-﻿using SkincareBookingService.BLL.DTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
@@ -112,6 +113,29 @@ namespace SkincareBookingService.BLL.Services
             await _serviceRepository.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<List<ServiceDTO>> GetServiceBySkintherapistIdAsync(int skintherapistId)
+        {
+            var skintherapistServices = await _serviceRepository.Query()
+                .Where(b => b.SkinTherapistServices.Any(sts => sts.SkintherapistId == skintherapistId))
+                .ToListAsync();
+
+            if (skintherapistServices == null || !skintherapistServices.Any())
+            {
+                return null;
+            }
+
+            return skintherapistServices.Select(s => new ServiceDTO
+            {
+                ServiceId = s.ServiceId,
+                Name = s.Name,
+                Description = s.Description,
+                Price = s.Price,
+                Duration = s.Duration,
+                ProcedureDescription = s.ProcedureDescription,
+                Image = s.Image
+            }).ToList();
         }
     }
 }
