@@ -191,7 +191,7 @@ const BookingListTable = () => {
       },
     },
     {
-      title: "BookingID",
+      title: "Mã Booking",
       dataIndex: "bookingId",
       key: "bookingId",
     },
@@ -200,6 +200,14 @@ const BookingListTable = () => {
       dataIndex: "date",
       key: "date",
       render: (text: string) => dayjs(text).format("DD/MM/YYYY HH:mm:ss"),
+      sorter: (a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf(),
+    },
+    {
+      title: "Ngày tạo",
+      dataIndex: "createAt",
+      key: "createAt",
+      render: (text: string) => dayjs(text).format("DD/MM/YYYY HH:mm:ss"),
+      sorter: (a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf(),
     },
     {
       title: "Khách hàng",
@@ -326,7 +334,7 @@ const BookingListTable = () => {
               rowKey="bookingId"
               bordered
               onChange={handleTableChange}
-              pagination={{ pageSize: 5 }}
+              pagination={{ pageSize: 10 }}
             />
           </Tabs.TabPane>
           <Tabs.TabPane tab="Đã hoàn thành làm dịch vụ" key="finished">
@@ -337,7 +345,7 @@ const BookingListTable = () => {
               rowKey="bookingId"
               bordered
               onChange={handleTableChange}
-              pagination={{ pageSize: 5 }}
+              pagination={{ pageSize: 10 }}
             />
           </Tabs.TabPane>
           <Tabs.TabPane tab="Đã check-in" key="checkIn">
@@ -348,7 +356,7 @@ const BookingListTable = () => {
               rowKey="bookingId"
               bordered
               onChange={handleTableChange}
-              pagination={{ pageSize: 5 }}
+              pagination={{ pageSize: 10 }}
             />
           </Tabs.TabPane>
           <Tabs.TabPane tab="Đã hủy" key="cancelled">
@@ -359,7 +367,7 @@ const BookingListTable = () => {
               rowKey="bookingId"
               bordered
               onChange={handleTableChange}
-              pagination={{ pageSize: 5 }}
+              pagination={{ pageSize: 10 }}
             />
           </Tabs.TabPane>
           <Tabs.TabPane tab="Đã hủy thanh toán" key="denied">
@@ -370,7 +378,7 @@ const BookingListTable = () => {
               rowKey="bookingId"
               bordered
               onChange={handleTableChange}
-              pagination={{ pageSize: 5 }}
+              pagination={{ pageSize: 10 }}
             />
           </Tabs.TabPane>
           <Tabs.TabPane tab="Đã hoàn thành thanh toán" key="completed">
@@ -381,7 +389,7 @@ const BookingListTable = () => {
               rowKey="bookingId"
               bordered
               onChange={handleTableChange}
-              pagination={{ pageSize: 5 }}
+              pagination={{ pageSize: 10 }}
             />
           </Tabs.TabPane>
         </Tabs>
@@ -393,7 +401,7 @@ const BookingListTable = () => {
           rowKey="bookingId"
           bordered
           onChange={handleTableChange}
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 10 }}
         />
       )}
     </div>
