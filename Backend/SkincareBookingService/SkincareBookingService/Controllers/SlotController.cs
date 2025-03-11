@@ -17,14 +17,10 @@ namespace SkincareBookingService.Controllers
         }
 
         [HttpPost("createSlot")]
-        public async Task<IActionResult> CreateSlot([FromBody] SlotDTO slot)
+        public async Task<IActionResult> CreateSlot([FromBody] SlotDTO slotDTO)
         {
-            var result = await _slotService.CreateSlotAsync(slot);
-            if (result)
-            {
-                return Ok("Slot created successfully");
-            }
-            return BadRequest("Failed to create slot");
+            var slot = await _slotService.CreateSlotAsync(slotDTO);
+            return Ok(slot);
         }
 
         [HttpGet("getAllSlots")]
@@ -127,6 +123,17 @@ namespace SkincareBookingService.Controllers
                 return NotFound("Slot not found");
             }
             return Ok("Slot updated successfully");
+        }
+
+        [HttpDelete("deleteSlot/{id}")]
+        public async Task<IActionResult> DeleteSlot(int id)
+        {
+            var result = await _slotService.DeleteSlotAsync(id);
+            if (!result)
+            {
+                return NotFound("Slot not found");
+            }
+            return Ok("Slot deleted successfully");
         }
     }
 }
