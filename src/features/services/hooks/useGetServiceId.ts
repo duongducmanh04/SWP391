@@ -2,8 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { ServiceDto } from "../dto/get-service.dto";
 
-const API_BASE_URL =
-  "http://skincare-sbs.southeastasia.azurecontainer.io:8080/api/service/getServiceById";
+const API_BASE_URL = "https://localhost:7071/api/service/getServiceById";
 
 export const useServiceById = (serviceId: string) => {
   return useQuery<ServiceDto, Error>({

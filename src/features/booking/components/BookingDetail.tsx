@@ -173,9 +173,9 @@ const BookingDetail = () => {
     }
   };
 
-  const handleTherapistChange = (value: number) => {
-    setSelectedTherapist(value);
-  };
+  // const handleTherapistChange = (value: number) => {
+  //   setSelectedTherapist(value);
+  // };
 
   const handleUpdateNote = () => {
     updateNote(
@@ -264,7 +264,7 @@ const BookingDetail = () => {
       value:
         therapistMap.get(booking.skintherapistId)?.name ||
         booking.skintherapistId,
-      editable: true,
+      editable: false,
     },
   ];
 
@@ -371,28 +371,28 @@ const BookingDetail = () => {
               </Select>
             );
           }
-          if (record.key === "3") {
-            return (
-              <Select
-                style={{ width: "100%" }}
-                value={
-                  (therapists?.find(
-                    (t) => t.skintherapistId === selectedTherapist
-                  )?.name as unknown as number) ?? selectedTherapist
-                }
-                onChange={handleTherapistChange}
-              >
-                {therapists?.map((therapist: any) => (
-                  <Select.Option
-                    key={therapist.skintherapistId}
-                    value={therapist.therapistId}
-                  >
-                    {therapist.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            );
-          }
+          // if (record.key === "3") {
+          //   return (
+          //     <Select
+          //       style={{ width: "100%" }}
+          //       value={
+          //         (therapists?.find(
+          //           (t) => t.skintherapistId === selectedTherapist
+          //         )?.name as unknown as number) ?? selectedTherapist
+          //       }
+          //       onChange={handleTherapistChange}
+          //     >
+          //       {therapists?.map((therapist: any) => (
+          //         <Select.Option
+          //           key={therapist.skintherapistId}
+          //           value={therapist.therapistId}
+          //         >
+          //           {therapist.name}
+          //         </Select.Option>
+          //       ))}
+          //     </Select>
+          //   );
+          // }
         }
         return text;
       },
@@ -404,9 +404,7 @@ const BookingDetail = () => {
       render: (_: any, record: any) => {
         if (record.key === "1") {
           return isEditing ? (
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "8px" }}
-            >
+            <div style={{ display: "flex", flexDirection: "row", gap: "8px" }}>
               <Button
                 type="primary"
                 icon={<SaveOutlined />}
@@ -432,7 +430,6 @@ const BookingDetail = () => {
                 setSelectedTherapist(booking.skintherapistId);
                 setIsEditing(true);
               }}
-              style={{ width: "100%", height: "100px" }} // Làm cho nút "Sửa" chiếm 3 hàng
             >
               Sửa
             </Button>
@@ -489,11 +486,11 @@ const BookingDetail = () => {
               onDenied={handleDenied}
               onFinished={handleFinished}
             />
-            <h4 style={{ marginTop: 20 }}>Lịch sử trạng thái</h4>
+            {/* <h4 style={{ marginTop: 20 }}>Lịch sử trạng thái</h4>
             <p>
               🟢 {dayjs(booking.updateAt).format("DD/MM/YYYY HH:mm:ss")} -{" "}
               {booking.status}
-            </p>
+            </p> */}
           </Card>
           {user?.role == RoleCode.THERAPIST && (
             <Card style={{ marginTop: "10px" }}>

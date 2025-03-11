@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { Card, Spin, Alert, Button, message, Modal } from "antd";
 import { useBookingById } from "../features/booking/hooks/useGetBookingId";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -10,7 +10,8 @@ const API_BASE_URL =
   "http://skincare-sbs.southeastasia.azurecontainer.io:8080/api/Booking";
 
 const CustomerBookingDetail = () => {
-  const { bookingId } = useParams();
+  const location = useLocation();
+  const { bookingId } = location.state || {};
   const queryClient = useQueryClient();
 
   console.log("🔍 Booking ID từ URL:", bookingId);

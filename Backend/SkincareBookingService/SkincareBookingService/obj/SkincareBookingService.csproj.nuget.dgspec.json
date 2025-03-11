@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService\\SkincareBookingService.csproj": {}
+    "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService\\SkincareBookingService.csproj": {}
   },
   "projects": {
-    "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.BLL\\SkincareBookingService.BLL.csproj": {
+    "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.BLL\\SkincareBookingService.BLL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.BLL\\SkincareBookingService.BLL.csproj",
+        "projectUniqueName": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.BLL\\SkincareBookingService.BLL.csproj",
         "projectName": "SkincareBookingService.BLL",
-        "projectPath": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.BLL\\SkincareBookingService.BLL.csproj",
+        "projectPath": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.BLL\\SkincareBookingService.BLL.csproj",
         "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.BLL\\obj\\",
+        "outputPath": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.BLL\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -32,8 +32,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.DAL\\SkincareBookingService.DAL.csproj": {
-                "projectPath": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.DAL\\SkincareBookingService.DAL.csproj"
+              "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.DAL\\SkincareBookingService.DAL.csproj": {
+                "projectPath": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.DAL\\SkincareBookingService.DAL.csproj"
               }
             }
           }
@@ -73,14 +73,14 @@
         }
       }
     },
-    "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.Core\\SkincareBookingService.Core.csproj": {
+    "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.Core\\SkincareBookingService.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.Core\\SkincareBookingService.Core.csproj",
+        "projectUniqueName": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.Core\\SkincareBookingService.Core.csproj",
         "projectName": "SkincareBookingService.Core",
-        "projectPath": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.Core\\SkincareBookingService.Core.csproj",
+        "projectPath": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.Core\\SkincareBookingService.Core.csproj",
         "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.Core\\obj\\",
+        "outputPath": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -144,14 +144,14 @@
         }
       }
     },
-    "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.DAL\\SkincareBookingService.DAL.csproj": {
+    "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.DAL\\SkincareBookingService.DAL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.DAL\\SkincareBookingService.DAL.csproj",
+        "projectUniqueName": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.DAL\\SkincareBookingService.DAL.csproj",
         "projectName": "SkincareBookingService.DAL",
-        "projectPath": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.DAL\\SkincareBookingService.DAL.csproj",
+        "projectPath": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.DAL\\SkincareBookingService.DAL.csproj",
         "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.DAL\\obj\\",
+        "outputPath": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.DAL\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -172,8 +172,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.Core\\SkincareBookingService.Core.csproj": {
-                "projectPath": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.Core\\SkincareBookingService.Core.csproj"
+              "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.Core\\SkincareBookingService.Core.csproj": {
+                "projectPath": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.Core\\SkincareBookingService.Core.csproj"
               }
             }
           }
@@ -229,14 +229,14 @@
         }
       }
     },
-    "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService\\SkincareBookingService.csproj": {
+    "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService\\SkincareBookingService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService\\SkincareBookingService.csproj",
+        "projectUniqueName": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService\\SkincareBookingService.csproj",
         "projectName": "SkincareBookingService",
-        "projectPath": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService\\SkincareBookingService.csproj",
+        "projectPath": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService\\SkincareBookingService.csproj",
         "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService\\obj\\",
+        "outputPath": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -257,8 +257,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.BLL\\SkincareBookingService.BLL.csproj": {
-                "projectPath": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.BLL\\SkincareBookingService.BLL.csproj"
+              "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.BLL\\SkincareBookingService.BLL.csproj": {
+                "projectPath": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.BLL\\SkincareBookingService.BLL.csproj"
               }
             }
           }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "8X91kKeSw94=",
+  "dgSpecHash": "MfSnWVD0DMM=",
   "success": true,
-  "projectFilePath": "D:\\SWP\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.Core\\SkincareBookingService.Core.csproj",
+  "projectFilePath": "D:\\SWP391\\Backend\\SkincareBookingService\\SkincareBookingService.Core\\SkincareBookingService.Core.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Lenovo\\.nuget\\packages\\microsoft.identitymodel.abstractions\\7.1.2\\microsoft.identitymodel.abstractions.7.1.2.nupkg.sha512",
     "C:\\Users\\Lenovo\\.nuget\\packages\\microsoft.identitymodel.jsonwebtokens\\7.1.2\\microsoft.identitymodel.jsonwebtokens.7.1.2.nupkg.sha512",

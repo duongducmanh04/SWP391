@@ -51,6 +51,18 @@ const SkinTherapistDetail = () => {
             <div style={{ marginBottom: 16 }}>
               <Text strong>Email:</Text> {therapist.email}
             </div>
+            <Divider />
+            <div style={{ marginBottom: 16 }}>
+              <Text strong>Kinh nghiệm:</Text> {therapist.experience}
+            </div>
+            <Divider />
+            <div style={{ marginBottom: 16 }}>
+              <Text strong>Bằng cấp:</Text> {therapist.degree}
+            </div>
+            <Divider />
+            <div style={{ marginBottom: 16 }}>
+              <Text strong>Chuyên môn:</Text> {therapist.expertise}
+            </div>
           </Col>
         </Row>
       </Card>

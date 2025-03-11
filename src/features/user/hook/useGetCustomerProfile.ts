@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { CustomerProfileDto } from "../dto/customerprofile.dto";
+import { CustomerProfileDto } from "../dto/customer-profile.dto";
 
 const fetchCustomerProfile = async (
   accountId: number,

@@ -11,7 +11,7 @@ const fetchQuizQuestion = async (): Promise<QuizQuestionDto[]> => {
 
 export const useQuizQuestion = () => {
   return useQuery<QuizQuestionDto[], Error>({
-    queryKey: ["getAllQuizQuestions"],
+    queryKey: ["QuizQuestion"],
     queryFn: fetchQuizQuestion,
   });
 };

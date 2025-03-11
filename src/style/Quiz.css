@@ -9,14 +9,27 @@
 }
 
 .quiz-card {
-  background-color: #a67b5b !important; /* Màu xanh mint */
-  border: 2px solid #45b29d; /* Viền xanh đậm */
+  /* background-color: green !important;
+  border: 2px solid #45b29d;  */
   border-radius: 12px;
   padding: 20px;
   width: 100%;
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.quiz-container .service-card .ant-card-body {
+  padding: 0 !important;
+}
+
+.quiz-container:has(.result-card) {
+  display: block !important;
+}
+
+.service-list .ant-card-body {
+  display: flex;
+  flex-direction: column;
 }
 
 /* Hiệu ứng hover: Phóng to nhẹ và đổ bóng */
