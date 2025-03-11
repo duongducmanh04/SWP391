@@ -128,11 +128,17 @@ const QuizTest = () => {
           .map((item: { skintypeId: number }) => item.skintypeId)
       : [];
 
+    console.log(`Service ID: ${serviceId} -> Skintype IDs:`, skintypeIds);
+
     return skinTypeData
       .filter((skin) => skintypeIds.includes(skin.skintypeId))
       .map((skin) => skin.skintypeName)
       .join(", ");
   };
+  console.log("serviceId được truyền vào API:", serviceId);
+  console.log("skintypeServiceIdData:", skintypeServiceIdData);
+  console.log("allServices:", allServices);
+  console.log("skinTypeData:", skinTypeData);
 
   return (
     <div className="quiz-container">
