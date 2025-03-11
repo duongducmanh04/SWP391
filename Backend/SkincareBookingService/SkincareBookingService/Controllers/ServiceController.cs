@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.Interfaces;
 
 namespace SkincareBookingService.Controllers
@@ -12,6 +13,14 @@ namespace SkincareBookingService.Controllers
         {
             _serviceService = serviceService;
         }
+
+        [HttpPost("createService")]
+        public async Task<IActionResult> CreateService([FromBody] ServiceDTO serviceDTO)
+        {
+            var service = await _serviceService.CreateServiceAsync(serviceDTO);
+            return Ok(service);
+        }
+
         [HttpGet("getAllServices")]
         public async Task<IActionResult> GetServices()
         {
@@ -108,6 +117,17 @@ namespace SkincareBookingService.Controllers
                 return Ok(new { message = "Service procedure description updated successfully." });
             }
             return BadRequest(new { message = "Failed to update service procedure description." });
+        }
+
+        [HttpDelete("deleteService/{serviceId}")]
+        public async Task<IActionResult> DeleteService(int serviceId)
+        {
+            var result = await _serviceService.DeleteServiceAsync(serviceId);
+            if (result)
+            {
+                return Ok(new { message = "Service deleted successfully." });
+            }
+            return BadRequest(new { message = "Failed to delete service." });
         }
     }
 }
