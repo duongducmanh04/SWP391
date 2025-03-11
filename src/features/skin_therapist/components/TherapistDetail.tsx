@@ -1,26 +1,33 @@
-import { Card, Typography, Row, Col, Image, Divider, Spin } from "antd";
+import { Card, Typography, Row, Col, Image, Divider, Spin, List } from "antd";
 import { useLocation } from "react-router-dom";
 import { useTherapistById } from "../hooks/useGetTherapistId";
+import { useServicesByTherapistId } from "../hooks/useServicesByTherapistId";
 
 const { Title, Text } = Typography;
 
 const SkinTherapistDetail = () => {
-  // const { skintherapistId } = useParams();
   const location = useLocation();
   const { skintherapistId } = location.state || {};
+
+  // Lấy thông tin chuyên viên
   const {
     data: therapist,
-    isLoading,
-    isError,
+    isLoading: therapistLoading,
+    isError: therapistError,
   } = useTherapistById(skintherapistId || "");
 
-  if (isLoading) {
-    return <Spin size="large" />;
-  }
+  // Lấy các dịch vụ của chuyên viên
+  const {
+    data: services,
+    isLoading: servicesLoading,
+    isError: servicesError,
+  } = useServicesByTherapistId(skintherapistId || "");
 
-  if (isError || !therapist) {
+  if (therapistLoading || servicesLoading) return <Spin size="large" />;
+  if (therapistError || !therapist)
     return <div>Không tìm thấy thông tin chuyên viên chăm sóc da</div>;
-  }
+  if (servicesError)
+    return <div>Không thể lấy danh sách dịch vụ của chuyên viên</div>;
 
   return (
     <div style={{ padding: "20px", backgroundColor: "#FBFEFB" }}>
@@ -41,28 +48,26 @@ const SkinTherapistDetail = () => {
             />
           </Col>
           <Col xs={24} md={14}>
-            <Title level={2} style={{ marginBottom: 16 }}>
-              {therapist.name}
-            </Title>
-            <Text style={{ fontSize: 16, color: "#555" }}>
-              {therapist.speciality}
-            </Text>
+            <Title level={2}>{therapist.name}</Title>
+            <Text>{therapist.speciality}</Text>
             <Divider />
-            <div style={{ marginBottom: 16 }}>
-              <Text strong>Email:</Text> {therapist.email}
-            </div>
+            <Text strong>Email:</Text> {therapist.email}
             <Divider />
-            <div style={{ marginBottom: 16 }}>
-              <Text strong>Kinh nghiệm:</Text> {therapist.experience}
-            </div>
+            <Text strong>Kinh nghiệm:</Text> {therapist.experience}
             <Divider />
-            <div style={{ marginBottom: 16 }}>
-              <Text strong>Bằng cấp:</Text> {therapist.degree}
-            </div>
+            <Text strong>Bằng cấp:</Text> {therapist.degree}
             <Divider />
-            <div style={{ marginBottom: 16 }}>
-              <Text strong>Chuyên môn:</Text> {therapist.expertise}
-            </div>
+            <Title level={4}>Dịch vụ có thể thực hiện:</Title>
+            <List
+              dataSource={services}
+              renderItem={(service) => (
+                <List.Item>
+                  <div>
+                    <Text strong>{service.name}</Text> - {service.description}
+                  </div>
+                </List.Item>
+              )}
+            />
           </Col>
         </Row>
       </Card>
