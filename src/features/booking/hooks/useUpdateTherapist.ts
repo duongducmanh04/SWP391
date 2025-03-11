@@ -3,23 +3,23 @@ import axios from "axios";
 
 interface MutationVariables {
   bookingId: number;
-  amount: number;
+  skintherapistId: number;
 }
 
-export const useUpdateServiceAmount = () => {
+export const useUpdateTherapist = () => {
   const queryClient = useQueryClient();
 
   return useMutation<void, Error, MutationVariables>({
     mutationFn: async ({
       bookingId,
-      amount,
+      skintherapistId,
     }: MutationVariables): Promise<void> => {
       await axios.put(
-        `https://localhost:7071/api/Booking/amount/${bookingId}?amount=${amount}`
+        `https://localhost:7071/api/Booking/skintherapist/${bookingId}?skintherapistId=${skintherapistId}`
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["amount"] });
+      queryClient.invalidateQueries({ queryKey: ["skintherapist"] });
     },
   });
 };

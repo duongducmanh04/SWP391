@@ -1,11 +1,13 @@
 import { Card, Typography, Row, Col, Image, Divider, Spin } from "antd";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useTherapistById } from "../hooks/useGetTherapistId";
 
 const { Title, Text } = Typography;
 
 const SkinTherapistDetail = () => {
-  const { skintherapistId } = useParams();
+  // const { skintherapistId } = useParams();
+  const location = useLocation();
+  const { skintherapistId } = location.state || {};
   const {
     data: therapist,
     isLoading,
@@ -48,6 +50,18 @@ const SkinTherapistDetail = () => {
             <Divider />
             <div style={{ marginBottom: 16 }}>
               <Text strong>Email:</Text> {therapist.email}
+            </div>
+            <Divider />
+            <div style={{ marginBottom: 16 }}>
+              <Text strong>Kinh nghiệm:</Text> {therapist.experience}
+            </div>
+            <Divider />
+            <div style={{ marginBottom: 16 }}>
+              <Text strong>Bằng cấp:</Text> {therapist.degree}
+            </div>
+            <Divider />
+            <div style={{ marginBottom: 16 }}>
+              <Text strong>Chuyên môn:</Text> {therapist.expertise}
             </div>
           </Col>
         </Row>

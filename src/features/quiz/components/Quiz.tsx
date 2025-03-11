@@ -1,244 +1,254 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
-import { Card, Button, Radio, message, Typography, Divider, Table } from "antd";
-import { Question, SkinCareProcess } from "../dto/quiz.dto";
-import "../../../style/Quiz.css";
+import { useState, useEffect } from "react";
+import { Card, Button, Radio, message, Typography, Spin, Col, Row } from "antd";
 import { useQuizQuestion } from "../hooks/useGetQuizQuestion";
 import { useQuizAnswer } from "../hooks/useGetQuizAnswer";
+import { useSubmitQuiz } from "../hooks/useSubmitQuiz";
+import { useSkinTypes } from "../../skin_type/hooks/useGetSkin";
+import { useSkintypeServiceBySkintypeId } from "../../services/hooks/useGetSkintypeServiceBySkintypeId";
+import { useServices } from "../../services/hooks/useGetService";
+import { useNavigate } from "react-router-dom";
+import "../../../style/Quiz.css";
+import { PagePath } from "../../../enums/page-path.enum";
+import { useSkintypeServiceByServiceId } from "../../services/hooks/useGetSkintypeServiceByServiceId";
 
-const { Title, Text } = Typography;
-
-const quizData: Question[] = [
-  {
-    id: 1,
-    question: "Da của bạn cảm thấy như thế nào sau khi rửa mặt?",
-    options: [
-      { text: "Căng và khô", skinType: "Da khô" },
-      { text: "Bị nhần và bóng dầu", skinType: "Da dầu" },
-      { text: "Bình thường", skinType: "Da bình thường" },
-      { text: "Nhạy cảm hoặc đỏ", skinType: "Da nhạy cảm" },
-    ],
-  },
-  {
-    id: 2,
-    question: "Bạn thường bắt gặp mụn hoặc mụn đầu đen bao nhiêu lâu một lần?",
-    options: [
-      { text: "Hiếm khi", skinType: "Da bình thường" },
-      { text: "Thường xuyên", skinType: "Da dầu" },
-      { text: "Gần như không bao giờ", skinType: "Da khô" },
-      { text: "Thỉnh thoảng, nhưng dễ kích ứng", skinType: "Da nhạy cảm" },
-    ],
-  },
-  {
-    id: 3,
-    question: "Da của bạn cảm thấy như thế nào vào cuối ngày?",
-    options: [
-      { text: "Rất nhần dầu", skinType: "Da dầu" },
-      { text: "Khô hoặc bong tróc", skinType: "Da khô" },
-      { text: "Cân bằng", skinType: "Da bình thường" },
-      { text: "Kích ứng hoặc ngứa", skinType: "Da nhạy cảm" },
-    ],
-  },
-];
-
-const skinCareProcesses: SkinCareProcess[] = [
-  {
-    skinType: "Da khô",
-    description: "Quy trình dưỡng âm và cung cấp độ ẩm cho da khô.",
-    price: "$50/lần",
-    steps: [
-      {
-        title: "Làm sạch",
-        description: "Sử dụng sản phẩm làm sạch dịu nhẹ, cung cấp độ ẩm.",
-      },
-      {
-        title: "Dưỡng âm",
-        description: "Thoa kem dưỡng âm dành cho da khô để duy trì độ ẩm.",
-      },
-      {
-        title: "Bảo vệ",
-        description:
-          "Sử dụng kem chống nắng để bảo vệ da khỏi tác hại của ánh nắng mặt trời.",
-      },
-    ],
-  },
-  {
-    skinType: "Da dầu",
-    description: "Quy trình kiểm dầu và ngăn ngừa mụn.",
-    price: "$40/lần",
-    steps: [
-      {
-        title: "Làm sạch",
-        description: "Sử dụng sản phẩm làm sạch dành cho da dầu.",
-      },
-      { title: "Cân bằng", description: "Thoa toner kiểm dầu." },
-      {
-        title: "Điều trị",
-        description:
-          "Sử dụng sản phẩm có chứa acid salicylic hoặc các sản phẩm điều trị mụn.",
-      },
-    ],
-  },
-  {
-    skinType: "Da bình thường",
-    description: "Quy trình dưỡng da cân bằng cho da bình thường.",
-    price: "$35/lần",
-    steps: [
-      {
-        title: "Làm sạch",
-        description: "Sử dụng sản phẩm làm sạch nhẹ nhàng.",
-      },
-      { title: "Dưỡng âm", description: "Thoa kem dưỡng độ ẩm nhẹ." },
-      { title: "Bảo vệ", description: "Sử dụng kem chống nắng hàng ngày." },
-    ],
-  },
-  {
-    skinType: "Da nhạy cảm",
-    description: "Quy trình dưỡng da nhẹ nhàng dành cho da nhạy cảm.",
-    price: "$60/lần",
-    steps: [
-      {
-        title: "Làm sạch",
-        description: "Sử dụng sản phẩm làm sạch không mùi hương.",
-      },
-      { title: "Làm diễu hoà", description: "Thoa serum làm diễu hoà da." },
-      {
-        title: "Bảo vệ",
-        description: "Sử dụng kem chống nắng dành cho da nhạy cảm.",
-      },
-    ],
-  },
-];
-
-// const skinInfo: Skin[] = [
-//   {
-//     id: 1,
-//     name: "Da khô",
-//     descriptions: "",
-//     image: "",
-//   },
-//   {
-//     id: 2,
-//     name: "Da khô",
-//     descriptions: "",
-//     image: "",
-//   },
-//   {
-//     id: 3,
-//     name: "Da khô",
-//     descriptions: "",
-//     image: "",
-//   },
-// ];
+const { Title, Text, Paragraph } = Typography;
 
 const QuizTest = () => {
-  const {
-    data: questionData,
-    isLoading: isLoadingQuestion,
-    error: errorQuestion,
-  } = useQuizQuestion();
-  const {
-    data: answerData,
-    isLoading: isLoadingAnswer,
-    error: errorAnswer,
-  } = useQuizAnswer();
+  const { data: questionData = [], isLoading: isLoadingQuestion } =
+    useQuizQuestion();
+  const { data: skinTypeData = [] } = useSkinTypes();
+  const { data: answerData = [], isLoading: isLoadingAnswer } = useQuizAnswer();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedSkinTypes, setSelectedSkinTypes] = useState<string[]>([]);
-  const [resultSkinType, setResultSkinType] = useState<string | null>(null);
+  const [selectedAnswers, setSelectedAnswers] = useState<
+    Record<number, number>
+  >({});
+  const [recommendedSkinType, setRecommendedSkinType] = useState<string | null>(
+    null
+  );
+  const [skintypeId, setSkintypeId] = useState<number | null>(null);
+  const [serviceId, setServiceId] = useState<number | null>(null);
+  const navigate = useNavigate();
 
-  const currentQuestion = quizData[currentQuestionIndex];
+  const { mutate: submitQuiz, isPending: isSubmitting } = useSubmitQuiz();
+  const customerId = Number(localStorage.getItem("customerId") || "1");
+
+  const { data: skintypeServiceData = [] } = useSkintypeServiceBySkintypeId(
+    skintypeId ? skintypeId.toString() : ""
+  );
+
+  const { data: skintypeServiceIdData = [] } = useSkintypeServiceByServiceId(
+    serviceId ? serviceId.toString() : ""
+  );
+
+  const { data: allServices = [] } = useServices();
+
+  const handleNavigate = (serviceId: number) => {
+    navigate(PagePath.SKIN_SERVICE_DETAIL, {
+      state: {
+        serviceId: serviceId,
+      },
+    });
+  };
+
+  useEffect(() => {
+    console.log("Recommended Skin Type:", recommendedSkinType);
+    console.log("Skin Type Data:", skinTypeData);
+    if (recommendedSkinType) {
+      const matchedSkin = skinTypeData.find(
+        (skin) =>
+          skin.skintypeName.toLowerCase() === recommendedSkinType.toLowerCase()
+      );
+      if (matchedSkin) {
+        setSkintypeId(matchedSkin.skintypeId);
+      }
+    }
+  }, [recommendedSkinType, skinTypeData]);
+
+  if (isLoadingQuestion || isLoadingAnswer)
+    return <Spin tip="Đang tải câu hỏi..." />;
+  if (!questionData.length) return <p>Không có dữ liệu câu hỏi!</p>;
+
+  const currentQuestion = questionData[currentQuestionIndex];
+
+  const handleAnswerChange = (questionId: number, answerId: number) => {
+    setSelectedAnswers((prev) => ({ ...prev, [questionId]: answerId }));
+  };
 
   const handleNext = () => {
-    if (!selectedSkinTypes[currentQuestionIndex]) {
+    if (!selectedAnswers[currentQuestion.quizquestionId]) {
       message.warning("Vui lòng chọn một đáp án!");
       return;
     }
-
-    if (currentQuestionIndex < quizData.length - 1) {
+    if (currentQuestionIndex < questionData.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
     } else {
-      const mostCommonSkinType = selectedSkinTypes.sort(
-        (a, b) =>
-          selectedSkinTypes.filter((type) => type === b).length -
-          selectedSkinTypes.filter((type) => type === a).length
-      )[0];
-      setResultSkinType(mostCommonSkinType);
+      handleSubmit();
     }
   };
 
-  const handleSelect = (skinType: string) => {
-    const updated = [...selectedSkinTypes];
-    updated[currentQuestionIndex] = skinType;
-    setSelectedSkinTypes(updated);
+  const handleSubmit = () => {
+    const submitData = {
+      customerId,
+      answers: questionData.map((q) => ({
+        questionId: q.quizquestionId,
+        answerId: selectedAnswers[q.quizquestionId],
+      })),
+    };
+
+    submitQuiz(submitData, {
+      onSuccess: (data) => {
+        message.success("Bài quiz đã được gửi thành công!");
+        setRecommendedSkinType(data.recommendedSkinType || "Không xác định");
+      },
+      onError: () => {
+        message.error("Có lỗi xảy ra khi nộp bài! Vui lòng thử lại.");
+      },
+    });
   };
 
-  const recommendedProcess = skinCareProcesses.find(
-    (process) => process.skinType === resultSkinType
+  const matchedSkinType = skinTypeData.find(
+    (skin) =>
+      skin.skintypeName.toLowerCase() === recommendedSkinType?.toLowerCase()
   );
 
-  const columns = [
-    {
-      title: "Bước",
-      dataIndex: "title",
-      key: "title",
-    },
-    {
-      title: "Mô tả",
-      dataIndex: "description",
-      key: "description",
-    },
-  ];
+  const matchedServices = Array.isArray(skintypeServiceData)
+    ? (skintypeServiceData as { serviceId: number }[])
+        .map((skintypeService) =>
+          allServices.find(
+            (service) => service.serviceId === skintypeService.serviceId
+          )
+        )
+        .filter((service) => service !== undefined)
+    : [];
+
+  const getSkinTypesForService = (serviceId: number) => {
+    const skintypeIds = Array.isArray(skintypeServiceIdData)
+      ? skintypeServiceIdData
+          .filter((item: { serviceId: number }) => item.serviceId === serviceId)
+          .map((item: { skintypeId: number }) => item.skintypeId)
+      : [];
+
+    console.log(`Service ID: ${serviceId} -> Skintype IDs:`, skintypeIds);
+
+    return skinTypeData
+      .filter((skin) => skintypeIds.includes(skin.skintypeId))
+      .map((skin) => skin.skintypeName)
+      .join(", ");
+  };
+  console.log("serviceId được truyền vào API:", serviceId);
+  console.log("skintypeServiceIdData:", skintypeServiceIdData);
+  console.log("allServices:", allServices);
+  console.log("skinTypeData:", skinTypeData);
 
   return (
-    <div style={{ maxWidth: 800, margin: "50px auto", padding: 20 }}>
-      {!resultSkinType ? (
-        <Card style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+    <div className="quiz-container">
+      {!recommendedSkinType && (
+        <Card className="quiz-card">
           <Title level={4}>
-            Câu hỏi {currentQuestionIndex + 1}/{quizData.length}
+            Câu hỏi {currentQuestionIndex + 1}/{questionData.length}
           </Title>
-          <Text style={{ fontSize: 16 }}>{currentQuestion.question}</Text>
+          <Text className="quiz-text">{currentQuestion?.content}</Text>
           <Radio.Group
-            onChange={(e) => handleSelect(e.target.value)}
-            value={selectedSkinTypes[currentQuestionIndex]}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-              marginTop: 20,
-            }}
+            onChange={(e) =>
+              handleAnswerChange(currentQuestion.quizquestionId, e.target.value)
+            }
+            value={selectedAnswers[currentQuestion.quizquestionId] || null}
+            className="quiz-radio-group"
           >
-            {currentQuestion.options.map((option: any) => (
-              <Radio key={option.text} value={option.skinType}>
-                {option.text}
-              </Radio>
-            ))}
+            {answerData
+              .filter(
+                (ans) => ans.quizquestionId === currentQuestion.quizquestionId
+              )
+              .map((option) => (
+                <Radio key={option.answerId} value={option.answerId}>
+                  {option.answer}
+                </Radio>
+              ))}
           </Radio.Group>
           <Button
             type="primary"
             className="quiz-button"
-            style={{ marginTop: 20, alignSelf: "center" }}
+            style={{ marginTop: 20 }}
             onClick={handleNext}
+            loading={isSubmitting}
           >
-            {currentQuestionIndex < quizData.length - 1
+            {currentQuestionIndex < questionData.length - 1
               ? "Tiếp theo"
-              : "Nộp bài"}
+              : "Hoàn thành"}
           </Button>
         </Card>
-      ) : (
-        <div style={{ textAlign: "center" }}>
-          <Title level={3}>Quy trình dưỡng da gợi ý cho {resultSkinType}</Title>
-          <Text style={{ fontSize: 16, color: "#555" }}>
-            {recommendedProcess?.description}
+      )}
+
+      {recommendedSkinType && matchedSkinType && (
+        <Card className="result-card" style={{ marginTop: 20 }}>
+          <Title level={4}>Loại da của bạn:</Title>
+          <Text strong style={{ fontSize: "18px", color: "#1890ff" }}>
+            {matchedSkinType.skintypeName}
           </Text>
-          <Divider />
-          <Title level={4}>Giá: {recommendedProcess?.price}</Title>
-          <Divider />
-          <Table
-            dataSource={recommendedProcess?.steps || []}
-            columns={columns}
-            pagination={false}
-            bordered
-          />
+          <Title level={5}>Ưu điểm:</Title>
+          <Paragraph>{matchedSkinType.pros}</Paragraph>
+          <Title level={5}>Nhược điểm:</Title>
+          <Paragraph>{matchedSkinType.cons}</Paragraph>
+          <Title level={5}>Hướng dẫn chăm sóc:</Title>
+          <Paragraph>{matchedSkinType.skincareGuide}</Paragraph>
+        </Card>
+      )}
+
+      {matchedServices.length > 0 && (
+        <div
+          className="service-list"
+          style={{
+            marginTop: 20,
+            gap: "20px",
+          }}
+        >
+          <Title level={4}>Dịch vụ phù hợp:</Title>
+          <hr />
+          <Row gutter={[16, 16]} justify="start">
+            {matchedServices.map((service) => (
+              <Col
+                key={service.serviceId}
+                xs={24}
+                sm={12}
+                md={8}
+                lg={6}
+                style={{ display: "flex" }}
+              >
+                <Card
+                  hoverable
+                  cover={
+                    <img
+                      alt={service.name}
+                      src={service.image}
+                      style={{ height: 222 }}
+                    />
+                  }
+                  style={{ width: "-webkit-fill-available" }}
+                >
+                  <Title level={5} style={{ marginTop: "10px" }}>
+                    {service.name}
+                  </Title>
+                  <Text>
+                    {getSkinTypesForService(service.serviceId) ||
+                      "Không có thông tin"}
+                  </Text>
+                  <Text strong>Giá: {service.price} VNĐ</Text>
+                  <br />
+                  <Text>Thời gian: {service.duration} phút</Text>
+                  <Button
+                    type="primary"
+                    style={{
+                      marginTop: "10px",
+                      background: "rgb(193, 154, 107)",
+                    }}
+                    onClick={() => handleNavigate(service.serviceId)}
+                  >
+                    Chi tiết
+                  </Button>
+                </Card>
+              </Col>
+            ))}
+          </Row>
         </div>
       )}
     </div>

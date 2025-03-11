@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import Login from "./features/authentication/components/Login";
 import Register from "./features/authentication/components/Register";
-import Home from "./Home";
+import Home from "./pages/Home";
 import WorkVolume from "./features/work_volume/WorkVolume";
 import UserListPage from "./features/user/pages/UserListPage";
 import UserDetail from "./features/user/components/UserListDetail";
@@ -20,7 +20,6 @@ import SkincareServices from "./features/services/components/SkinService";
 import BlogPage from "./features/blog/components/Blog";
 import BlogDetail from "./features/blog/components/BlogDetail";
 import NavbarMenu from "./components/NavBarMenu";
-import Complete from "./pages/CompleteResult";
 import ServiceDetail from "./features/services/components/SkinServiceDetail";
 import SkincareBooking from "./features/services/components/BookingService";
 import PricingTable from "./pages/PricingPage";
@@ -36,7 +35,10 @@ import BookingDetail from "./features/booking/components/BookingDetail";
 import CompleteBookingPage from "./pages/CompleteResult";
 import ScheduleCalendarPage from "./features/schedule/page/SchedulePage";
 import ScheduleCalendarManagementPage from "./features/schedule/page/TherapistSchedulePage";
-import BookingInfoConfirm from "./pages/BookingInfoConfirm";
+import BookingInfoConfirm from "./features/services/components/BookingInfoConfirm";
+import CustomerProfile from "./pages/CustomerProfilePage";
+import CustomerBookingDetail from "./pages/CustomerBookingDetail";
+
 const App = () => {
   return (
     <Router>
@@ -94,16 +96,24 @@ const App = () => {
               path={PagePath.BOOKING_SERVICE}
               element={<SkincareBooking />}
             />
-            <Route path={PagePath.RESULT_COMPLETE} element={<Complete />} />
             <Route path={PagePath.PRICE_SERVICE} element={<PricingTable />} />
             <Route path={PagePath.SKIN_TYPE} element={<SkinType />} />
+            <Route
+              path={PagePath.BOOKING_INFO_CONFIRM}
+              element={<BookingInfoConfirm />}
+            />
             <Route
               path={PagePath.COMPLETE_RESULT}
               element={<CompleteBookingPage />}
             />
-             <Route path={PagePath.BOOKING_INFO_CONFIRM}
-              element={<BookingInfoConfirm />} 
-              />
+            <Route
+              path={PagePath.CUSTOMER_PROFILE}
+              element={<CustomerProfile />}
+            />
+            <Route
+              path={PagePath.CUSTOMER_BOOKING_DETAIL}
+              element={<CustomerBookingDetail />}
+            />
           </Route>
         </Routes>
       </AuthGuardProvider>

@@ -4,6 +4,7 @@ import { HeartOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useServices } from "../hooks/useGetService";
 import { useServiceStore } from "../hooks/useServiceStore";
+import { PagePath } from "../../../enums/page-path.enum";
 
 const { Title, Text } = Typography;
 
@@ -17,8 +18,15 @@ const SkincareServices = () => {
 
   const { setServices } = useServiceStore();
 
+  // const handleNavigate = (serviceId: number) => {
+  //   navigate(`/Homepage/Service/${serviceId}`);
+  // };
   const handleNavigate = (serviceId: number) => {
-    navigate(`/Homepage/Service/${serviceId}`);
+    navigate(PagePath.SKIN_SERVICE_DETAIL, {
+      state: {
+        serviceId: serviceId,
+      },
+    });
   };
 
   useEffect(() => {
@@ -35,7 +43,7 @@ const SkincareServices = () => {
       >
         Dịch Vụ Chăm Sóc Da Chuyên Nghiệp
       </Title>
-      <Row gutter={[16, 16]} justify="center">
+      <Row gutter={[16, 16]} justify="start">
         {serviceData?.map((service) => (
           <Col
             key={service.serviceId}
@@ -68,6 +76,7 @@ const SkincareServices = () => {
                   Chi tiết
                 </Button>,
               ]}
+              style={{ width: "-webkit-fill-available" }}
             >
               <Title level={4}>{service.name}</Title>
               <Text>{service.description}</Text>
