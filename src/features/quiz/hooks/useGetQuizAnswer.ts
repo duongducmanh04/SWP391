@@ -4,14 +4,14 @@ import { QuizAnswerDto } from "../dto/quiz-answer.dto";
 
 const fetchQuizAnswer = async (): Promise<QuizAnswerDto[]> => {
   const response = await axios.get<QuizAnswerDto[]>(
-    "https://localhost:7071/getAllQuizAnswers"
+    "https://localhost:7071/api/QuizAnswer"
   );
   return response.data;
 };
 
 export const useQuizAnswer = () => {
   return useQuery<QuizAnswerDto[], Error>({
-    queryKey: ["getAllQuizAnswers"],
+    queryKey: ["QuizAnswer"],
     queryFn: fetchQuizAnswer,
   });
 };
