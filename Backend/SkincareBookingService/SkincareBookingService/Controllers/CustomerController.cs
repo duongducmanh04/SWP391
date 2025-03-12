@@ -93,5 +93,16 @@ namespace SkincareBookingService.Controllers
             }
             return BadRequest(new { message = "Failed to update customer skintype." });
         }
+
+        [HttpPut("updateCustomer/{customerId}")]
+        public async Task<IActionResult> UpdateCustomer(int customerId, [FromBody] CustomerDTO customer)
+        {
+            var result = await _customerService.UpdateCustomerAsync(customerId, customer.Name, customer.Email, customer.PhoneNumber, (int)customer.SkintypeId);
+            if (result)
+            {
+                return Ok(new { message = "Customer updated successfully." });
+            }
+            return BadRequest(new { message = "Failed to update customer." });
+        }
     }
 }

@@ -22,6 +22,8 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<bool> UpdateServiceProcedureDescriptionAsync(int serviceId, string procedureDescription);
 
+        Task<bool> UpdateServiceAsync(int serviceId, ServiceDTO serviceDTO);
+
         Task<bool> DeleteServiceAsync(int serviceId);
 
     }

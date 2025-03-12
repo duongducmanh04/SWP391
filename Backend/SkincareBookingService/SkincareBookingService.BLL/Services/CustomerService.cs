@@ -89,6 +89,24 @@ namespace SkincareBookingService.BLL.Services
             };
         }
 
+        public async Task<bool> UpdateCustomerAsync(int customerId, string name, string email, string phoneNumber, int skintypeId)
+        {
+            var customer = await _customerRepository.FirstOrDefaultAsync(c => c.CustomerId == customerId);
+
+            if (customer == null)
+            {
+                return false;
+            }
+
+            customer.Name = name;
+            customer.Email = email;
+            customer.PhoneNumber = phoneNumber;
+            customer.SkintypeId = skintypeId;
+
+            await _customerRepository.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<bool> UpdateCustomerEmailAsync(int customerId, string email)
         {
             var customer = await _customerRepository.FirstOrDefaultAsync(c => c.CustomerId == customerId);

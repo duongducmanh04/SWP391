@@ -119,6 +119,17 @@ namespace SkincareBookingService.Controllers
             return BadRequest(new { message = "Failed to update service procedure description." });
         }
 
+        [HttpPut("updateService/{serviceId}")]
+        public async Task<IActionResult> UpdateService(int serviceId, [FromBody] ServiceDTO serviceDTO)
+        {
+            var result = await _serviceService.UpdateServiceAsync(serviceId, serviceDTO);
+            if (result)
+            {
+                return Ok(new { message = "Service updated successfully." });
+            }
+            return BadRequest(new { message = "Failed to update service." });
+        }
+
         [HttpDelete("deleteService/{serviceId}")]
         public async Task<IActionResult> DeleteService(int serviceId)
         {
