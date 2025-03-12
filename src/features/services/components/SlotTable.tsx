@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Table,
   Space,
@@ -16,7 +16,8 @@ import {
 import { useSlots } from "../hooks/useGetSlot";
 import { useAvailableSlot } from "../hooks/useAvailableSlot";
 import { useBookedSlot } from "../hooks/useGetBookedSlot";
-import { useCreateSlot, useDeleteSlot } from "../hooks/useCreateSlot";
+import { useCreateSlot } from "../hooks/useCreateSlot";
+import { useDeleteSlot } from "../hooks/useDeleteSlot";
 import {
   EditOutlined,
   DeleteOutlined,

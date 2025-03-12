@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from "react";
-import { Table, Input, Button, message } from "antd";
+import { Table, Input, Button, message, Modal, Form } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useSkinTypes } from "../hooks/useGetSkin";
 import { useDeleteSkinType } from "../hooks/useDeleteSkinType";
+import { useCreateSkinType } from "../hooks/useCreateSkinType";
 import { TablePaginationConfig } from "antd/es/table";
-import { SkinDto } from "../dto/skin.dto"; // Import kiểu dữ liệu SkinDto
+import { SkinDto } from "../dto/skin.dto";
 
 interface SkinType {
   skinTypeId: string;
@@ -13,16 +14,18 @@ interface SkinType {
 }
 
 const SkinTypeTable: React.FC = () => {
-  const { data: skinDtos, isLoading, refetch } = useSkinTypes(); // Sửa tên biến để rõ nghĩa hơn
+  const { data: skinDtos, isLoading, refetch } = useSkinTypes();
   const { mutate: deleteSkinType } = useDeleteSkinType();
+  const { mutate: createSkinType } = useCreateSkinType();
 
   const [searchText, setSearchText] = useState("");
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
 
-  // Chuyển đổi dữ liệu từ SkinDto[] thành SkinType[]
   const skinTypes: SkinType[] =
     skinDtos?.map((skin: SkinDto) => ({
-      skinTypeId: skin.skintypeId.toString(), // Đảm bảo là string
+      skinTypeId: skin.skintypeId.toString(),
       name: skin.skintypeName,
       description: skin.description,
     })) || [];
@@ -35,7 +38,6 @@ const SkinTypeTable: React.FC = () => {
 
   const handleDelete = (skinTypeId: string) => {
     deleteSkinType(Number(skinTypeId), {
-      // Chuyển skinTypeId thành số
       onSuccess: () => {
         message.success("Xóa loại da thành công");
         refetch();
@@ -43,6 +45,22 @@ const SkinTypeTable: React.FC = () => {
       onError: () => {
         message.error("Xóa loại da thất bại");
       },
+    });
+  };
+
+  const handleAddSkinType = () => {
+    form.validateFields().then((values) => {
+      createSkinType(values, {
+        onSuccess: () => {
+          message.success("Thêm loại da thành công");
+          setIsModalVisible(false);
+          form.resetFields();
+          refetch();
+        },
+        onError: () => {
+          message.error("Thêm loại da thất bại");
+        },
+      });
     });
   };
 
@@ -83,7 +101,11 @@ const SkinTypeTable: React.FC = () => {
           onChange={(e) => setSearchText(e.target.value)}
           style={{ width: 300 }}
         />
-        <Button type="primary" icon={<PlusOutlined />}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => setIsModalVisible(true)}
+        >
           Thêm loại da
         </Button>
       </div>
@@ -101,6 +123,30 @@ const SkinTypeTable: React.FC = () => {
           })
         }
       />
+
+      <Modal
+        title="Thêm loại da"
+        visible={isModalVisible}
+        onOk={handleAddSkinType}
+        onCancel={() => setIsModalVisible(false)}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            name="skintypeName"
+            label="Tên loại da"
+            rules={[{ required: true, message: "Vui lòng nhập tên loại da" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="description"
+            label="Mô tả"
+            rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
+          >
+            <Input.TextArea rows={4} />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
