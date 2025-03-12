@@ -27,6 +27,7 @@ import useAuthStore from "../features/authentication/hooks/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import { PagePath } from "../enums/page-path.enum";
 import { RoleCode } from "../enums/role.enum";
+import { useGetTherapistProfile } from "../features/authentication/hooks/useGetTherapistProfile";
 
 const { Header, Content, Sider } = Layout;
 
@@ -50,6 +51,13 @@ const SidebarMenu = () => {
   const navigate = useNavigate();
 
   const { user, logout } = useAuthStore();
+  const { data: profileData } = useGetTherapistProfile(
+    user?.accountId,
+    user?.role
+  );
+
+  const profile = Array.isArray(profileData) ? profileData[0] : undefined;
+  const therapist = profile?.skinTherapists?.[0] ?? null;
 
   useEffect(() => {
     document.title = "Trang chủ";
@@ -308,7 +316,10 @@ const SidebarMenu = () => {
                 }}
               >
                 <img
-                  src="https://joesch.moe/api/v1/male/random?key=1"
+                  src={
+                    therapist?.image ||
+                    "https://joesch.moe/api/v1/male/random?key=1"
+                  }
                   style={{
                     marginRight: "10px",
                     width: "40px",
