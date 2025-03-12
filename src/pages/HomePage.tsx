@@ -4,55 +4,14 @@ import "antd/dist/reset.css";
 import "../style/HomePage.css";
 import { Link } from "react-router-dom";
 import { PagePath } from "../enums/page-path.enum";
+import { useTherapists } from "../features/skin_therapist/hooks/useGetTherapist";
 
 const { Content } = Layout;
-
 const { Title, Text, Paragraph } = Typography;
 
-const experts = [
-  {
-    id: 1,
-    name: "Nancy Reimer",
-    expertise: "Giáo dục & Kiến thức chăm sóc da",
-    experience:
-      "Hàng chục năm kinh nghiệm và kiến thức chuyên sâu về chăm sóc da.",
-    field: "Giáo dục",
-    degree: "Giám đốc Giáo dục",
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 2,
-    name: "Tiffany Medois",
-    expertise: "Tư vấn viên & Chuyên viên thẩm mỹ",
-    experience:
-      "Từng làm nhà báo, nhà sản xuất, nhà làm phim tài liệu và biên tập viên.",
-    field: "Tư vấn",
-    degree: "Chuyên viên Thẩm mỹ Chứng nhận",
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 3,
-    name: "Katina Gilmore",
-    expertise: "Điều dưỡng & Thẩm mỹ",
-    experience:
-      "Kết hợp giữa điều dưỡng và thẩm mỹ để mang lại sự chuyên môn cá nhân hóa.",
-    field: "Chăm sóc sức khỏe",
-    degree: "Y tá Chứng nhận (R.N.)",
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 4,
-    name: "Bill Levins",
-    expertise: "Giám đốc Tiếp thị",
-    experience:
-      "Mang đến kiến thức thông qua sự am hiểu sâu sắc trong ngành kinh doanh chăm sóc da.",
-    field: "Tiếp thị",
-    degree: "Phó Chủ tịch Tiếp thị",
-    image: "https://via.placeholder.com/150",
-  },
-];
-
 const HomePage = () => {
+  const { data: therapists = [], isLoading, error } = useTherapists();
+
   return (
     <Layout>
       <Layout
@@ -202,52 +161,51 @@ const HomePage = () => {
         </Row>
       </Content>
 
-      <div style={{ padding: "20px", backgroundColor: "#FBFEFB" }}>
-        <Title level={3} style={{ textAlign: "center", marginBottom: "30px" }}>
+      <Content style={{ padding: "50px", background: "#f5f5f5" }}>
+        <Title level={3} style={{ textAlign: "center" }}>
           Chuyên viên trị liệu da
         </Title>
         <Row gutter={[16, 16]}>
-          {experts.map((expert) => (
-            <Col xs={24} sm={12} md={8} lg={6} key={expert.id}>
+          {therapists.map((therapist) => (
+            <Col xs={24} sm={12} md={8} lg={6} key={therapist.skintherapistId}>
               <Card
                 hoverable
                 style={{ borderRadius: "10px", textAlign: "center" }}
                 cover={
                   <img
-                    alt={expert.name}
-                    src={expert.image}
+                    alt={therapist.name}
+                    src={therapist.image || "https://via.placeholder.com/150"}
                     style={{
                       borderTopLeftRadius: "10px",
                       borderTopRightRadius: "10px",
                       objectFit: "cover",
+                      height: "200px",
                     }}
                   />
                 }
               >
                 <Title level={4} style={{ marginBottom: "5px" }}>
-                  {expert.name}
+                  {therapist.name}
                 </Title>
-                <Text strong>{expert.expertise}</Text>
+                <Text strong>Chuyên môn: {therapist.speciality}</Text>
                 <br />
-                <Text>{expert.experience}</Text>
+                <Text>Mô tả: {therapist.expertise}</Text>
                 <br />
-                <Text type="secondary">Lĩnh vực: {expert.field}</Text>
-                <br />
-                <Text type="secondary">Bằng cấp: {expert.degree}</Text>
+                <Text type="secondary">Bằng cấp: {therapist.degree}</Text>
                 <div style={{ marginTop: "15px" }}>
                   <Button
                     type="primary"
                     shape="round"
                     style={{ background: "rgb(193, 154, 107)" }}
                   >
-                    Đặt lịch với {expert.name.split(" ")[0]}
+                    Đặt lịch với {therapist.name}
                   </Button>
                 </div>
               </Card>
             </Col>
           ))}
         </Row>
-      </div>
+      </Content>
     </Layout>
   );
 };

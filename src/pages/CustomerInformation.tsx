@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Layout,
@@ -27,6 +27,7 @@ const PAGE_SIZE = 5; // Số lượng booking mỗi trang
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("personal");
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentBookings, setCurrentBookings] = useState<BookingDto[]>([]);
   const navigate = useNavigate();
   const accountId = 7;
   const role = "Customer";
@@ -51,16 +52,19 @@ const ProfilePage = () => {
     error: bookingError,
   } = useBookingHistory();
 
+  useEffect(() => {
+    if (bookings) {
+      setCurrentBookings(
+        bookings.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+      );
+    }
+  }, [bookings, currentPage]);
+
   const handleNavigateToBookingDetail = (bookingId: number) => {
     const url = `/CustomerBookingDetail/${bookingId}`;
     console.log("🔍 Điều hướng đến:", url);
     navigate(url);
   };
-
-  const currentBookings = bookings?.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#f5f1eb" }}>
@@ -150,11 +154,12 @@ const ProfilePage = () => {
                             renderItem={(booking: BookingDto) => (
                               <List.Item
                                 style={{ cursor: "pointer" }}
-                                onClick={() =>
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   handleNavigateToBookingDetail(
                                     booking.bookingId
-                                  )
-                                }
+                                  );
+                                }}
                                 actions={[
                                   <Button
                                     type="primary"
@@ -179,7 +184,7 @@ const ProfilePage = () => {
 
                           <Pagination
                             current={currentPage}
-                            total={bookings.length}
+                            total={bookings ? bookings.length : 0}
                             pageSize={PAGE_SIZE}
                             onChange={(page) => setCurrentPage(page)}
                             style={{ textAlign: "center", marginTop: "20px" }}
