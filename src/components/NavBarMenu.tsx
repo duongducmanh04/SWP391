@@ -7,6 +7,8 @@ import { Content } from "antd/es/layout/layout";
 import Footers from "./Footer";
 import useAuthStore from "../features/authentication/hooks/useAuthStore";
 import { useGetCustomerProfile } from "../features/authentication/hooks/useGetCustomerProfile";
+import { useEffect, useState } from "react";
+
 
 const NavbarMenu = () => {
   const navigate = useNavigate();
@@ -20,7 +22,13 @@ const NavbarMenu = () => {
   const profile = Array.isArray(profileData) ? profileData[0] : undefined;
   const customers = profile?.customer?.[0] ?? null;
 
+  const [selectedKey, setSelectedKey] = useState<string>(
+    localStorage.getItem("selectedMenu") || "home"
+  );
+
   const handleMenuClick = (key: string) => {
+    setSelectedKey(key);
+    localStorage.setItem("selectedMenu", key);
     if (key === "service") {
       navigate(PagePath.SKIN_SERVICE);
     } else if (key === "blog") {
@@ -36,8 +44,16 @@ const NavbarMenu = () => {
     }
   };
 
+  useEffect(() => {
+    const storedMenu = localStorage.getItem("selectedMenu");
+    if (storedMenu) {
+      setSelectedKey(storedMenu);
+    }
+  }, []);
+
   const handleLogout = () => {
     logout();
+    localStorage.removeItem("selectedMenu");
     navigate(PagePath.ROOT);
   };
 
@@ -72,7 +88,7 @@ const NavbarMenu = () => {
         <div className="navbar-left">
           <Menu
             mode="horizontal"
-            defaultSelectedKeys={["home"]}
+            selectedKeys={[selectedKey]}
             className="navbar-menu"
             onClick={({ key }) => handleMenuClick(key)}
           >
