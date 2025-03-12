@@ -29,10 +29,6 @@ public partial class Customer
 
     public virtual ICollection<CustomerSurvey> CustomerSurveys { get; set; } = new List<CustomerSurvey>();
 
-    public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
-
-    public virtual ICollection<QuizAnswer> QuizAnswers { get; set; } = new List<QuizAnswer>();
-
     public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
 
     public virtual SkinType Skintype { get; set; }

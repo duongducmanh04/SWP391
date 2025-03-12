@@ -9,7 +9,7 @@ const API_SERVICE_URL = "https://localhost:7071/api/service/getServiceById";
 
 // Mapping cứng các dịch vụ theo chuyên viên
 const therapistServiceMapping: Record<number, number[]> = {
-  1: [1], // Dr. Emily White cung cấp dịch vụ có ID là 1 (Facial)
+  1: [4], // Dr. Emily White cung cấp dịch vụ có ID là 1 (Facial)
   2: [2, 3], // Dr. Michael Brown cung cấp dịch vụ có ID là 2, 3
 };
 

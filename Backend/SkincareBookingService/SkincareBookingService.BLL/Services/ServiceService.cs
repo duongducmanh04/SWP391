@@ -1,4 +1,5 @@
-﻿using SkincareBookingService.BLL.DTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
@@ -108,6 +109,87 @@ namespace SkincareBookingService.BLL.Services
             if (service == null) return false;
 
             service.ProcedureDescription = procedureDescription;
+            await _serviceRepository.UpdateAsync(service);
+            await _serviceRepository.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<List<ServiceDTO>> GetServiceBySkintherapistIdAsync(int skintherapistId)
+        {
+            var skintherapistServices = await _serviceRepository.Query()
+                .Where(b => b.SkinTherapistServices.Any(sts => sts.SkintherapistId == skintherapistId))
+                .ToListAsync();
+
+            if (skintherapistServices == null || !skintherapistServices.Any())
+            {
+                return null;
+            }
+
+            return skintherapistServices.Select(s => new ServiceDTO
+            {
+                ServiceId = s.ServiceId,
+                Name = s.Name,
+                Description = s.Description,
+                Price = s.Price,
+                Duration = s.Duration,
+                ProcedureDescription = s.ProcedureDescription,
+                Image = s.Image
+            }).ToList();
+        }
+
+        public async Task<ServiceDTO> CreateServiceAsync(ServiceDTO serviceDTO)
+        {
+            var service = new Service
+            {
+                Name = serviceDTO.Name,
+                Description = serviceDTO.Description,
+                Price = serviceDTO.Price,
+                Duration = serviceDTO.Duration,
+                ProcedureDescription = serviceDTO.ProcedureDescription,
+                Image = serviceDTO.Image
+            };
+
+            await _serviceRepository.AddAsync(service);
+            await _serviceRepository.SaveChangesAsync();
+
+            return new ServiceDTO
+            {
+                ServiceId = service.ServiceId,
+                Name = service.Name,
+                Description = service.Description,
+                Price = service.Price,
+                Duration = service.Duration,
+                ProcedureDescription = service.ProcedureDescription,
+                Image = service.Image
+            };
+        }
+
+        public async Task<bool> DeleteServiceAsync(int serviceId)
+        {
+            var service = await _serviceRepository.GetByIdAsync(serviceId);
+
+            if (service == null) return false;
+
+            await _serviceRepository.DeleteAsync(service);
+            await _serviceRepository.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UpdateServiceAsync(int serviceId, ServiceDTO serviceDTO)
+        {
+            var service = await _serviceRepository.GetByIdAsync(serviceId);
+
+            if (service == null) return false;
+
+            service.Name = serviceDTO.Name;
+            service.Description = serviceDTO.Description;
+            service.Price = serviceDTO.Price;
+            service.Duration = serviceDTO.Duration;
+            service.ProcedureDescription = serviceDTO.ProcedureDescription;
+            service.Image = serviceDTO.Image;
+
             await _serviceRepository.UpdateAsync(service);
             await _serviceRepository.SaveChangesAsync();
 

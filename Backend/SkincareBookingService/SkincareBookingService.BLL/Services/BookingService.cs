@@ -188,12 +188,12 @@ namespace SkincareBookingService.BLL.Services
             BookingDTO bookingDto = new();
             bookingDto.Location = booking.Location;
             bookingDto.BookingId = booking.BookingId;
-            bookingDto.CustomerId = booking.CustomerId;
+            bookingDto.CustomerId = (int)booking.CustomerId;
             bookingDto.Date = booking.Date;
             bookingDto.CreateAt = booking.CreateAt;
             bookingDto.Status = booking.Status;
             bookingDto.Amount = booking.Amount;
-            bookingDto.SkintherapistId = booking.SkintherapistId;
+            bookingDto.SkintherapistId = (int)booking.SkintherapistId;
             bookingDto.UpdateAt = booking.UpdateAt;
             bookingDto.ServiceName = await _serviceRepository.Query()
                 .Where(s => s.ServiceId == booking.ServiceId)

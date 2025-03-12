@@ -46,28 +46,24 @@ namespace SkincareBookingService.BLL.Services
             };
         }
 
-        public async Task<SkintypeServiceDTO> GetSkintypeServiceByServiceIdAsync(int serviceId)
+        public async Task<List<SkintypeServiceDTO>> GetSkintypeServiceByServiceIdAsync(int serviceId)
         {
-            var skintypeServices = await _skintypeServiceRepository.Query()
+           var skintypeServices = await _skintypeServiceRepository.Query()
                 .Where(b => b.ServiceId == serviceId)
                 .ToListAsync();
-
             if (skintypeServices == null || !skintypeServices.Any())
             {
                 return null;
             }
-
-            var skintypeService = skintypeServices.First();
-
-            return new SkintypeServiceDTO
+            return skintypeServices.Select(s => new SkintypeServiceDTO
             {
-                SkintypeServiceId = skintypeService.SkintypeServiceId,
-                SkintypeId = skintypeService.SkintypeId,
-                ServiceId = skintypeService.ServiceId
-            };
+                SkintypeServiceId = s.SkintypeServiceId,
+                SkintypeId = s.SkintypeId,
+                ServiceId = s.ServiceId
+            }).ToList();
         }
 
-        public async Task<SkintypeServiceDTO> GetSkintypeServiceBySkintypeIdAsync(int skintypeId)
+        public async Task<List<SkintypeServiceDTO>> GetSkintypeServiceBySkintypeIdAsync(int skintypeId)
         {
             var skintypeServices = await _skintypeServiceRepository.Query()
                 .Where(b => b.SkintypeId == skintypeId)
@@ -78,14 +74,12 @@ namespace SkincareBookingService.BLL.Services
                 return null;
             }
 
-            var skintypeService = skintypeServices.First();
-
-            return new SkintypeServiceDTO
+            return skintypeServices.Select(s => new SkintypeServiceDTO
             {
-                SkintypeServiceId = skintypeService.SkintypeServiceId,
-                SkintypeId = skintypeService.SkintypeId,
-                ServiceId = skintypeService.ServiceId
-            };
+                SkintypeServiceId = s.SkintypeServiceId,
+                SkintypeId = s.SkintypeId,
+                ServiceId = s.ServiceId
+            }).ToList();
         }
 
         public async Task<List<SkintypeServiceDTO>> GetSkintypeServicesAsync()

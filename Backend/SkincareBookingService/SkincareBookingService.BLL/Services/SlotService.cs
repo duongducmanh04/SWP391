@@ -15,17 +15,34 @@ namespace SkincareBookingService.BLL.Services
             _slotRepository = slotRepository;
         }
 
-        public async Task<bool> CreateSlotAsync(SlotDTO slotDto)
+        public async Task<SlotDTO> CreateSlotAsync(SlotDTO slotDto)
         {
-            var slot = new Slot
-            {
-                Status = slotDto.Status,
-                Time = slotDto.Time,
-                BookingId = slotDto.BookingId,
-            };
-
+           var slot = new Slot
+           {
+               Time = slotDto.Time,
+               Status = slotDto.Status,
+               BookingId = slotDto.BookingId
+           };
             await _slotRepository.AddAsync(slot);
             await _slotRepository.SaveChangesAsync();
+            return new SlotDTO
+            {
+                SlotId = slot.SlotId,
+                Time = slot.Time,
+                Status = slot.Status,
+                BookingId = slot.BookingId
+            };
+        }
+
+        public async Task<bool> DeleteSlotAsync(int id)
+        {
+            var slot = await _slotRepository.GetByIdAsync(id);
+
+            if (slot == null) return false;
+
+            await _slotRepository.DeleteAsync(slot);
+            await _slotRepository.SaveChangesAsync();
+
             return true;
         }
 

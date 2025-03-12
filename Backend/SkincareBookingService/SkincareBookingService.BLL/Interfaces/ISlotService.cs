@@ -4,7 +4,7 @@ namespace SkincareBookingService.BLL.Interfaces
 {
     public interface ISlotService
     {
-        Task<bool> CreateSlotAsync(SlotDTO slot);
+        Task<SlotDTO> CreateSlotAsync(SlotDTO slot);
 
         Task<List<SlotDTO>> GetActiveSlotsAsync();
 
@@ -22,6 +22,7 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<bool> UpdateSlotBookingIdAsync(int slotId, int bookingId);
 
+        Task<bool> DeleteSlotAsync(int id);
 
     }
 }
