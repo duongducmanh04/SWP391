@@ -136,7 +136,7 @@ const ServiceDetail = () => {
   };
 
   return (
-    <div style={{ padding: "20px", backgroundColor: "#FBFEFB" }}>
+    <div style={{ padding: "20px" }}>
       <Card
         style={{
           maxWidth: 1200,

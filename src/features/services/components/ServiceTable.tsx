@@ -23,17 +23,17 @@ import {
   PlusOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { useCreateUser } from "../../user/hook/useCreateUser";
+import { useCreateService } from "../hooks/useCreateService";
 import { useUpdateService } from "../hooks/useUpdateService";
-import { useDeleteUser } from "../../user/hook/useDeleteUser";
+import { useDeleteService } from "../hooks/useDeleteService";
 import { ColumnsType } from "antd/es/table";
 import { ServiceDto } from "../dto/get-service.dto";
 
 const ServiceTable = () => {
   const { data, isLoading, error } = useServices();
-  const { mutate: createService } = useCreateUser();
+  const { mutate: createService } = useCreateService();
   const { mutate: updateService } = useUpdateService();
-  const { mutate: deleteService } = useDeleteUser();
+  const { mutate: deleteService } = useDeleteService();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingService, setEditingService] = useState<any>(null);
   const [form] = Form.useForm();
