@@ -12,15 +12,18 @@ import { LoginDto } from "../dto/login.dto";
 import { PagePath } from "../../../enums/page-path.enum";
 import { RoleCode } from "../../../enums/role.enum";
 import "../../../style/Login.css";
+import { useState } from "react";
 
 const { TabPane } = Tabs;
 
 const LoginRegister = () => {
-  const [form] = Form.useForm();
+  const [loginForm] = Form.useForm(); 
+const [registerForm] = Form.useForm(); 
+  const [activeTab, setActiveTab] = useState("1"); 
   const { login } = useAuthStore();
   const navigate = useNavigate();
 
-  const mutation = useMutation<
+  const loginMutation = useMutation<
     { success: boolean; message: string; role: string },
     unknown,
     LoginDto
@@ -47,9 +50,65 @@ const LoginRegister = () => {
     },
   });
 
-  const onFinish = (values: LoginDto) => {
-    mutation.mutate(values);
-  };
+  
+  const registerMutation = useMutation<
+  { success: boolean; message: string },
+  unknown,
+  any
+ >
+({
+  mutationFn: async (values) => {
+    console.log("🚀 Sending register request to API:", values);
+
+
+    const payload = {
+      accountName: values.accountName,
+      password: values.password,
+    };
+
+    const response = await fetch("https://localhost:7071/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        
+      },
+      body: JSON.stringify(payload),
+    });
+
+    console.log("📩 API Response received:", response);
+    return response.json();
+  },
+  onSuccess: (response) => {
+    console.log("📦 API Response Data:", response);
+    if (response.success) {
+      message.success("Đăng ký thành công! Vui lòng đăng nhập.");
+      setActiveTab("1");
+    } else {
+      message.error(response.message || "Đăng ký thất bại.");
+    }
+  },
+  onError: (error) => {
+    console.error("❌ Registration error:", error);
+    message.error("Lỗi kết nối đến máy chủ: " + (error as Error).message);
+  },
+});
+
+
+
+const onFinish = (values: any) => {
+  console.log("📌 Active Tab at Form Submit:", activeTab);
+
+  if (activeTab === "1") {
+    console.log("🔑 Logging in:", values);
+    loginMutation.mutate(values);
+  } else if (activeTab === "2") {
+    console.log("🆕 Registering:", values);
+    registerMutation.mutate(values);
+  } else {
+    console.error("❌ Unexpected Tab State:", activeTab);
+  }
+};
+
 
   return (
     <div className="login-page">
@@ -63,9 +122,9 @@ const LoginRegister = () => {
 
         <div className="login-form">
           <h2 className="login-title">Dịch vụ chăm sóc da</h2>
-          <Tabs defaultActiveKey="1" centered>
+          <Tabs defaultActiveKey="1" centered onChange={(key) => setActiveTab(key)}>
             <TabPane tab="Đăng nhập" key="1">
-              <Form form={form} name="login" onFinish={onFinish}>
+              <Form form={loginForm} name="login" onFinish={onFinish}>
                 <Form.Item
                   name="accountName"
                   label="Tài khoản"
@@ -77,6 +136,7 @@ const LoginRegister = () => {
                     allowClear
                   />
                 </Form.Item>
+        
                 <Form.Item
                   name="password"
                   label="Mật khẩu"
@@ -112,14 +172,21 @@ const LoginRegister = () => {
             </TabPane>
 
             <TabPane tab="Đăng ký" key="2">
-              <Form form={form} name="register" onFinish={onFinish}>
+              <Form form={registerForm} name="register" onFinish={onFinish}
+               onFinishFailed={(errorInfo) => {
+                console.error("❌ Form submission failed. Errors:", errorInfo);
+                alert("Form submission failed! Check console for errors.");
+              }}
+              
+              >
                 <Form.Item
-                  name="username"
+                  name="accountName"
                   label="Tài khoản"
                   rules={[{ required: true, message: "Nhập tài khoản" }]}
                 >
                   <Input placeholder="Tài khoản" allowClear />
                 </Form.Item>
+
                 <Form.Item
                   name="fullName"
                   label="Họ & Tên"
@@ -127,6 +194,7 @@ const LoginRegister = () => {
                 >
                   <Input placeholder="Họ & Tên" allowClear />
                 </Form.Item>
+             
                 <Form.Item
                   name="password"
                   label="Mật khẩu"
@@ -140,6 +208,7 @@ const LoginRegister = () => {
                     }
                   />
                 </Form.Item>
+
                 <Form.Item
                   name="confirmPassword"
                   label="Nhập lại mật khẩu"
@@ -153,14 +222,19 @@ const LoginRegister = () => {
                     }
                   />
                 </Form.Item>
+               
                 <Form.Item>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    className="submit-btn"
-                  >
-                    Đăng ký
-                  </Button>
+                <Button
+    type="primary"
+    htmlType="submit"
+    className="submit-btn"
+    onClick={() => {
+      console.log("🖱️ Đăng ký button clicked! Submitting form...");
+      loginForm.submit();
+    }}
+  >
+    Đăng ký
+  </Button>
                 </Form.Item>
               </Form>
             </TabPane>
