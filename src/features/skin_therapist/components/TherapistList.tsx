@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, Col, Row, Typography, Button, List, Divider, Spin } from "antd";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTherapists } from "../hooks/useGetTherapist";
 import { useTherapistStore } from "../hooks/useTherapistStore";
-import { useServicesByTherapistId } from "../hooks/useServicesByTherapistId";
+import { useGetServiceByTherapistId } from "../../services/hooks/useGetServiceByTherapistId";
 import { PagePath } from "../../../enums/page-path.enum";
 
 const { Title, Text } = Typography;
@@ -59,7 +60,7 @@ const TherapistCard = ({ therapist, handleNavigate }: any) => {
     data: services,
     isLoading,
     isError,
-  } = useServicesByTherapistId(therapist.skintherapistId);
+  } = useGetServiceByTherapistId(therapist.skintherapistId);
 
   return (
     <Col xs={24} sm={12} md={8} lg={6}>
@@ -74,6 +75,8 @@ const TherapistCard = ({ therapist, handleNavigate }: any) => {
               borderTopLeftRadius: "10px",
               borderTopRightRadius: "10px",
               objectFit: "cover",
+              width: "70%",
+              margin: "0 auto",
             }}
           />
         }

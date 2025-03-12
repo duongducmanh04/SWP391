@@ -63,11 +63,14 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
     const role = user.role as UserRole;
     const restrictedPages: Record<UserRole, string[]> = {
       Admin: [
-        PagePath.USER,
+        PagePath.USER_MANAGEMENT,
         PagePath.USER_DETAIL,
         PagePath.HOME,
         PagePath.WORK_VOLUME,
         PagePath.PROFILE,
+        PagePath.SKIN_TYPE_MANAGEMENT,
+        PagePath.SLOT_MANAGEMENT,
+        PagePath.SERVICE_MANAGEMENT,
       ],
       Staff: [
         PagePath.HOME,
