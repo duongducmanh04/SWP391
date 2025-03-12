@@ -176,5 +176,24 @@ namespace SkincareBookingService.BLL.Services
 
             return true;
         }
+
+        public async Task<bool> UpdateServiceAsync(int serviceId, ServiceDTO serviceDTO)
+        {
+            var service = await _serviceRepository.GetByIdAsync(serviceId);
+
+            if (service == null) return false;
+
+            service.Name = serviceDTO.Name;
+            service.Description = serviceDTO.Description;
+            service.Price = serviceDTO.Price;
+            service.Duration = serviceDTO.Duration;
+            service.ProcedureDescription = serviceDTO.ProcedureDescription;
+            service.Image = serviceDTO.Image;
+
+            await _serviceRepository.UpdateAsync(service);
+            await _serviceRepository.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
