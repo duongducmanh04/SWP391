@@ -21,6 +21,7 @@ import {
   Modal,
   Popover,
 } from "antd";
+import type { MenuProps } from "antd";
 import { Link, useLocation, Outlet } from "react-router-dom";
 import "../style/Home.css";
 import useAuthStore from "../features/authentication/hooks/useAuthStore";
@@ -46,7 +47,7 @@ const notificationContent = (
 
 const SidebarMenu = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -96,16 +97,11 @@ const SidebarMenu = () => {
   // }, [token, user]);
 
   const handleOk = () => {
-    setIsModalVisible(false);
+    setIsModalOpen(false);
   };
 
   const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
+    setIsModalOpen(false);
   };
 
   const handleMenu = (key: string) => {
@@ -117,21 +113,18 @@ const SidebarMenu = () => {
     }
   };
 
-  const accountMenu = (
-    <Menu onClick={({ key }) => handleMenu(key)}>
-      <Menu.Item key="account" icon={<UserOutlined />}>
-        Thông tin tài khoản
-      </Menu.Item>
-      <Menu.Item
-        key="logout"
-        icon={<LogoutOutlined />}
-        onClick={() => handleLogout()}
-        style={{ color: "red" }}
-      >
-        Đăng xuất
-      </Menu.Item>
-    </Menu>
-  );
+  const items: MenuProps["items"] = [
+    {
+      key: "account",
+      label: "Thông tin tài khoản",
+      icon: <UserOutlined />,
+    },
+    {
+      key: "logout",
+      label: <span style={{ color: "red" }}>Đăng xuất</span>,
+      icon: <LogoutOutlined />,
+    },
+  ];
 
   const items2 = [
     {
@@ -307,7 +300,7 @@ const SidebarMenu = () => {
               />
             </Popover>
 
-            <Dropdown overlay={accountMenu}>
+            <Dropdown menu={{ items, onClick: ({ key }) => handleMenu(key) }}>
               <span
                 style={{
                   cursor: "pointer",
@@ -363,7 +356,7 @@ const SidebarMenu = () => {
       </Layout>
       <Modal
         title="Quy định nhập liệu"
-        visible={isModalVisible}
+        open={isModalOpen}
         footer={null}
         onOk={handleOk}
         onCancel={handleCancel}
