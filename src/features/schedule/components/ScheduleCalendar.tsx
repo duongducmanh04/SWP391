@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Select, Calendar, Spin, Flex, Tooltip, Badge } from "antd";
+import { Select, Calendar, Spin, Flex, Tooltip, Badge, Row } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
@@ -177,65 +177,6 @@ const TherapistScheduleView = () => {
     );
   };
 
-  // const dateCellRender = (value: Dayjs) => {
-  //   if (!schedule || !Array.isArray(schedule) || !slots) return null;
-
-  //   const formattedDate = value.format("YYYY-MM-DD");
-
-  //   const scheduleForTherapist = schedule.filter(
-  //     (s) =>
-  //       s.skinTherapistId.toString() === selectedTherapist &&
-  //       dayjs(s.date).format("YYYY-MM-DD") === formattedDate
-  //   );
-
-  //   const slotsForDate = scheduleForTherapist
-  //     .map((s) => slots.find((slot) => slot.slotId === s.slotId))
-  //     .filter(Boolean) as SlotDto[];
-
-  //   slotsForDate.sort((a, b) =>
-  //     dayjs(a.time, "h:mm A").isBefore(dayjs(b.time, "h:mm A")) ? -1 : 1
-  //   );
-
-  //   const tooltipContent = (
-  //     <ul>
-  //       {slotsForDate.map((slot) => (
-  //         <li key={slot.slotId}>
-  //           {slot.time} - {slot.status}
-  //         </li>
-  //       ))}
-  //     </ul>
-  //   );
-
-  //   const cellContent = (
-  //     <div>
-  //       {slotsForDate.map((slot) => {
-  //         const badgeStatus: "error" | "success" =
-  //           slot.status === "Booked" ? "error" : "success";
-
-  //         return (
-  //           <Badge
-  //             status={badgeStatus}
-  //             text={slot.time}
-  //             key={slot.slotId}
-  //             style={{
-  //               width: "100%",
-  //               textAlign: "center",
-  //               display: "block",
-  //               marginBottom: 4,
-  //             }}
-  //           />
-  //         );
-  //       })}
-  //     </div>
-  //   );
-
-  //   return (
-  //     <Tooltip title={tooltipContent} placement="top">
-  //       <div>{cellContent}</div>
-  //     </Tooltip>
-  //   );
-  // };
-
   return (
     <div>
       <Flex gap="middle" justify="space-between">
@@ -257,6 +198,10 @@ const TherapistScheduleView = () => {
           </Select.Option>
         ))}
       </Select>
+      <Row style={{ gap: 30 }}>
+        <Badge status="error" text="Đã đặt" />
+        <Badge status="success" text="Lịch trống" />
+      </Row>
 
       {loadingSchedule || loadingSlots || loadingBookings ? (
         <Spin size="large" />
