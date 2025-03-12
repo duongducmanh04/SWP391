@@ -1,13 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Card, Col, Row, Typography, Button, List, Divider, Spin } from "antd";
-import { useEffect } from "react";
+import {
+  Card,
+  Col,
+  Row,
+  Typography,
+  Button,
+  List,
+  Divider,
+  Spin,
+  Input,
+  Select,
+} from "antd";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTherapists } from "../hooks/useGetTherapist";
 import { useTherapistStore } from "../hooks/useTherapistStore";
 import { useGetServiceByTherapistId } from "../../services/hooks/useGetServiceByTherapistId";
 import { PagePath } from "../../../enums/page-path.enum";
+import { TherapistDto } from "../dto/get-therapist.dto";
 
 const { Title, Text } = Typography;
+const { Option } = Select;
 
 const SkinTherapistList = () => {
   const navigate = useNavigate();
@@ -16,20 +29,44 @@ const SkinTherapistList = () => {
     isLoading: isLoadingTherapist,
     error: errorTherapist,
   } = useTherapists();
-
   const { setTherapists } = useTherapistStore();
-
-  const handleNavigate = (skintherapistId: number) => {
-    navigate(PagePath.SKIN_THERAPIST_DETAIL, {
-      state: { skintherapistId },
-    });
-  };
+  const [filteredTherapists, setFilteredTherapists] = useState<TherapistDto[]>(
+    []
+  );
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [experienceFilter, setExperienceFilter] = useState<number | null>(null);
 
   useEffect(() => {
     if (therapistData && !isLoadingTherapist && !errorTherapist) {
       setTherapists(therapistData);
+      setFilteredTherapists(therapistData);
     }
   }, [therapistData, isLoadingTherapist, errorTherapist, setTherapists]);
+
+  useEffect(() => {
+    const filtered = therapistData?.filter((therapist: TherapistDto) => {
+      const matchesSearch = therapist.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const experienceInYears = parseInt(therapist.experience);
+      const matchesExperience =
+        experienceFilter !== null ? experienceInYears < experienceFilter : true;
+      return matchesSearch && matchesExperience;
+    });
+    setFilteredTherapists(filtered || []);
+  }, [searchTerm, experienceFilter, therapistData]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleFilterChange = (value: string) => {
+    setExperienceFilter(value === "All" ? null : parseInt(value, 10));
+  };
+
+  const handleNavigate = (skintherapistId: number) => {
+    navigate(PagePath.SKIN_THERAPIST_DETAIL, { state: { skintherapistId } });
+  };
 
   if (isLoadingTherapist) return <Spin size="large" />;
   if (errorTherapist) return <div>Không thể lấy danh sách chuyên viên</div>;
@@ -42,8 +79,26 @@ const SkinTherapistList = () => {
       >
         Chọn chuyên viên trị liệu da cho bạn
       </Title>
+      <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
+        <Input
+          placeholder="Tìm kiếm tên chuyên viên..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+        <Select
+          defaultValue="All"
+          onChange={handleFilterChange}
+          style={{ width: 200 }}
+        >
+          <Option value="All">Tất cả kinh nghiệm</Option>
+          <Option value="15">Dưới 15 năm</Option>
+          <Option value="12">Dưới 12 năm</Option>
+          <Option value="10">Dưới 10 năm</Option>
+          <Option value="7">Dưới 7 năm</Option>
+        </Select>
+      </div>
       <Row gutter={[16, 16]}>
-        {therapistData?.map((therapist) => (
+        {filteredTherapists.map((therapist: TherapistDto) => (
           <TherapistCard
             key={therapist.skintherapistId}
             therapist={therapist}
@@ -55,7 +110,13 @@ const SkinTherapistList = () => {
   );
 };
 
-const TherapistCard = ({ therapist, handleNavigate }: any) => {
+const TherapistCard = ({
+  therapist,
+  handleNavigate,
+}: {
+  therapist: TherapistDto;
+  handleNavigate: (id: number) => void;
+}) => {
   const {
     data: services,
     isLoading,
@@ -83,23 +144,19 @@ const TherapistCard = ({ therapist, handleNavigate }: any) => {
         actions={[
           <Button
             type="text"
-            key="wishlist"
             onClick={() => handleNavigate(therapist.skintherapistId)}
           >
             Thông tin chi tiết
           </Button>,
         ]}
       >
-        <Title level={4} style={{ marginBottom: "5px" }}>
-          {therapist.name}
-        </Title>
+        <Title level={4}>{therapist.name}</Title>
         <Text strong>{therapist.expertise}</Text>
         <br />
-        <Text type="secondary">Kinh nghiệm: {therapist.experience}</Text>
+        <Text type="secondary">Kinh nghiệm: {therapist.experience} năm</Text>
         <br />
         <Text type="secondary">Bằng cấp: {therapist.degree}</Text>
         <Divider />
-
         <Title level={5}>Dịch vụ cung cấp:</Title>
         {isLoading ? (
           <Spin size="small" />
@@ -109,7 +166,7 @@ const TherapistCard = ({ therapist, handleNavigate }: any) => {
           <List
             size="small"
             dataSource={services}
-            renderItem={(service: any) => (
+            renderItem={(service: { name: string }) => (
               <List.Item>
                 <Text>{service.name}</Text>
               </List.Item>
