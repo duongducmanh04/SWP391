@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { Card, Typography, Row, Col, Calendar, Button, message } from "antd";
-import { CheckCircleOutlined } from "@ant-design/icons";
 import {
   Card,
   Typography,
@@ -11,8 +9,6 @@ import {
   message,
   Modal,
   Avatar,
-  List,
-  Spin,
 } from "antd";
 import { CheckCircleOutlined,UserOutlined,MailOutlined,SolutionOutlined,ReadOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -21,15 +17,11 @@ import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
 import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { useAvailableSlot } from "../hooks/useAvailableSlot";
 import utc from "dayjs/plugin/utc";
-import { useCustomers } from "../../user/hook/useGetCustomer";
-import { useGetSchedule } from "../../schedule/hooks/useGetSchedule";
-import { useNavigate } from "react-router-dom";
-import { PagePath } from "../../../enums/page-path.enum";
 import { useGetCustomers } from "../hooks/useGetCustomers";
 import { useGetSchedule } from "../hooks/useGetSchedule";
 import { useNavigate } from "react-router-dom";
 import { PagePath } from "../../../enums/page-path.enum"; 
-import { useGetServiceByTherapistId } from "../hooks/useGetServiceByTherapistId";
+
 
 
  
@@ -38,33 +30,6 @@ dayjs.extend(utc);
 const { Title, Text } = Typography;
 
 
-const ServiceNameList = ({ therapistId }: { therapistId: number }) => {
-  const { data: services = [], isLoading, error } = useGetServiceByTherapistId(therapistId);
-
-  if (isLoading) return <Spin />;
-  if (error) return <Text style={{ color: "red" }}>Không thể tải dịch vụ</Text>;
-
-  return (
-    <List
-      size="large"
-      bordered
-      style={{
-        marginTop: "15px",
-        background: "#F9F9F9",
-        borderRadius: "8px",
-        padding: "10px",
-        boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-      }}
-      dataSource={services}
-      renderItem={(service) => (
-        <List.Item>
-          <Text strong>✅ {service.name}</Text>
-        </List.Item>
-      )}
-    />
-  );
-};
-
 const SkincareBooking = () => {
   const today = dayjs().format("YYYY-MM-DD");
   const [selectedDate, setSelectedDate] = useState<string>(today);
@@ -72,15 +37,9 @@ const SkincareBooking = () => {
   const [selectedTime, setSelectedTime] = useState<string>("");
   const location = useLocation();
   const { user } = useAuthStore();
-  const { data: therapists = [] } = useTherapists();
-  const { data: availableSlots } = useAvailableSlot();
   const { data: therapists =[] } = useTherapists();
   const { data: availableSlots } = useAvailableSlot(); 
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
-  const { data: customers, isLoading, error } = useCustomers();
-  const { amount, serviceId, serviceName } = location.state || {};
-  const { data: schedules } = useGetSchedule(serviceId);
-  const navigate = useNavigate();
   const { data: customers, isLoading, error } = useGetCustomers(); 
   const { amount, serviceId,serviceName } = location.state || {};
   const { data: schedules } = useGetSchedule(serviceId);
@@ -96,8 +55,6 @@ const SkincareBooking = () => {
   if (isLoading) return <p>Loading ...</p>;
   if (error) {
     console.error("❌ Error fetching customers:", error);
-    return <p>Error loading customers.</p>;
-    console.error("❌ Error fetching customers:", error);
     return <p>Error loading .</p>;
   }
 
@@ -106,52 +63,8 @@ const SkincareBooking = () => {
       console.warn("⚠️ No schedules or available slots found!");
       return [];
     }
-  const getAvailableSlotsForTherapist = (therapistId: number) => {
-    if (!schedules || !availableSlots) {
-      console.warn("⚠️ No schedules or available slots found!");
-      return [];
-    }
     
 
-    const flatSchedules = schedules.flat();
-
-    console.log(
-      "📡 Debugging: Full Flattened Schedules Data:",
-      JSON.stringify(flatSchedules, null, 2)
-    );
-    console.log("📡 Debugging: Raw Available Slots:", availableSlots);
-
-    const scheduleSlotIds = flatSchedules.map(
-      (schedule) => schedule.slotId || "MISSING_SLOT_ID"
-    );
-    const availableSlotIds = availableSlots.map((slot) => slot.slotId);
-
-    console.log("🔍 All Schedule Slot IDs:", scheduleSlotIds);
-    console.log("🔍 All Available Slot IDs:", availableSlotIds);
-
-    return flatSchedules
-      .filter((schedule) => {
-        const scheduleDate = dayjs(schedule.date).format("YYYY-MM-DD");
-        const isDateMatch = scheduleDate === selectedDate;
-        const isTherapistMatch = schedule.skinTherapistId === therapistId;
-
-        if (!schedule.slotId) {
-          console.warn(`⚠️ Schedule missing slotId:`, schedule);
-          return false;
-        }
-
-        const matchingSlot = availableSlots.find(
-          (slot) =>
-            slot.slotId === schedule.slotId && slot.status === "Available"
-        );
-
-        console.log(
-          `🧐 Checking Schedule - Date: ${scheduleDate}, Therapist ID: ${
-            schedule.skinTherapistId
-          }, Slot ID: ${schedule.slotId}, Match: ${!!matchingSlot}`
-        );
-
-        return isDateMatch && isTherapistMatch && matchingSlot;
    
   
     const flatSchedules = schedules.flat(); 
@@ -183,30 +96,6 @@ const SkincareBooking = () => {
         return isDateMatch && isTherapistMatch && matchingSlot;
       })
       .map((schedule) => {
-        const matchingSlot = availableSlots.find(
-          (slot) =>
-            slot.slotId === schedule.slotId && slot.status === "Available"
-        );
-
-        console.log(
-          `🔗 Matched Slot for Schedule Slot ID ${schedule.slotId}:`,
-          matchingSlot
-        );
-
-        return matchingSlot
-          ? {
-              time: dayjs(matchingSlot.time, ["h:mm A", "HH:mm"]).format(
-                "HH:mm"
-              ),
-              slotId: matchingSlot.slotId,
-            }
-          : null;
-      })
-      .filter((slot) => slot !== null)
-      .sort((a, b) =>
-        dayjs(a.time, "HH:mm").isBefore(dayjs(b.time, "HH:mm")) ? -1 : 1
-      );
-      .map((schedule) => {
         const matchingSlot = availableSlots.find((slot) => slot.slotId === schedule.slotId && slot.status === "Available");
   
         console.log(`🔗 Matched Slot for Schedule Slot ID ${schedule.slotId}:`, matchingSlot);
@@ -234,29 +123,14 @@ const SkincareBooking = () => {
   
 
 
-  const handleConfirmBooking = () => {
-    if (!selectedExpert || !selectedTime || !selectedSlotId) {
-      message.warning("Vui lòng chọn chuyên viên, thời gian và slot!");
-      return;
-    }
 dayjs.extend(utc); 
 
-    if (!user || !user.accountId) {
-      message.error("Lỗi: Không tìm thấy thông tin tài khoản!");
-      console.error("❌ User object is missing:", user);
-      return;
-    }
 const handleConfirmBooking = () => {
   if (!selectedExpert || !selectedTime || !selectedSlotId) { 
     message.warning("Vui lòng chọn chuyên viên, thời gian và slot!");
     return;
   }
 
-    if (!customers || customers.length === 0) {
-      message.error("Lỗi: Danh sách khách hàng trống hoặc chưa tải xong!");
-      console.error("❌ Customers not loaded or empty:", customers);
-      return;
-    }
   if (!user || !user.accountId) {
     message.error("Lỗi: Không tìm thấy thông tin tài khoản!");
     console.error("❌ User object is missing:", user);
@@ -269,31 +143,14 @@ const handleConfirmBooking = () => {
     return;
   }
 
-    if (!matchedCustomer) {
-      message.error("Lỗi: Không tìm thấy khách hàng phù hợp!");
-      console.error("❌ No matching customer for accountId:", user.accountId);
-      return;
-    }
   const matchedCustomer = customers.find(c => Number(c.accountId) === Number(user.accountId));
 
-    if (!selectedSlotId) {
-      message.error("Lỗi: Không tìm thấy slot đã chọn!");
-      console.error("❌ Missing slotId:", selectedSlotId);
-      return;
-    }
   if (!matchedCustomer) {
     message.error("Lỗi: Không tìm thấy khách hàng phù hợp!");
     console.error("❌ No matching customer for accountId:", user.accountId);
     return;
   }
 
-    // ✅ Find therapist name
-    const selectedTherapist = therapists.find(
-      (t) => t.skintherapistId === selectedExpert
-    );
-    const therapistName = selectedTherapist
-      ? selectedTherapist.name
-      : "Không rõ";
   if (!selectedSlotId) {
     message.error("Lỗi: Không tìm thấy slot đã chọn!");
     console.error("❌ Missing slotId:", selectedSlotId);
@@ -321,22 +178,6 @@ const handleConfirmBooking = () => {
   });
 };
 
-    // ✅ Save booking details but do NOT send API request yet
-    navigate(PagePath.BOOKING_INFO_CONFIRM, {
-      state: {
-        serviceName: serviceName,
-        amount: amount,
-        selectedDate: selectedDate,
-        selectedTime: selectedTime,
-        therapistName: therapistName,
-        bookingLocation: "HCM",
-        customerId: matchedCustomer.customerId,
-        selectedSlotId: selectedSlotId,
-        selectedExpert: selectedExpert,
-        serviceId: serviceId,
-      },
-    });
-  };
 const handleOpenTherapistModal = (therapist: any) => {
   setSelectedTherapist(therapist);
   setTherapistModalVisible(true);
@@ -365,7 +206,6 @@ const handleCloseTherapistModal = () => {
               cellRender={(value) => {
                 const isPast = value.isBefore(dayjs(), "day");
                 return isPast ? null : (
-                  <div style={{ paddingLeft: "5px" }}></div>
                   <div style={{ paddingLeft: "5px" }}>
                     
                   </div>
@@ -393,11 +233,6 @@ const handleCloseTherapistModal = () => {
                 <Text strong style={{ fontSize: "16px" }}>Ngày đã chọn: {selectedDate}</Text>
                 <div style={{ marginTop: "20px" }}>
                   {therapists?.map((expert) => {
-                    const availableTimes = getAvailableSlotsForTherapist(
-                      expert.skintherapistId
-                    );
-                    if (availableTimes.length === 0) return null;
-
                     const availableTimes = getAvailableSlotsForTherapist(expert.skintherapistId); 
                     if (availableTimes.length === 0) return null;
 
@@ -496,7 +331,7 @@ const handleCloseTherapistModal = () => {
   onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#8AA851")}
   onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#A7C957")}
 >
-  Xác nhận
+  Xác nhận 
 </Button>
 
                 </div>
@@ -534,12 +369,7 @@ const handleCloseTherapistModal = () => {
         </Col>
       </Row>
 
-      <Title level={4} style={{ marginTop: "20px" }}>Dịch vụ có thể thực hiện:</Title>
-
-   
-      {selectedTherapist.skintherapistId && (
-        <ServiceNameList therapistId={selectedTherapist.skintherapistId} />
-      )}
+     
     </div>
   )}
 </Modal>
