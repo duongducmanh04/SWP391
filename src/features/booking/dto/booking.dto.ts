@@ -11,7 +11,7 @@ export interface BookingDto {
   serviceName: string;
   serviceId: number;
   note: string;
-  skintherapistName: string;
+
   customer: string;
   updateAt: string;
 }

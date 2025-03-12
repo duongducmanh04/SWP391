@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Layout, Menu, Card, Spin, Alert, Avatar, List, Button } from "antd";
+import {
+  Layout,
+  Menu,
+  Card,
+  Spin,
+  Alert,
+  Avatar,
+  List,
+  Button,
+  Pagination,
+} from "antd";
 import {
   UserOutlined,
   ClockCircleOutlined,
@@ -12,9 +22,11 @@ import { useGetCustomerId } from "../features/user/hook/useGetCustomerId";
 import { BookingDto } from "../features/booking/dto/booking.dto";
 
 const { Sider, Content } = Layout;
+const PAGE_SIZE = 5; // Số lượng booking mỗi trang
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("personal");
+  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
   const accountId = 7;
   const role = "Customer";
@@ -24,12 +36,14 @@ const ProfilePage = () => {
     isLoading: isCustomerIdLoading,
     error: customerIdError,
   } = useGetCustomerId();
+
   const {
     data: customer,
     isLoading: isCustomerLoading,
     isError: isCustomerError,
     error: customerError,
   } = useGetCustomerProfile(accountId, role);
+
   const {
     data: bookings,
     isLoading: isBookingLoading,
@@ -42,6 +56,11 @@ const ProfilePage = () => {
     console.log("🔍 Điều hướng đến:", url);
     navigate(url);
   };
+
+  const currentBookings = bookings?.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#f5f1eb" }}>
@@ -124,36 +143,48 @@ const ProfilePage = () => {
                           type="error"
                         />
                       ) : bookings && bookings.length > 0 ? (
-                        <List
-                          itemLayout="horizontal"
-                          dataSource={bookings}
-                          renderItem={(booking: BookingDto) => (
-                            <List.Item
-                              style={{ cursor: "pointer" }}
-                              onClick={() =>
-                                handleNavigateToBookingDetail(booking.bookingId)
-                              } // Điều hướng khi click cả item
-                              actions={[
-                                <Button
-                                  type="primary"
-                                  onClick={(e) => {
-                                    e.stopPropagation(); // Ngăn chặn sự kiện click từ lan ra ngoài
-                                    handleNavigateToBookingDetail(
-                                      booking.bookingId
-                                    );
-                                  }}
-                                >
-                                  Xem Chi Tiết
-                                </Button>,
-                              ]}
-                            >
-                              <List.Item.Meta
-                                title={`Dịch vụ: ${booking.serviceName}`}
-                                description={`Ngày: ${booking.date} | Trạng thái: ${booking.status} | Địa điểm: ${booking.location}`}
-                              />
-                            </List.Item>
-                          )}
-                        />
+                        <>
+                          <List
+                            itemLayout="horizontal"
+                            dataSource={currentBookings}
+                            renderItem={(booking: BookingDto) => (
+                              <List.Item
+                                style={{ cursor: "pointer" }}
+                                onClick={() =>
+                                  handleNavigateToBookingDetail(
+                                    booking.bookingId
+                                  )
+                                }
+                                actions={[
+                                  <Button
+                                    type="primary"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleNavigateToBookingDetail(
+                                        booking.bookingId
+                                      );
+                                    }}
+                                  >
+                                    Xem Chi Tiết
+                                  </Button>,
+                                ]}
+                              >
+                                <List.Item.Meta
+                                  title={`Dịch vụ: ${booking.serviceName}`}
+                                  description={`Ngày: ${booking.date} | Trạng thái: ${booking.status} | Địa điểm: ${booking.location}`}
+                                />
+                              </List.Item>
+                            )}
+                          />
+
+                          <Pagination
+                            current={currentPage}
+                            total={bookings.length}
+                            pageSize={PAGE_SIZE}
+                            onChange={(page) => setCurrentPage(page)}
+                            style={{ textAlign: "center", marginTop: "20px" }}
+                          />
+                        </>
                       ) : (
                         <Alert
                           message="Không có lịch sử đặt lịch."

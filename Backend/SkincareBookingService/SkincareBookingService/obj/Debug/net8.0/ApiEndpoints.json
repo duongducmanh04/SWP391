@@ -381,6 +381,85 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "SkincareBookingService.Controllers.QuizAnswerController",
+    "Method": "GetAll",
+    "RelativePath": "api/QuizAnswer",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.QuizAnswerController",
+    "Method": "Create",
+    "RelativePath": "api/QuizAnswer",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "SkincareBookingService.BLL.DTOs.QuizAnswerPostDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.QuizAnswerController",
+    "Method": "GetById",
+    "RelativePath": "api/QuizAnswer/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.QuizAnswerController",
+    "Method": "Update",
+    "RelativePath": "api/QuizAnswer/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "SkincareBookingService.BLL.DTOs.QuizAnswerPutDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.QuizAnswerController",
+    "Method": "Delete",
+    "RelativePath": "api/QuizAnswer/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "SkincareBookingService.Controllers.QuizQuestionController",
     "Method": "GetAllQuizQuestions",
     "RelativePath": "api/QuizQuestion",
@@ -582,6 +661,38 @@
   },
   {
     "ContainingType": "SkincareBookingService.Controllers.ServiceController",
+    "Method": "CreateService",
+    "RelativePath": "api/service/createService",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "serviceDTO",
+        "Type": "SkincareBookingService.BLL.DTOs.ServiceDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.ServiceController",
+    "Method": "DeleteService",
+    "RelativePath": "api/service/deleteService/{serviceId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "serviceId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.ServiceController",
     "Method": "GetServices",
     "RelativePath": "api/service/getAllServices",
     "HttpMethod": "GET",
@@ -601,6 +712,43 @@
       {
         "Name": "serviceId",
         "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.ServiceController",
+    "Method": "GetServiceBySkintherapistId",
+    "RelativePath": "api/service/getServiceBySkintherapistId/{skintherapistId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "skintherapistId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.ServiceController",
+    "Method": "UpdateService",
+    "RelativePath": "api/service/updateService/{serviceId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "serviceId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "serviceDTO",
+        "Type": "SkincareBookingService.BLL.DTOs.ServiceDTO",
         "IsRequired": true
       }
     ],
@@ -776,6 +924,38 @@
   },
   {
     "ContainingType": "SkincareBookingService.Controllers.SkintypeController",
+    "Method": "CreateSkintype",
+    "RelativePath": "api/skintype/createSkintype",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "skintypeDTO",
+        "Type": "SkincareBookingService.BLL.DTOs.SkintypeDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.SkintypeController",
+    "Method": "DeleteSkintype",
+    "RelativePath": "api/skintype/deleteSkintype/{skintypeId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "skintypeId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.SkintypeController",
     "Method": "GetSkintypes",
     "RelativePath": "api/skintype/getAllSkintypes",
     "HttpMethod": "GET",
@@ -801,6 +981,174 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "SkincareBookingService.Controllers.SkintypeController",
+    "Method": "UpdateSkintypeCons",
+    "RelativePath": "api/skintype/updateSkintypeCons/{skintypeId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "skintypeId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "cons",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.SkintypeController",
+    "Method": "UpdateSkintypeDescription",
+    "RelativePath": "api/skintype/updateSkintypeDescription/{skintypeId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "skintypeId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "description",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.SkintypeController",
+    "Method": "UpdateSkintypeImage",
+    "RelativePath": "api/skintype/updateSkintypeImage/{skintypeId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "skintypeId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "image",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.SkintypeController",
+    "Method": "UpdateSkintypeIntroduction",
+    "RelativePath": "api/skintype/updateSkintypeIntroduction/{skintypeId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "skintypeId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "introduction",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.SkintypeController",
+    "Method": "UpdateSkintypeName",
+    "RelativePath": "api/skintype/updateSkintypeName/{skintypeId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "skintypeId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "skintypeName",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.SkintypeController",
+    "Method": "UpdateSkintypePros",
+    "RelativePath": "api/skintype/updateSkintypePros/{skintypeId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "skintypeId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "pros",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.SkintypeController",
+    "Method": "UpdateSkintypeSkincareGuide",
+    "RelativePath": "api/skintype/updateSkintypeSkincareGuide/{skintypeId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "skintypeId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "skincareGuide",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.SkintypeController",
+    "Method": "UpdateSkintypeStatus",
+    "RelativePath": "api/skintype/updateSkintypeStatus/{skintypeId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "skintypeId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "status",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "SkincareBookingService.Controllers.SlotController",
     "Method": "CreateSlot",
     "RelativePath": "api/slot/createSlot",
@@ -809,8 +1157,24 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "slot",
+        "Name": "slotDTO",
         "Type": "SkincareBookingService.BLL.DTOs.SlotDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.SlotController",
+    "Method": "DeleteSlot",
+    "RelativePath": "api/slot/deleteSlot/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],
@@ -1036,16 +1400,6 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "SkincareBookingService.Controllers.QuizAnswerController",
-    "Method": "GetAllQuizAnswers",
-    "RelativePath": "getAllQuizAnswers",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
     "ContainingType": "SkincareBookingService.Controllers.CustomerSurveyController",
     "Method": "GetAllSurveys",
     "RelativePath": "getAllSurveys",
@@ -1053,6 +1407,38 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.QuizAnswerController",
+    "Method": "GetByQuizquestionId",
+    "RelativePath": "GetByQuizquestionId/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.QuizAnswerController",
+    "Method": "GetBySkinTypeId",
+    "RelativePath": "GetBySkinTypeId/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {
@@ -1107,22 +1493,6 @@
     "Parameters": [
       {
         "Name": "year",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "SkincareBookingService.Controllers.QuizAnswerController",
-    "Method": "GetQuizAnswerById",
-    "RelativePath": "getQuizAnswerById/{id}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
         "Type": "System.Int32",
         "IsRequired": true
       }
@@ -1314,6 +1684,27 @@
       {
         "Name": "request",
         "Type": "SkincareBookingService.BLL.DTOs.CustomerSurveyDTOs.SubmitSurveyDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.CustomerController",
+    "Method": "UpdateCustomer",
+    "RelativePath": "updateCustomer/{customerId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "customerId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "customer",
+        "Type": "SkincareBookingService.BLL.DTOs.CustomerDTO",
         "IsRequired": true
       }
     ],
