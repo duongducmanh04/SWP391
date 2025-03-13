@@ -95,6 +95,8 @@ namespace SkincareBookingService
 
             builder.Services.AddScoped<IRatingService, RatingService>();
 
+            builder.Services.AddScoped<IBlogService, BlogService>();
+
             /*====================================================*/
 
             var app = builder.Build();

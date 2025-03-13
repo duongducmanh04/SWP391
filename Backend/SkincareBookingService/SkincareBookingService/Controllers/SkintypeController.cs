@@ -132,6 +132,17 @@ namespace SkincareBookingService.Controllers
             return Ok("Skintype introduction updated");
         }
 
+        [HttpPut("updateSkintype")]
+        public async Task<IActionResult> UpdateSkintype([FromBody] SkintypeDTO skintypeDTO)
+        {
+            var result = await _skintypeService.UpdateSkintypeAsync(skintypeDTO);
+            if (!result)
+            {
+                return NotFound("Skintype not found");
+            }
+            return Ok("Skintype updated");
+        }
+
         [HttpDelete("deleteSkintype/{skintypeId}")]
         public async Task<IActionResult> DeleteSkintype(int skintypeId)
         {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SkincareBookingService.BLL.DTOs.AccountDTOs;
 using SkincareBookingService.BLL.Interfaces;
 
 namespace SkincareBookingService.Controllers
@@ -10,6 +11,17 @@ namespace SkincareBookingService.Controllers
         public AccountController(IAccountService accountService)
         {
             _accountService = accountService;
+        }
+
+        [HttpPost("createAccount")]
+        public async Task<IActionResult> CreateAccount([FromBody] CreateAccountDTO account)
+        {
+            var newAccount = await _accountService.CreateAccountAsync(account);
+            if (newAccount == null)
+            {
+                return BadRequest("Failed to create account");
+            }
+            return Ok(newAccount);
         }
 
         [HttpGet("getAllAccounts")]
@@ -62,6 +74,39 @@ namespace SkincareBookingService.Controllers
                 return NotFound("No accounts found with that id and role");
             }
             return Ok(accounts);
+        }
+
+        [HttpPut("updateAccount")]
+        public async Task<IActionResult> UpdateAccount([FromBody] AccountDTO account)
+        {
+            var result = await _accountService.UpdateAccountAsync(account);
+            if (result)
+            {
+                return Ok("Account updated successfully");
+            }
+            return BadRequest("Failed to update account");
+        }
+
+        [HttpPut("updateAccountPassword/{accountId}")]
+        public async Task<IActionResult> UpdateAccountPassword(int accountId, [FromBody] string password)
+        {
+            var result = await _accountService.UpdateAccountPasswordAsync(accountId, password);
+            if (result)
+            {
+                return Ok("Password updated successfully");
+            }
+            return BadRequest("Failed to update password");
+        }
+
+        [HttpDelete("deleteAccount/{accountId}")]
+        public async Task<IActionResult> DeleteAccount(int accountId)
+        {
+            var result = await _accountService.DeleteAccountAsync(accountId);
+            if (result)
+            {
+                return Ok("Account deleted successfully");
+            }
+            return BadRequest("Failed to delete account");
         }
     }
 }

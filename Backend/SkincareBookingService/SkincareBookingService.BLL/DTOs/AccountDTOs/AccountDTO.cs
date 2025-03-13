@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SkincareBookingService.BLL.DTOs
+namespace SkincareBookingService.BLL.DTOs.AccountDTOs
 {
     public class AccountDTO
     {
