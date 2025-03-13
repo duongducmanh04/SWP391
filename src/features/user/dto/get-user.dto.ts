@@ -1,9 +1,5 @@
 export interface UserDto {
-  id: number;
-  name: string;
-  dateofbirth: Date;
-  gender: boolean;
-  class: string;
-  image: string;
-  feedback: string;
+  accountId: number;
+  accountName: string;
+  role: string;
 }
