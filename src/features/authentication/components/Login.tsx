@@ -16,7 +16,8 @@ import "../../../style/Login.css";
 const { TabPane } = Tabs;
 
 const LoginRegister = () => {
-  const [form] = Form.useForm();
+  const [loginForm] = Form.useForm();
+  const [registerForm] = Form.useForm();
   const { login } = useAuthStore();
   const navigate = useNavigate();
 
@@ -65,7 +66,7 @@ const LoginRegister = () => {
           <h2 className="login-title">Dịch vụ chăm sóc da</h2>
           <Tabs defaultActiveKey="1" centered>
             <TabPane tab="Đăng nhập" key="1">
-              <Form form={form} name="login" onFinish={onFinish}>
+              <Form form={loginForm} name="login" onFinish={onFinish}>
                 <Form.Item
                   name="accountName"
                   label="Tài khoản"
@@ -112,7 +113,7 @@ const LoginRegister = () => {
             </TabPane>
 
             <TabPane tab="Đăng ký" key="2">
-              <Form form={form} name="register" onFinish={onFinish}>
+              <Form form={registerForm} name="register" onFinish={onFinish}>
                 <Form.Item
                   name="username"
                   label="Tài khoản"

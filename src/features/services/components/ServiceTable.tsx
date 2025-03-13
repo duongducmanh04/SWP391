@@ -9,7 +9,6 @@ import {
   Button,
   Modal,
   Flex,
-  Switch,
   Image,
   Skeleton,
   Empty,
@@ -34,15 +33,14 @@ const ServiceTable = () => {
   const { mutate: createService } = useCreateService();
   const { mutate: updateService } = useUpdateService();
   const { mutate: deleteService } = useDeleteService();
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<any>(null);
   const [form] = Form.useForm();
-  const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [serviceToDelete, setServiceToDelete] = useState<any>(null);
   const { services, setServices } = useServiceStore();
   const [searchText, setSearchText] = useState("");
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
-  // const dateFormat = "DD/MM/YYYY";
 
   useEffect(() => {
     if (data) {
@@ -51,18 +49,18 @@ const ServiceTable = () => {
   }, [data, setServices]);
 
   const handleCreate = () => {
-    setIsModalVisible(true);
+    setIsModalOpen(true);
     form.resetFields();
   };
 
-  const handleCreateUser = () => {
+  const handleCreateService = () => {
     form
       .validateFields()
       .then((values) => {
         createService(values, {
           onSuccess: () => {
             message.success("Tạo dịch vụ thành công");
-            setIsModalVisible(false);
+            setIsModalOpen(false);
             form.resetFields();
           },
           onError: (err: { message: any }) => {
@@ -78,12 +76,12 @@ const ServiceTable = () => {
   const handleEdit = (record: any) => {
     setEditingService(record);
     form.setFieldsValue(record);
-    setIsModalVisible(true);
+    setIsModalOpen(true);
   };
 
   const handleDelete = (serviceId: string) => {
     setServiceToDelete(serviceId);
-    setDeleteModalVisible(true);
+    setDeleteModalOpen(true);
   };
 
   const confirmDelete = () => {
@@ -91,7 +89,7 @@ const ServiceTable = () => {
       deleteService(serviceToDelete, {
         onSuccess: () => {
           message.success("Xóa dịch vụ thành công");
-          setDeleteModalVisible(false);
+          setDeleteModalOpen(false);
           setServiceToDelete(null);
         },
         onError: (err: { message: any }) => {
@@ -110,7 +108,7 @@ const ServiceTable = () => {
           {
             onSuccess: () => {
               message.success("Cập nhật dịch vụ thành công");
-              setIsModalVisible(false);
+              setIsModalOpen(false);
               setEditingService(null);
             },
             onError: (err: { message: any }) => {
@@ -252,9 +250,9 @@ const ServiceTable = () => {
 
       <Modal
         title={editingService ? "Cập nhật dịch vụ" : "Tạo dịch vụ"}
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        onOk={editingService ? handleUpdate : handleCreateUser}
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        onOk={editingService ? handleUpdate : handleCreateService}
         width={600}
         cancelText="Hủy"
         okText={editingService ? "Cập nhật" : "Tạo"}
@@ -283,13 +281,6 @@ const ServiceTable = () => {
             <AntInput />
           </Form.Item>
           <Form.Item
-            name="gender"
-            label="Gender"
-            rules={[{ required: true, message: "Please select the gender!" }]}
-          >
-            <Switch checked={form.getFieldValue("gender")} />
-          </Form.Item>
-          <Form.Item
             name="class"
             label="Class"
             rules={[{ required: true, message: "Please enter the class!" }]}
@@ -304,11 +295,11 @@ const ServiceTable = () => {
 
       <Modal
         title="Confirm Deletion"
-        visible={isDeleteModalVisible}
+        open={isDeleteModalOpen}
         width={200}
-        onCancel={() => setDeleteModalVisible(false)}
+        onCancel={() => setDeleteModalOpen(false)}
         footer={[
-          <Button key="back" onClick={() => setDeleteModalVisible(false)}>
+          <Button key="back" onClick={() => setDeleteModalOpen(false)}>
             Hủy
           </Button>,
           <Button key="delete" type="primary" danger onClick={confirmDelete}>
