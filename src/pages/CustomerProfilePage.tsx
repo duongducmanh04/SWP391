@@ -23,6 +23,7 @@ import { BookingDto } from "../features/booking/dto/booking.dto";
 import { PagePath } from "../enums/page-path.enum";
 import useAuthStore from "../features/authentication/hooks/useAuthStore";
 import dayjs from "dayjs";
+import StatusTag from "../components/TagStatus";
 
 const { Sider, Content } = Layout;
 
@@ -163,6 +164,7 @@ const CustomerProfile = () => {
                               booking.location
                             }`}
                           />
+                          <StatusTag status={booking.status} />
                         </List.Item>
                       )}
                     />
