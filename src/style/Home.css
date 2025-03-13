@@ -60,18 +60,6 @@ body:has(.ant-layout) {
 }
 
 /* .css-dev-only-do-not-override-14i19y2:has(.ant-breadcrumb) { */
-.home-background {
-  background-image: url("https://dev.ddc.fis.vn/econstruction_web_client/assets/background-login-BeIlyCyv.png");
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
-  display: flex;
-  justify-content: center;
-  margin: 0;
-}
-.home-background main {
-  display: none;
-}
 .ant-layout-sider-children .ant-menu .ant-menu-item-selected {
   /* color: rgb(255 255 255 / 1) !important;
   background-color: rgb(22 49 94 / 1) !important; */

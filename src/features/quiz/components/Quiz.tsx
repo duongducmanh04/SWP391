@@ -26,7 +26,7 @@ const QuizTest = () => {
     null
   );
   const [skintypeId, setSkintypeId] = useState<number | null>(null);
-  const [serviceId, setServiceId] = useState<number | null>(null);
+  const [serviceId] = useState<number | null>(null);
   const navigate = useNavigate();
 
   const { mutate: submitQuiz, isPending: isSubmitting } = useSubmitQuiz();
@@ -121,20 +121,6 @@ const QuizTest = () => {
         .filter((service) => service !== undefined)
     : [];
 
-  const getSkinTypesForService = (serviceId: number) => {
-    const skintypeIds = Array.isArray(skintypeServiceIdData)
-      ? skintypeServiceIdData
-          .filter((item: { serviceId: number }) => item.serviceId === serviceId)
-          .map((item: { skintypeId: number }) => item.skintypeId)
-      : [];
-
-    console.log(`Service ID: ${serviceId} -> Skintype IDs:`, skintypeIds);
-
-    return skinTypeData
-      .filter((skin) => skintypeIds.includes(skin.skintypeId))
-      .map((skin) => skin.skintypeName)
-      .join(", ");
-  };
   console.log("serviceId được truyền vào API:", serviceId);
   console.log("skintypeServiceIdData:", skintypeServiceIdData);
   console.log("allServices:", allServices);
@@ -228,10 +214,10 @@ const QuizTest = () => {
                   <Title level={5} style={{ marginTop: "10px" }}>
                     {service.name}
                   </Title>
-                  <Text>
+                  {/* <Text>
                     {getSkinTypesForService(service.serviceId) ||
                       "Không có thông tin"}
-                  </Text>
+                  </Text> */}
                   <Text strong>Giá: {service.price} VNĐ</Text>
                   <br />
                   <Text>Thời gian: {service.duration} phút</Text>

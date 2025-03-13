@@ -224,8 +224,6 @@ const SidebarMenu = () => {
       : []),
   ];
 
-  const isHomePage = location.pathname === PagePath.HOME;
-
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider
@@ -334,7 +332,7 @@ const SidebarMenu = () => {
             padding: "64px 24px 24px",
             backgroundColor: "#FFF",
           }}
-          className={isHomePage ? "home-background" : ""}
+          className={"home-background"}
         >
           <Breadcrumb
             style={{
