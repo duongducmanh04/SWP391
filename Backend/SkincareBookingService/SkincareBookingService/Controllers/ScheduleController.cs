@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SkincareBookingService.BLL.DTOs.ScheduleDTOs;
 using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.BLL.Services;
 
@@ -14,6 +15,14 @@ namespace SkincareBookingService.Controllers
         {
             _scheduleService = scheduleService;
         }
+
+        [HttpPost("createSchedule")]
+        public async Task<IActionResult> CreateSchedule([FromBody] ScheduleInputDTO scheduleInputDTO)
+        {
+            var schedule = await _scheduleService.CreateScheduleAsync(scheduleInputDTO);
+            return Ok(schedule);
+        }
+
         // Show all schedules of the service that assigned to the skin therapist
         [HttpGet("/search-by-skintherapist/{skintherapistId}")]
         public async Task<IActionResult> GetSchedulesBySkinTherapistID(int skintherapistId)

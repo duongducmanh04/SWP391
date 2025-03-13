@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SkincareBookingService.BLL.DTOs;
+using SkincareBookingService.BLL.DTOs.ScheduleDTOs;
 using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
@@ -116,10 +116,30 @@ namespace SkincareBookingService.BLL.Services
                 .FirstOrDefaultAsync();
             if(schedule == null)
             {
-                throw new Exception("Schedule not found");
+                throw new Exception($"Schedule not found for Slot ID: {slotId}");
             }
             return (DateTime)schedule.Date;
         }
-        
+
+        public async Task<ScheduleInputDTO> CreateScheduleAsync(ScheduleInputDTO scheduleInputDTO)
+        {
+            var schedule = new Schedule
+            {
+                SkinTherapistId = scheduleInputDTO.SkinTherapistId,
+                SlotId = scheduleInputDTO.SlotId,
+                Date = scheduleInputDTO.Date
+            };
+
+            await _scheduleRepository.AddAsync(schedule);
+            await _scheduleRepository.SaveChangesAsync();
+
+            return new ScheduleInputDTO
+            {
+                ScheduleId = schedule.ScheduleId,
+                SkinTherapistId = schedule.SkinTherapistId,
+                SlotId = schedule.SlotId,
+                Date = (DateTime)schedule.Date
+            };
+        }
     }
 }
