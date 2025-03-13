@@ -27,14 +27,17 @@ namespace SkincareBookingService.Controllers
         public async Task<IActionResult> GetAllSlots()
         {
             var slots = await _slotService.GetAllSlotsAsync();
+
             if (slots == null || slots.Count == 0)
             {
                 return NotFound("No slots found");
             }
+
             foreach (var slot in slots)
             {
                 slot.Date = await _scheduleService.GetDateBySlotId(slot.SlotId);
             }
+
             return Ok(slots);
         }
 

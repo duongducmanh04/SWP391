@@ -1,6 +1,6 @@
 ﻿using SkincareBookingService.DAL.Entities;
 
-namespace SkincareBookingService.BLL.DTOs
+namespace SkincareBookingService.BLL.DTOs.ScheduleDTOs
 {
     public class ScheduleDTO
     {

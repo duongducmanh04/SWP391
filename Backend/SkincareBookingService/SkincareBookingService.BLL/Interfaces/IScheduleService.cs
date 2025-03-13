@@ -1,9 +1,11 @@
-﻿using SkincareBookingService.BLL.DTOs;
+﻿using SkincareBookingService.BLL.DTOs.ScheduleDTOs;
 
 namespace SkincareBookingService.BLL.Interfaces
 {
     public interface IScheduleService
     {
+        Task<ScheduleInputDTO> CreateScheduleAsync(ScheduleInputDTO scheduleInputDTO);
+
         Task<List<ScheduleDTO>> GetAllBySkinTherapistId(int skinTherapistId);
         Task<List<List<ScheduleDTO>>> GetAllByServiceId(int serviceId);
         Task<ScheduleDTO> GetScheduleById(int id);
