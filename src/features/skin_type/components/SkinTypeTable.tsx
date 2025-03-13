@@ -1,43 +1,46 @@
-import React, { useState, useMemo } from "react";
-import { Table, Input, Button, message, Modal, Form } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from "react";
+import {
+  Table,
+  Input as AntInput,
+  Button,
+  message,
+  Modal,
+  Form,
+  Space,
+  Tooltip,
+  Image,
+  Flex,
+} from "antd";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import { useSkinTypes } from "../hooks/useGetSkin";
-import { useDeleteSkinType } from "../hooks/useDeleteSkinType";
-import { useCreateSkinType } from "../hooks/useCreateSkinType";
+import { useDeleteSkin } from "../hooks/useDeleteSkin";
+import { useCreateSkin } from "../hooks/useCreateSkin";
 import { TablePaginationConfig } from "antd/es/table";
 import { SkinDto } from "../dto/skin.dto";
+import { ColumnsType } from "antd/es/table";
 
-interface SkinType {
-  skinTypeId: string;
-  name: string;
-  description: string;
-}
-
-const SkinTypeTable: React.FC = () => {
-  const { data: skinDtos, isLoading, refetch } = useSkinTypes();
-  const { mutate: deleteSkinType } = useDeleteSkinType();
-  const { mutate: createSkinType } = useCreateSkinType();
+const SkinTypeTable = () => {
+  const { data: skinData, isLoading, refetch } = useSkinTypes();
+  const { mutate: deleteSkinType } = useDeleteSkin();
+  const { mutate: createSkinType } = useCreateSkin();
 
   const [searchText, setSearchText] = useState("");
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
 
-  const skinTypes: SkinType[] =
-    skinDtos?.map((skin: SkinDto) => ({
-      skinTypeId: skin.skintypeId.toString(),
-      name: skin.skintypeName,
-      description: skin.description,
-    })) || [];
+  const filterSkins = skinData?.filter((skin: any) =>
+    skin.skintypeName.toLowerCase().includes(searchText.toLowerCase())
+  );
 
-  const filteredSkinTypes = useMemo(() => {
-    return skinTypes.filter((skin: SkinType) =>
-      skin.name.toLowerCase().includes(searchText.toLowerCase())
-    );
-  }, [skinTypes, searchText]);
-
-  const handleDelete = (skinTypeId: string) => {
-    deleteSkinType(Number(skinTypeId), {
+  const handleDeleteSkin = (skintypeId: number) => {
+    deleteSkinType(skintypeId, {
       onSuccess: () => {
         message.success("Xóa loại da thành công");
         refetch();
@@ -48,27 +51,46 @@ const SkinTypeTable: React.FC = () => {
     });
   };
 
-  const handleAddSkinType = () => {
+  const handleCreate = () => {
+    setIsModalOpen(true);
+    form.resetFields();
+  };
+
+  const handleCreateSkin = () => {
     form.validateFields().then((values) => {
       createSkinType(values, {
         onSuccess: () => {
-          message.success("Thêm loại da thành công");
-          setIsModalVisible(false);
+          message.success("Tạo loại da thành công");
+          setIsModalOpen(false);
           form.resetFields();
           refetch();
         },
         onError: () => {
-          message.error("Thêm loại da thất bại");
+          message.error("Tạo loại da thất bại");
         },
       });
     });
   };
 
-  const columns = [
+  const columns: ColumnsType<SkinDto> = [
     {
-      title: "Tên loại da",
-      dataIndex: "name",
-      key: "name",
+      title: "No",
+      dataIndex: "No",
+      fixed: "left",
+      width: 50,
+      render: (_value: any, _record: any, index: number) => {
+        return (pagination.current - 1) * pagination.pageSize + index + 1;
+      },
+    },
+    {
+      title: "ID",
+      dataIndex: "skintypeId",
+      key: "skintypeId",
+    },
+    {
+      title: "Loại da",
+      dataIndex: "skintypeName",
+      key: "skintypeName",
     },
     {
       title: "Mô tả",
@@ -76,46 +98,61 @@ const SkinTypeTable: React.FC = () => {
       key: "description",
     },
     {
-      title: "Hành động",
-      key: "actions",
-      render: (_: unknown, record: SkinType) => (
-        <Button danger onClick={() => handleDelete(record.skinTypeId)}>
-          Xóa
-        </Button>
+      title: "Image",
+      dataIndex: "image",
+      key: "image",
+      render: (image: string) => (
+        <Image
+          src={image}
+          width={50}
+          height={50}
+          style={{ borderRadius: "50%" }}
+        />
+      ),
+    },
+    {
+      title: "Actions",
+      render: (_: unknown, record: SkinDto) => (
+        <Space>
+          <Tooltip title="Edit">
+            <Button icon={<EditOutlined />} />
+          </Tooltip>
+          <Tooltip title="Delete">
+            <Button
+              icon={<DeleteOutlined />}
+              onClick={() => handleDeleteSkin(record.skintypeId)}
+            />
+          </Tooltip>
+        </Space>
       ),
     },
   ];
 
   return (
     <div>
-      <div
-        style={{
-          marginBottom: 16,
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <Input.Search
-          placeholder="Tìm kiếm loại da"
+      <Flex gap="middle" justify="space-between">
+        <div className="content-header">Danh sách loại da</div>
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+          Tạo loại da
+        </Button>
+      </Flex>
+      <hr style={{ opacity: 0.1 }} />
+      <Space direction="vertical" style={{ width: "100%" }}>
+        <AntInput
+          prefix={<SearchOutlined />}
+          placeholder="Nhập loại da cần tìm"
+          style={{ border: "none", backgroundColor: "transparent" }}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          style={{ width: 300 }}
         />
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setIsModalVisible(true)}
-        >
-          Thêm loại da
-        </Button>
-      </div>
+      </Space>
 
       <Table
         columns={columns}
-        dataSource={filteredSkinTypes}
+        dataSource={filterSkins}
         loading={isLoading}
         pagination={pagination}
-        rowKey="skinTypeId"
+        rowKey="skintypeId"
         onChange={(pagination: TablePaginationConfig) =>
           setPagination({
             current: pagination.current || 1,
@@ -126,9 +163,9 @@ const SkinTypeTable: React.FC = () => {
 
       <Modal
         title="Thêm loại da"
-        visible={isModalVisible}
-        onOk={handleAddSkinType}
-        onCancel={() => setIsModalVisible(false)}
+        open={isModalOpen}
+        onOk={handleCreateSkin}
+        onCancel={() => setIsModalOpen(false)}
       >
         <Form form={form} layout="vertical">
           <Form.Item
@@ -136,14 +173,14 @@ const SkinTypeTable: React.FC = () => {
             label="Tên loại da"
             rules={[{ required: true, message: "Vui lòng nhập tên loại da" }]}
           >
-            <Input />
+            <AntInput />
           </Form.Item>
           <Form.Item
             name="description"
             label="Mô tả"
             rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
           >
-            <Input.TextArea rows={4} />
+            <AntInput.TextArea rows={4} />
           </Form.Item>
         </Form>
       </Modal>

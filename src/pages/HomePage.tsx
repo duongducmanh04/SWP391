@@ -156,7 +156,7 @@ const HomePage = () => {
                   style={{ width: "100%", borderRadius: "8px" }}
                 />
               }
-              bordered={false}
+              variant="borderless"
               style={{ background: "transparent" }}
             />
           </Col>

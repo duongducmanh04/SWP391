@@ -10,8 +10,6 @@ import {
   message,
   Modal,
   Avatar,
-  List,
-  Spin,
 } from "antd";
 import {
   CheckCircleOutlined,
@@ -30,42 +28,10 @@ import { useCustomers } from "../../user/hook/useGetCustomer";
 import { useGetSchedule } from "../../schedule/hooks/useGetSchedule";
 import { useNavigate } from "react-router-dom";
 import { PagePath } from "../../../enums/page-path.enum";
-import { useGetServiceByTherapistId } from "../hooks/useGetServiceByTherapistId";
 
 dayjs.extend(utc);
 
 const { Title, Text } = Typography;
-
-const ServiceNameList = ({ therapistId }: { therapistId: number }) => {
-  const {
-    data: services = [],
-    isLoading,
-    error,
-  } = useGetServiceByTherapistId(therapistId);
-
-  if (isLoading) return <Spin />;
-  if (error) return <Text style={{ color: "red" }}>Không thể tải dịch vụ</Text>;
-
-  return (
-    <List
-      size="large"
-      bordered
-      style={{
-        marginTop: "15px",
-        background: "#F9F9F9",
-        borderRadius: "8px",
-        padding: "10px",
-        boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-      }}
-      dataSource={services}
-      renderItem={(service) => (
-        <List.Item>
-          <Text strong>✅ {service.name}</Text>
-        </List.Item>
-      )}
-    />
-  );
-};
 
 const SkincareBooking = () => {
   const today = dayjs().format("YYYY-MM-DD");
@@ -498,16 +464,6 @@ const SkincareBooking = () => {
                 </Card>
               </Col>
             </Row>
-
-            <Title level={4} style={{ marginTop: "20px" }}>
-              Những dịch vụ chuyên viên làm:
-            </Title>
-
-            {selectedTherapist.skintherapistId && (
-              <ServiceNameList
-                therapistId={selectedTherapist.skintherapistId}
-              />
-            )}
           </div>
         )}
       </Modal>

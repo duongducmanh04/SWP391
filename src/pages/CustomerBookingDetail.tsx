@@ -14,7 +14,6 @@ const CustomerBookingDetail = () => {
   const { bookingId } = location.state || {};
   const queryClient = useQueryClient();
 
-  console.log("🔍 Booking ID từ URL:", bookingId);
   const validBookingId = bookingId ? String(bookingId) : "";
 
   const {

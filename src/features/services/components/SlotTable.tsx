@@ -12,6 +12,8 @@ import {
   Form,
   Input,
   message,
+  Flex,
+  Tag,
 } from "antd";
 import { useSlots } from "../hooks/useGetSlot";
 import { useAvailableSlot } from "../hooks/useAvailableSlot";
@@ -37,7 +39,7 @@ const SlotTable = () => {
 
   const [searchText, setSearchText] = useState("");
   const [activeTab, setActiveTab] = useState("all");
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
 
   const filterSlots = (slots: SlotDto[] | undefined) =>
@@ -57,9 +59,16 @@ const SlotTable = () => {
   };
 
   const columns: ColumnsType<SlotDto> = [
-    { title: "ID", dataIndex: "slotId" },
-    { title: "Status", dataIndex: "status" },
-    { title: "Time", dataIndex: "time" },
+    { title: "ID", dataIndex: "slotId", key: "slotId" },
+    { title: "Time", dataIndex: "time", key: "time" },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status: string) => (
+        <Tag color={status === "Available" ? "green" : "red"}>{status}</Tag>
+      ),
+    },
     {
       title: "Actions",
       render: (_: unknown, record: SlotDto) => (
@@ -84,16 +93,29 @@ const SlotTable = () => {
     if (activeTab === "booked") return filterSlots(bookedSlots);
   };
 
-  const handleAddSlot = () => {
-    form.validateFields().then((values) => {
-      createSlot(values, {
-        onSuccess: () => {
-          message.success("Thêm slot mới thành công");
-          setIsModalVisible(false);
-          form.resetFields();
-        },
+  const handleCreate = () => {
+    setIsModalOpen(true);
+    form.resetFields();
+  };
+
+  const handleCreateSlot = () => {
+    form
+      .validateFields()
+      .then((values) => {
+        createSlot(values, {
+          onSuccess: () => {
+            message.success("Tạo slot thành công");
+            setIsModalOpen(false);
+            form.resetFields();
+          },
+          onError: (err: { message: any }) => {
+            message.error(`Lỗi tạo người dùng: ${err.message}`);
+          },
+        });
+      })
+      .catch((info) => {
+        console.error("Validate Failed:", info);
       });
-    });
   };
 
   if (isLoadingAll || isLoadingAvailable || isLoadingBooked)
@@ -101,22 +123,22 @@ const SlotTable = () => {
 
   return (
     <div>
-      <div className="content-header">Danh sách slot</div>
-      <AntInput
-        prefix={<SearchOutlined />}
-        placeholder="Tìm kiếm slot"
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        style={{ marginBottom: 16 }}
-      />
-      <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={() => setIsModalVisible(true)}
-        style={{ marginBottom: 16 }}
-      >
-        Thêm Slot
-      </Button>
+      <Flex gap="middle" justify="space-between">
+        <div className="content-header">Danh sách slot</div>
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+          Tạo slot
+        </Button>
+      </Flex>
+      <hr style={{ opacity: 0.1 }} />
+      <Space direction="vertical" style={{ width: "100%" }}>
+        <AntInput
+          prefix={<SearchOutlined />}
+          placeholder="Nhập slot cần tìm"
+          style={{ border: "none", backgroundColor: "transparent" }}
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+      </Space>
       <Tabs
         activeKey={activeTab}
         onChange={(key) => setActiveTab(key)}
@@ -130,9 +152,9 @@ const SlotTable = () => {
 
       <Modal
         title="Thêm Slot"
-        visible={isModalVisible}
-        onOk={handleAddSlot}
-        onCancel={() => setIsModalVisible(false)}
+        open={isModalOpen}
+        onOk={handleCreateSlot}
+        onCancel={() => setIsModalOpen(false)}
       >
         <Form form={form} layout="vertical">
           <Form.Item name="status" label="Status" rules={[{ required: true }]}>

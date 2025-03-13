@@ -1,6 +1,17 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Layout, Menu, Card, Spin, Alert, Avatar, List, Button } from "antd";
+import {
+  Layout,
+  Menu,
+  Card,
+  Spin,
+  Alert,
+  Avatar,
+  List,
+  Button,
+  Pagination,
+} from "antd";
 import {
   UserOutlined,
   ClockCircleOutlined,
@@ -12,6 +23,7 @@ import { BookingDto } from "../features/booking/dto/booking.dto";
 import { PagePath } from "../enums/page-path.enum";
 import useAuthStore from "../features/authentication/hooks/useAuthStore";
 import dayjs from "dayjs";
+import StatusTag from "../components/TagStatus";
 
 const { Sider, Content } = Layout;
 
@@ -49,7 +61,6 @@ const CustomerProfile = () => {
     isLoading: isBookingLoading,
     isError: isBookingError,
     error: bookingError,
-    // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useBookingHistory();
 
   const handleNavigateToBookingDetail = (bookingId: number) => {
@@ -59,6 +70,13 @@ const CustomerProfile = () => {
       },
     });
   };
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10; // Số kết quả mỗi trang
+
+  const indexOfLastItem = currentPage * pageSize;
+  const indexOfFirstItem = indexOfLastItem - pageSize;
+  const currentBookings = bookings?.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#f5f1eb" }}>
@@ -117,7 +135,7 @@ const CustomerProfile = () => {
                   ) : bookings && bookings.length > 0 ? (
                     <List
                       itemLayout="horizontal"
-                      dataSource={bookings}
+                      dataSource={currentBookings}
                       renderItem={(booking: BookingDto) => (
                         <List.Item
                           style={{ cursor: "pointer" }}
@@ -146,6 +164,7 @@ const CustomerProfile = () => {
                               booking.location
                             }`}
                           />
+                          <StatusTag status={booking.status} />
                         </List.Item>
                       )}
                     />
@@ -155,6 +174,13 @@ const CustomerProfile = () => {
                       type="warning"
                     />
                   )}
+                  <Pagination
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={bookings?.length ?? 0}
+                    onChange={(page) => setCurrentPage(page)} // Cập nhật trang khi bấm nút
+                    style={{ marginTop: "20px", textAlign: "center" }}
+                  />
                 </>
               )}
 

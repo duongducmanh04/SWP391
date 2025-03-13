@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Card,
   Col,
@@ -79,18 +78,22 @@ const SkinTherapistList = () => {
       >
         Chọn chuyên viên trị liệu da cho bạn
       </Title>
-      <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
+      <div
+        style={{
+          marginBottom: "20px",
+          display: "flex",
+          gap: "10px",
+          justifyContent: "end",
+        }}
+      >
         <Input
           placeholder="Tìm kiếm tên chuyên viên..."
           value={searchTerm}
           onChange={handleSearchChange}
+          style={{ width: 300 }}
         />
-        <Select
-          defaultValue="All"
-          onChange={handleFilterChange}
-          style={{ width: 200 }}
-        >
-          <Option value="All">Tất cả kinh nghiệm</Option>
+        <Select defaultValue="All" onChange={handleFilterChange}>
+          <Option value="All">Tất cả</Option>
           <Option value="15">Dưới 15 năm</Option>
           <Option value="12">Dưới 12 năm</Option>
           <Option value="10">Dưới 10 năm</Option>
@@ -157,7 +160,7 @@ const TherapistCard = ({
         <br />
         <Text type="secondary">Bằng cấp: {therapist.degree}</Text>
         <Divider />
-        <Title level={5}>Dịch vụ cung cấp:</Title>
+        <Title level={5}>Dịch vụ chuyên viên làm:</Title>
         {isLoading ? (
           <Spin size="small" />
         ) : isError ? (

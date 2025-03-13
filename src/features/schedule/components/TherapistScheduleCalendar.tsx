@@ -1,4 +1,4 @@
-import { Calendar, Spin, Flex, Tooltip } from "antd";
+import { Calendar, Spin, Flex, Tooltip, Badge } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { useGetScheduleByTherapistId } from "../hooks/useGetScheduleByTherapistId";
@@ -7,7 +7,7 @@ import { useBookingss } from "../../booking/hooks/useGetBooking";
 import { ScheduleDto } from "../dto/schedule.dto";
 import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
 import { SlotDto } from "../../services/dto/slot.dto";
-import { BookingDto } from "../../booking/dto/booking.dto";
+// import { BookingDto } from "../../booking/dto/booking.dto";
 import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { useMemo } from "react";
 
@@ -90,37 +90,31 @@ const TherapistScheduleView = () => {
 
     const formattedDate = value.format("YYYY-MM-DD");
 
-    const bookedSlots = slots.filter(
-      (slot: SlotDto) => slot.status === "Booked"
-    );
-    const slotMap = new Map(bookedSlots.map((slot) => [slot.slotId, slot]));
-
     const scheduleForTherapist = schedule.filter(
       (s: ScheduleDto) => s.skinTherapistId === skintherapistId
     );
 
-    const bookingsForDate = bookings.filter((booking: BookingDto) => {
-      return scheduleForTherapist.some((s: ScheduleDto) => {
-        const slot = slotMap.get(s.slotId);
-        return (
-          slot &&
-          slot.bookingId === booking.bookingId &&
-          dayjs(booking.date).format("YYYY-MM-DD") === formattedDate
-        );
-      });
+    const slotsForDate = slots.filter((slot: SlotDto) => {
+      return scheduleForTherapist.some(
+        (s: ScheduleDto) =>
+          s.slotId === slot.slotId &&
+          dayjs(slot.date).format("YYYY-MM-DD") === formattedDate
+      );
     });
 
-    if (bookingsForDate.length === 0) return null;
+    slotsForDate.sort((a, b) =>
+      dayjs(a.time, "h:mm A").isBefore(dayjs(b.time, "h:mm A")) ? -1 : 1
+    );
+
+    if (slotsForDate.length === 0) return null;
 
     const tooltipContent = (
       <ul>
-        {bookingsForDate.map((booking: BookingDto) => {
-          const slot = bookedSlots.find(
-            (s) => s.bookingId === booking.bookingId
-          );
+        {slotsForDate.map((slot: SlotDto) => {
+          const booking = bookings.find((b) => b.bookingId === slot.bookingId);
           return (
-            <li key={booking.bookingId}>
-              {slot ? slot.time : "Unknown"} - {booking.serviceName}
+            <li key={slot.slotId}>
+              {slot.time} - {booking ? booking.serviceName : "Trống"}
             </li>
           );
         })}
@@ -128,13 +122,20 @@ const TherapistScheduleView = () => {
     );
 
     const cellContent = (
-      <ul>
-        {bookingsForDate.map((booking: BookingDto) => {
-          const slot = bookedSlots.find(
-            (s) => s.bookingId === booking.bookingId
-          );
+      <ul style={{ padding: 0, margin: 0, listStyle: "none" }}>
+        {slotsForDate.map((slot: SlotDto) => {
+          // const booking = bookings.find((b) => b.bookingId === slot.bookingId);
           return (
-            <li key={booking.bookingId}>{slot ? slot.time : "Unknown"}</li>
+            <li key={slot.slotId} style={{ marginBottom: 4 }}>
+              <Badge
+                status={slot.status === "Booked" ? "error" : "success"}
+                text={`${slot.time}`}
+                style={{
+                  width: "100%",
+                  textAlign: "center",
+                }}
+              />
+            </li>
           );
         })}
       </ul>
