@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { SlotDto } from "../dto/slot.dto";
 
@@ -16,17 +15,6 @@ export const useCreateSlot = () => {
 };
 
 export const useDeleteSlot = () => {
-  return useMutation({
-    mutationFn: async (slotId: number) => {
-      const response = await axios.delete(
-        `https://localhost:7071/api/slot/deleteSlot/${slotId}`
-      );
-      return response.data;
-=======
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-
-export const useDeleteSlot = () => {
   const queryClient = useQueryClient();
 
   return useMutation<void, Error, number>({
@@ -37,7 +25,6 @@ export const useDeleteSlot = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["deleteService"] });
->>>>>>> e21d13c7ce2271ea3855d26e39440be1e5a0f14e
     },
   });
 };

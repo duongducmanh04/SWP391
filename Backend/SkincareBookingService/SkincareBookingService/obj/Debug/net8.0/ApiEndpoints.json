@@ -618,6 +618,133 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "SkincareBookingService.Controllers.RatingController",
+    "Method": "GetRatings",
+    "RelativePath": "api/Rating",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.RatingController",
+    "Method": "CreateRating",
+    "RelativePath": "api/Rating",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "SkincareBookingService.BLL.DTOs.PostRatingDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.RatingController",
+    "Method": "GetRating",
+    "RelativePath": "api/Rating/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.RatingController",
+    "Method": "UpdateRating",
+    "RelativePath": "api/Rating/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "SkincareBookingService.BLL.DTOs.PutRatingDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.RatingController",
+    "Method": "DeleteRating",
+    "RelativePath": "api/Rating/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.RatingController",
+    "Method": "GetRatingsByCustomerId",
+    "RelativePath": "api/Rating/customer/{customerId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "customerId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.RatingController",
+    "Method": "GetRatingsByServiceId",
+    "RelativePath": "api/Rating/service/{serviceId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "serviceId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.ScheduleController",
+    "Method": "CreateSchedule",
+    "RelativePath": "api/Schedule/createSchedule",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "scheduleInputDTO",
+        "Type": "SkincareBookingService.BLL.DTOs.ScheduleDTOs.ScheduleInputDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "SkincareBookingService.Controllers.ScheduleController",
     "Method": "UpdateSkinTherapistID",
     "RelativePath": "api/Schedule/updateSkintherapistId/{scheduleId}",

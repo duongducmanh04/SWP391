@@ -124,7 +124,7 @@ const CustomerBookingDetail = () => {
             </p>
 
             {/* Nút Hủy Đặt Lịch */}
-            {booking.status !== "Cancelled" && (
+            {booking.status === "Booked" && (
               <Button
                 type="primary"
                 danger
