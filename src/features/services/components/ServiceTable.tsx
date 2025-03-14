@@ -254,6 +254,7 @@ const ServiceTable = () => {
         onCancel={() => setIsModalOpen(false)}
         onOk={editingService ? handleUpdate : handleCreateService}
         width={600}
+        centered
         cancelText="Hủy"
         okText={editingService ? "Cập nhật" : "Tạo"}
         footer={(_, { OkBtn, CancelBtn }) => (
@@ -272,22 +273,45 @@ const ServiceTable = () => {
             <AntInput />
           </Form.Item>
           <Form.Item
-            name="dateofbirth"
-            label="Date of birth"
+            name="description"
+            label="description"
             rules={[
-              { required: true, message: "Please enter the date of birth!" },
+              { required: true, message: "Please enter the description!" },
             ]}
           >
             <AntInput />
           </Form.Item>
           <Form.Item
-            name="class"
-            label="Class"
-            rules={[{ required: true, message: "Please enter the class!" }]}
+            name="price"
+            label="price"
+            rules={[{ required: true, message: "Please enter the price!" }]}
           >
             <AntInput />
           </Form.Item>
-          <Form.Item name="feedback" label="Feedback">
+          <Form.Item
+            name="duration"
+            label="duration"
+            rules={[{ required: true, message: "Please enter the duration!" }]}
+          >
+            <AntInput />
+          </Form.Item>
+          <Form.Item
+            name="image"
+            label="image"
+            rules={[{ required: true, message: "Please enter the image!" }]}
+          >
+            <AntInput />
+          </Form.Item>
+          <Form.Item
+            name="procedureDescription"
+            label="procedureDescription"
+            rules={[
+              {
+                required: true,
+                message: "Please enter the procedure description!",
+              },
+            ]}
+          >
             <AntInput />
           </Form.Item>
         </Form>

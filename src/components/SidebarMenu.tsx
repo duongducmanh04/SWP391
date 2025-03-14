@@ -165,7 +165,7 @@ const SidebarMenu = () => {
           },
         ]
       : []),
-    ...(user?.role === RoleCode.ADMIN
+    ...(user?.role === RoleCode.ADMIN || user?.role === RoleCode.STAFF
       ? [
           {
             key: PagePath.SLOT_MANAGEMENT,

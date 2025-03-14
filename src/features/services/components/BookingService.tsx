@@ -248,6 +248,9 @@ const SkincareBooking = () => {
                 const newDate = value.format("YYYY-MM-DD");
                 console.log("📅 Selected Date:", newDate);
                 setSelectedDate(newDate);
+                setSelectedExpert(null);
+                setSelectedTime("");
+                setSelectedSlotId(null);
               }}
             />
           </Card>
@@ -365,7 +368,7 @@ const SkincareBooking = () => {
               </Text>
             )}
 
-            {selectedExpert && (
+            {selectedExpert && selectedTime && selectedSlotId && (
               <div style={{ marginTop: "20px" }}>
                 <Title level={4}>Xác nhận đặt lịch</Title>
                 <Text>
