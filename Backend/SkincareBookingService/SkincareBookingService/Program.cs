@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SkincareBookingService.BLL.DTOs.EmailDTOs;
 using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.BLL.Services;
 using SkincareBookingService.DAL.Entities;
@@ -96,6 +97,17 @@ namespace SkincareBookingService
             builder.Services.AddScoped<IRatingService, RatingService>();
 
             builder.Services.AddScoped<IBlogService, BlogService>();
+
+            /*====================================================*/
+
+
+            var emailConfig = builder.Configuration.GetSection("EmailSettings").Get<EmailSettingsDTO>();
+            builder.Services.AddScoped<IEmailService>(_ => new EmailService(
+                emailConfig.Host,   // "smtp.gmail.com"
+                emailConfig.Port,   // 587
+                emailConfig.Mail,   // "jackawmc@gmail.com"
+                emailConfig.Password // "wpncykcsxigryaxz"
+            ));
 
             /*====================================================*/
 

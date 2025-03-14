@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SkincareBookingService.BLL.DTOs.AuthenticationDTOs;
+using SkincareBookingService.BLL.DTOs.EmailDTOs;
 using SkincareBookingService.BLL.Interfaces;
 
 namespace SkincareBookingService.Controllers
@@ -60,6 +61,51 @@ namespace SkincareBookingService.Controllers
                 accountId = account.AccountId,
                 role = account.Role
             });
+        }
+
+        [HttpPost("forgotPassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO forgotPasswordDTO)
+        {
+            if (string.IsNullOrEmpty(forgotPasswordDTO.Email))
+            {
+                return BadRequest(new { message = "Please enter email!" });
+            }
+            var result = await _authService.ForgotPasswordAsync(forgotPasswordDTO.Email);
+            if (result)
+            {
+                return Ok(new { message = "OTP has been sent to your email!" });
+            }
+            return BadRequest(new { message = "Email not found!" });
+        }
+
+        [HttpPost("resetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO resetPasswordDTO)
+        {
+            if (string.IsNullOrEmpty(resetPasswordDTO.Email) || string.IsNullOrEmpty(resetPasswordDTO.Otp) || string.IsNullOrEmpty(resetPasswordDTO.NewPassword))
+            {
+                return BadRequest(new { message = "Please enter email, OTP and new password!" });
+            }
+            var result = await _authService.ResetPasswordAsync(resetPasswordDTO.Email, resetPasswordDTO.Otp, resetPasswordDTO.NewPassword);
+            if (result)
+            {
+                return Ok(new { message = "Password reset successfully!" });
+            }
+            return BadRequest(new { message = "Failed to reset password!" });
+        }
+
+        [HttpPost("verifyOtp")]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDTO verifyOtpDTO)
+        {
+            if (string.IsNullOrEmpty(verifyOtpDTO.Email) || string.IsNullOrEmpty(verifyOtpDTO.Otp))
+            {
+                return BadRequest(new { message = "Please enter email and OTP!" });
+            }
+            var result = await _authService.VerifyOtpAsync(verifyOtpDTO.Email, verifyOtpDTO.Otp);
+            if (result)
+            {
+                return Ok(new { message = "OTP is correct!" });
+            }
+            return BadRequest(new { message = "OTP is incorrect or expired!" });
         }
     }
 }
