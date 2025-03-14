@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.Interfaces;
 
 namespace SkincareBookingService.Controllers
@@ -12,6 +13,13 @@ namespace SkincareBookingService.Controllers
         public SkintherapistController(ISkintherapistService skintherapistService)
         {
             _skintherapistService = skintherapistService;
+        }
+
+        [HttpPost("addSkintherapist")]
+        public async Task<IActionResult> AddSkintherapist([FromBody] SkinTherapistDTO skintherapistDTO)
+        {
+            var skintherapist = await _skintherapistService.AddSkintherapistAsync(skintherapistDTO);
+            return Ok(skintherapist);
         }
 
         [HttpGet("getAllSkintherapist")]
@@ -36,6 +44,7 @@ namespace SkincareBookingService.Controllers
             }
             return Ok(skintherapist);
         }
+
         [HttpGet("list-by-service/{id}")]
         public async Task<IActionResult> GetSkintherapistByServiceId(int id)
         {
@@ -45,6 +54,28 @@ namespace SkincareBookingService.Controllers
                 return NotFound("No skintherapist found");
             }
             return Ok(skintherapistList);
+        }
+
+        [HttpPut("updateSkintherapist")]
+        public async Task<IActionResult> UpdateSkintherapist([FromBody] SkinTherapistDTO skintherapistDTO)
+        {
+            var updatedSkintherapist = await _skintherapistService.UpdateSkintherapistAsync(skintherapistDTO);
+            if (updatedSkintherapist == false)
+            {
+                return NotFound("No skintherapist found");
+            }
+            return Ok("Skintherapist updated");
+        }
+
+        [HttpDelete("deleteSkintherapist/{id}")]
+        public async Task<IActionResult> DeleteSkintherapist(int id)
+        {
+            var result = await _skintherapistService.DeleteSkintherapistAsync(id);
+            if (!result)
+            {
+                return NotFound("No skintherapist found");
+            }
+            return Ok("Skintherapist deleted");
         }
     }
 }

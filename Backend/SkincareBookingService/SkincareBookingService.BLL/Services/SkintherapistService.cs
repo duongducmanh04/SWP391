@@ -85,5 +85,64 @@ namespace SkincareBookingService.BLL.Services
                 AccountId = skinTherapist.AccountId
             };
         }
+
+        public async Task<SkinTherapistDTO> AddSkintherapistAsync(SkinTherapistDTO skintherapistDTO)
+        {
+            var therapist = new SkinTherapist
+            {
+                Name = skintherapistDTO.Name,
+                Speciality = skintherapistDTO.Speciality,
+                Email = skintherapistDTO.Email,
+                Experience = skintherapistDTO.Experience,
+                Image = skintherapistDTO.Image,
+                Degree = skintherapistDTO.Degree,
+                AccountId = skintherapistDTO.AccountId
+            };
+
+            await _skintherapistRepository.AddAsync(therapist);
+            await _skintherapistRepository.SaveChangesAsync();
+
+            return new SkinTherapistDTO
+            {
+                SkintherapistId = therapist.SkintherapistId,
+                Name = therapist.Name,
+                Speciality = therapist.Speciality,
+                Email = therapist.Email,
+                Experience = therapist.Experience,
+                Image = therapist.Image,
+                Degree = therapist.Degree,
+                AccountId = therapist.AccountId
+            };
+        }
+
+        public async Task<bool> UpdateSkintherapistAsync(SkinTherapistDTO skintherapistDTO)
+        {
+            var therapist = await _skintherapistRepository.GetByIdAsync(skintherapistDTO.SkintherapistId);
+
+            if (therapist == null) return false;
+
+            therapist.Name = skintherapistDTO.Name;
+            therapist.Speciality = skintherapistDTO.Speciality;
+            therapist.Email = skintherapistDTO.Email;
+            therapist.Experience = skintherapistDTO.Experience;
+            therapist.Image = skintherapistDTO.Image;
+            therapist.Degree = skintherapistDTO.Degree;
+
+            await _skintherapistRepository.UpdateAsync(therapist);
+            await _skintherapistRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteSkintherapistAsync(int id)
+        {
+            var therapist = await _skintherapistRepository.GetByIdAsync(id);
+
+            if (therapist == null) return false;
+
+            await _skintherapistRepository.DeleteAsync(therapist);
+            await _skintherapistRepository.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
