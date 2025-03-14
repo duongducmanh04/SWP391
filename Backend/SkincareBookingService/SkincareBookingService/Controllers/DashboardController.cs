@@ -46,5 +46,13 @@ namespace SkincareBookingService.Controllers
             var roleCounts = await _dashboardService.GetRoleCountsAsync();
             return Ok(roleCounts);
         }
+
+        [HttpGet("getTopSkintherapistByYear/{year}")]
+        public async Task<IActionResult> GetTopSkintherapistByYear(int year)
+        {
+            var topSkintherapists = await _dashboardService.GetTopSkintherapistByYearAsync(year);
+
+            return Ok(topSkintherapists);
+        }
     }
 }
