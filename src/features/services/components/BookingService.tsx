@@ -216,6 +216,9 @@ const handleCloseTherapistModal = () => {
                 const newDate = value.format("YYYY-MM-DD");
                 console.log("📅 Selected Date:", newDate);
                 setSelectedDate(newDate);
+                setSelectedExpert(null);
+                setSelectedTime("");
+                setSelectedSlotId(null);
               }}
             />
           </Card>
@@ -300,43 +303,43 @@ const handleCloseTherapistModal = () => {
               </Text>
             )}
 
-            {selectedExpert && (
-              <div style={{ marginTop: "20px" }}>
-                <Title level={4}>Xác nhận đặt lịch</Title>
-                <Text>
-                  Bạn đã chọn{" "}
-                  <strong>
-                    {
-                      therapists?.find(
-                        (e) => e.skintherapistId === selectedExpert
-                      )?.name
-                    }
-                  </strong>{" "}
-                  vào lúc <strong>{selectedTime}</strong> ngày{" "}
-                  <strong>{selectedDate}</strong>.
-                </Text>
-                <div style={{ marginTop: "20px" }}>
-                <Button
-  type="primary"
-  icon={<CheckCircleOutlined />}
-  onClick={handleConfirmBooking} 
-  style={{
-    backgroundColor: "#A7C957",
-    border: "none",
-    fontSize: "16px",
-    padding: "12px 24px",
-    borderRadius: "8px",
-    transition: "all 0.3s ease-in-out",
-  }}
-  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#8AA851")}
-  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#A7C957")}
->
-  Xác nhận 
-</Button>
+{selectedExpert && selectedTime && selectedSlotId && (
+  <div style={{ marginTop: "20px" }}>
+    <Title level={4}>Xác nhận đặt lịch</Title>
+    <Text>
+      Bạn đã chọn{" "}
+      <strong>
+        {
+          therapists?.find(
+            (e) => e.skintherapistId === selectedExpert
+          )?.name
+        }
+      </strong>{" "}
+      vào lúc <strong>{selectedTime}</strong> ngày{" "}
+      <strong>{selectedDate}</strong>.
+    </Text>
+    <div style={{ marginTop: "20px" }}>
+      <Button
+        type="primary"
+        icon={<CheckCircleOutlined />}
+        onClick={handleConfirmBooking}
+        style={{
+          backgroundColor: "#A7C957",
+          border: "none",
+          fontSize: "16px",
+          padding: "12px 24px",
+          borderRadius: "8px",
+          transition: "all 0.3s ease-in-out",
+        }}
+        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#8AA851")}
+        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#A7C957")}
+      >
+        Xác nhận
+      </Button>
+    </div>
+  </div>
+)}
 
-                </div>
-              </div>
-            )}
           </Card>
         </Col>
       </Row>

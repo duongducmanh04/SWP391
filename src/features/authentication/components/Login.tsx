@@ -84,11 +84,10 @@ const [registerForm] = Form.useForm();
       message.success("Đăng ký thành công! Vui lòng đăng nhập.");
       setActiveTab("1");
     } else {
-      message.error(response.message || "Đăng ký thất bại.");
+      message.error( "Đăng ký thất bại.");
     }
   },
   onError: (error) => {
-    console.error("❌ Registration error:", error);
     message.error("Lỗi kết nối đến máy chủ: " + (error as Error).message);
   },
 });
@@ -105,7 +104,7 @@ const onFinish = (values: any) => {
     console.log("🆕 Registering:", values);
     registerMutation.mutate(values);
   } else {
-    console.error("❌ Unexpected Tab State:", activeTab);
+    console.error(" Unexpected Tab State:", activeTab);
   }
 };
 
@@ -174,7 +173,7 @@ const onFinish = (values: any) => {
             <TabPane tab="Đăng ký" key="2">
               <Form form={registerForm} name="register" onFinish={onFinish}
                onFinishFailed={(errorInfo) => {
-                console.error("❌ Form submission failed. Errors:", errorInfo);
+                console.error(" Form submission failed. Errors:", errorInfo);
                 alert("Form submission failed! Check console for errors.");
               }}
               
@@ -229,7 +228,6 @@ const onFinish = (values: any) => {
     htmlType="submit"
     className="submit-btn"
     onClick={() => {
-      console.log("🖱️ Đăng ký button clicked! Submitting form...");
       loginForm.submit();
     }}
   >

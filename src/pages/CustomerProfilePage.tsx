@@ -12,11 +12,15 @@ import { BookingDto } from "../features/booking/dto/booking.dto";
 import { PagePath } from "../enums/page-path.enum";
 import useAuthStore from "../features/authentication/hooks/useAuthStore";
 import dayjs from "dayjs";
+import { useLocation } from "react-router-dom";
 
 const { Sider, Content } = Layout;
 
 const CustomerProfile = () => {
-  const [activeTab, setActiveTab] = useState("personal");
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const initialTab = searchParams.get("tab") || "personal";
+  const [activeTab, setActiveTab] = useState(initialTab);
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
@@ -49,14 +53,11 @@ const CustomerProfile = () => {
     isLoading: isBookingLoading,
     isError: isBookingError,
     error: bookingError,
-    // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useBookingHistory();
 
   const handleNavigateToBookingDetail = (bookingId: number) => {
-    navigate(PagePath.CUSTOMER_BOOKING_DETAIL, {
-      state: {
-        bookingId: bookingId,
-      },
+    navigate(`${PagePath.CUSTOMER_BOOKING_DETAIL}?tab=schedule`, {
+      state: { bookingId },
     });
   };
 
@@ -64,12 +65,15 @@ const CustomerProfile = () => {
     <Layout style={{ minHeight: "100vh", background: "#f5f1eb" }}>
       <Layout>
         <Sider width={250} theme="light" style={{ background: "#fff" }}>
-          <Menu
-            mode="inline"
-            selectedKeys={[activeTab]}
-            onClick={(e) => setActiveTab(e.key)}
-            style={{ borderRight: 0 }}
-          >
+        <Menu
+  mode="inline"
+  selectedKeys={[activeTab]}
+  onClick={(e) => {
+    setActiveTab(e.key);
+    navigate(`?tab=${e.key}`); 
+  }}
+  style={{ borderRight: 0 }}
+>
             <Menu.Item key="personal" icon={<UserOutlined />}>
               Thông tin cá nhân
             </Menu.Item>
