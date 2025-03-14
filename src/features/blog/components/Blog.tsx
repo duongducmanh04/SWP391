@@ -1,6 +1,8 @@
 import { Card, Row, Col, Typography, Avatar, Tag } from "antd";
 import { UserOutlined, CalendarOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { PagePath } from "../../../enums/page-path.enum";
+import { useBlogs } from "../hooks/useGetBlog";
 
 const { Title, Text } = Typography;
 
@@ -42,9 +44,14 @@ const blogPosts = [
 
 const BlogPage = () => {
   const navigate = useNavigate();
+  const { data: blogData } = useBlogs();
 
-  const handleNavigate = (id: number) => {
-    navigate(`/Homepage/blog/${id}`);
+  const handleNavigate = (blogId: number) => {
+    navigate(PagePath.BLOG_DETAIL, {
+      state: {
+        blogId: blogId,
+      },
+    });
   };
 
   return (

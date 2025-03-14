@@ -1,14 +1,17 @@
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { Typography, Card, Divider, Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
+import { useBlogById } from "../hooks/useGetBlogId";
 
 const { Title, Text, Paragraph } = Typography;
 
 const BlogDetail = () => {
-  const { id } = useParams();
+  const location = useLocation();
+  const { blogId } = location.state || {};
+  const { data: blog } = useBlogById(blogId || "");
 
   const blogDetail = {
-    id: id,
+    id: blogId,
     title:
       "Tác động của công nghệ đối với môi trường làm việc: Công nghệ đang thay đổi như thế nào",
     author: "Tracey Wilson",
