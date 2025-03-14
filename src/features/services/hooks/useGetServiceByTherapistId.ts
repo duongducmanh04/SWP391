@@ -2,7 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { ServiceDto } from "../dto/get-service.dto";
 
-const fetchServiceBySkinTherapistId = async (skintherapistId: number): Promise<ServiceDto[]> => {
+const fetchServiceBySkinTherapistId = async (
+  skintherapistId: number
+): Promise<ServiceDto[]> => {
   if (!skintherapistId) throw new Error("SkinTherapistId is needed");
 
   const response = await axios.get<ServiceDto[]>(
@@ -13,8 +15,8 @@ const fetchServiceBySkinTherapistId = async (skintherapistId: number): Promise<S
 
 export const useGetServiceByTherapistId = (skintherapistId: number) => {
   return useQuery<ServiceDto[], Error>({
-    queryKey: ["getSchedule", skintherapistId], 
+    queryKey: ["getSchedule", skintherapistId],
     queryFn: () => fetchServiceBySkinTherapistId(skintherapistId),
-    enabled: !!skintherapistId, 
+    enabled: !!skintherapistId,
   });
 };

@@ -2,6 +2,7 @@ import useAuthStore from "../hooks/useAuthStore";
 import { Form, Spin, Typography } from "antd";
 import { useGetProfile } from "../hooks/useGetProfile";
 import { useEffect } from "react";
+import { RoleCode } from "../../../enums/role.enum";
 
 const { Text } = Typography;
 
@@ -45,21 +46,25 @@ export default function ProfileInformation() {
           {skinTherapist?.name || profile?.accountName || "Không có thông tin"}
         </Text>
       </Form.Item>
-      <Form.Item label={"Số điện thoại"}>
-        <Text className=" font-medium">
-          {" "}
-          {/* {skinTherapist?.phoneNumber || "Không có thông tin"} */}
-        </Text>
-      </Form.Item>
-      <Form.Item label={"Email"}>
-        <Text className=" font-medium">{skinTherapist?.email}</Text>
-      </Form.Item>
-      <Form.Item label={"Kỹ năng"}>
-        <Text className=" font-medium">{skinTherapist?.speciality}</Text>
-      </Form.Item>
-      <Form.Item label={"Bằng cấp"}>
-        <Text className=" font-medium">{skinTherapist?.degree}</Text>
-      </Form.Item>
+      {user?.role === RoleCode.THERAPIST && (
+        <>
+          <Form.Item label={"Số điện thoại"}>
+            <Text className=" font-medium">
+              {" "}
+              {/* {skinTherapist?.phoneNumber || "Không có thông tin"} */}
+            </Text>
+          </Form.Item>
+          <Form.Item label={"Email"}>
+            <Text className=" font-medium">{skinTherapist?.email}</Text>
+          </Form.Item>
+          <Form.Item label={"Kỹ năng"}>
+            <Text className=" font-medium">{skinTherapist?.speciality}</Text>
+          </Form.Item>
+          <Form.Item label={"Bằng cấp"}>
+            <Text className=" font-medium">{skinTherapist?.degree}</Text>
+          </Form.Item>
+        </>
+      )}
     </Form>
   );
 }

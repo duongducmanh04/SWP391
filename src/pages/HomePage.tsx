@@ -2,57 +2,69 @@ import { Layout, Button, Card, Row, Col, Typography, Image } from "antd";
 import { RightOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import "antd/dist/reset.css";
 import "../style/HomePage.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { PagePath } from "../enums/page-path.enum";
+import { useTherapists } from "../features/skin_therapist/hooks/useGetTherapist";
 
 const { Content } = Layout;
 
 const { Title, Text, Paragraph } = Typography;
 
-const experts = [
-  {
-    id: 1,
-    name: "Nancy Reimer",
-    expertise: "Giáo dục & Kiến thức chăm sóc da",
-    experience:
-      "Hàng chục năm kinh nghiệm và kiến thức chuyên sâu về chăm sóc da.",
-    field: "Giáo dục",
-    degree: "Giám đốc Giáo dục",
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 2,
-    name: "Tiffany Medois",
-    expertise: "Tư vấn viên & Chuyên viên thẩm mỹ",
-    experience:
-      "Từng làm nhà báo, nhà sản xuất, nhà làm phim tài liệu và biên tập viên.",
-    field: "Tư vấn",
-    degree: "Chuyên viên Thẩm mỹ Chứng nhận",
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 3,
-    name: "Katina Gilmore",
-    expertise: "Điều dưỡng & Thẩm mỹ",
-    experience:
-      "Kết hợp giữa điều dưỡng và thẩm mỹ để mang lại sự chuyên môn cá nhân hóa.",
-    field: "Chăm sóc sức khỏe",
-    degree: "Y tá Chứng nhận (R.N.)",
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 4,
-    name: "Bill Levins",
-    expertise: "Giám đốc Tiếp thị",
-    experience:
-      "Mang đến kiến thức thông qua sự am hiểu sâu sắc trong ngành kinh doanh chăm sóc da.",
-    field: "Tiếp thị",
-    degree: "Phó Chủ tịch Tiếp thị",
-    image: "https://via.placeholder.com/150",
-  },
-];
+// const experts = [
+//   {
+//     id: 1,
+//     name: "Nancy Reimer",
+//     expertise: "Giáo dục & Kiến thức chăm sóc da",
+//     experience:
+//       "Hàng chục năm kinh nghiệm và kiến thức chuyên sâu về chăm sóc da.",
+//     field: "Giáo dục",
+//     degree: "Giám đốc Giáo dục",
+//     image: "https://via.placeholder.com/150",
+//   },
+//   {
+//     id: 2,
+//     name: "Tiffany Medois",
+//     expertise: "Tư vấn viên & Chuyên viên thẩm mỹ",
+//     experience:
+//       "Từng làm nhà báo, nhà sản xuất, nhà làm phim tài liệu và biên tập viên.",
+//     field: "Tư vấn",
+//     degree: "Chuyên viên Thẩm mỹ Chứng nhận",
+//     image: "https://via.placeholder.com/150",
+//   },
+//   {
+//     id: 3,
+//     name: "Katina Gilmore",
+//     expertise: "Điều dưỡng & Thẩm mỹ",
+//     experience:
+//       "Kết hợp giữa điều dưỡng và thẩm mỹ để mang lại sự chuyên môn cá nhân hóa.",
+//     field: "Chăm sóc sức khỏe",
+//     degree: "Y tá Chứng nhận (R.N.)",
+//     image: "https://via.placeholder.com/150",
+//   },
+//   {
+//     id: 4,
+//     name: "Bill Levins",
+//     expertise: "Giám đốc Tiếp thị",
+//     experience:
+//       "Mang đến kiến thức thông qua sự am hiểu sâu sắc trong ngành kinh doanh chăm sóc da.",
+//     field: "Tiếp thị",
+//     degree: "Phó Chủ tịch Tiếp thị",
+//     image: "https://via.placeholder.com/150",
+//   },
+// ];
 
 const HomePage = () => {
+  const { data: therapists = [] } = useTherapists();
+  const navigate = useNavigate();
+
+  const handleNavigate = (skintherapistId: number) => {
+    navigate(PagePath.SKIN_THERAPIST_DETAIL, {
+      state: {
+        skintherapistId: skintherapistId,
+      },
+    });
+  };
+
   return (
     <Layout>
       <Layout
@@ -126,6 +138,7 @@ const HomePage = () => {
                 style={{
                   width: "100%",
                   borderRadius: "10px",
+                  height: 400,
                 }}
               />
             </Col>
@@ -144,7 +157,7 @@ const HomePage = () => {
                   style={{ width: "100%", borderRadius: "8px" }}
                 />
               }
-              bordered={false}
+              variant="borderless"
               style={{ background: "transparent" }}
             />
           </Col>
@@ -182,7 +195,11 @@ const HomePage = () => {
           <Col xs={24} sm={12} md={6} lg={6}>
             <Card
               cover={
-                <Image src="https://via.placeholder.com/150" alt="Blog 1" />
+                <Image
+                  src="https://kbeauty.fpt.edu.vn/wp-content/uploads/2021/03/cham-soc-da-mat-o-spa-nao-tot-5.jpg"
+                  alt="Blog 1"
+                  style={{ height: 220 }}
+                />
               }
             >
               <Title level={5}>Quy trình chăm sóc da mặt tốt nhất</Title>
@@ -192,10 +209,14 @@ const HomePage = () => {
           <Col xs={24} sm={12} md={6} lg={6}>
             <Card
               cover={
-                <Image src="https://via.placeholder.com/150" alt="Blog 2" />
+                <Image
+                  src="https://th.bing.com/th/id/OIP.fGzFa5roER6jRl2aE47EQgHaFT?w=233&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+                  alt="Blog 2"
+                  style={{ height: 220 }}
+                />
               }
             >
-              <Title level={5}>Top 5 sản phẩm dưỡng da hot nhất</Title>
+              <Title level={5}>Top 10 sản phẩm dưỡng da hot nhất</Title>
               <Button type="link">Đọc thêm</Button>
             </Card>
           </Col>
@@ -207,40 +228,41 @@ const HomePage = () => {
           Chuyên viên trị liệu da
         </Title>
         <Row gutter={[16, 16]}>
-          {experts.map((expert) => (
-            <Col xs={24} sm={12} md={8} lg={6} key={expert.id}>
+          {therapists.map((therapist) => (
+            <Col xs={24} sm={12} md={8} lg={6} key={therapist.skintherapistId}>
               <Card
                 hoverable
                 style={{ borderRadius: "10px", textAlign: "center" }}
                 cover={
                   <img
-                    alt={expert.name}
-                    src={expert.image}
+                    alt={therapist.name}
+                    src={therapist.image || "https://via.placeholder.com/150"}
                     style={{
                       borderTopLeftRadius: "10px",
                       borderTopRightRadius: "10px",
                       objectFit: "cover",
+                      width: "70%",
+                      margin: "0 auto",
                     }}
                   />
                 }
               >
                 <Title level={4} style={{ marginBottom: "5px" }}>
-                  {expert.name}
+                  {therapist.name}
                 </Title>
-                <Text strong>{expert.expertise}</Text>
+                <Text strong>{therapist.speciality}</Text>
                 <br />
-                <Text>{expert.experience}</Text>
+                <Text>{therapist.experience}</Text>
                 <br />
-                <Text type="secondary">Lĩnh vực: {expert.field}</Text>
-                <br />
-                <Text type="secondary">Bằng cấp: {expert.degree}</Text>
+                <Text type="secondary">Bằng cấp: {therapist.degree}</Text>
                 <div style={{ marginTop: "15px" }}>
                   <Button
                     type="primary"
                     shape="round"
                     style={{ background: "rgb(193, 154, 107)" }}
+                    onClick={() => handleNavigate(therapist.skintherapistId)}
                   >
-                    Đặt lịch với {expert.name.split(" ")[0]}
+                    Xem chi tiết {therapist.name}
                   </Button>
                 </div>
               </Card>

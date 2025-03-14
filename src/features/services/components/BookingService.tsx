@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -10,7 +11,13 @@ import {
   Modal,
   Avatar,
 } from "antd";
-import { CheckCircleOutlined,UserOutlined,MailOutlined,SolutionOutlined,ReadOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  UserOutlined,
+  MailOutlined,
+  SolutionOutlined,
+  ReadOutlined,
+} from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useLocation } from "react-router-dom";
 import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
@@ -44,9 +51,8 @@ const SkincareBooking = () => {
   const { amount, serviceId,serviceName } = location.state || {};
   const { data: schedules } = useGetSchedule(serviceId);
   const navigate = useNavigate();
-  const [therapistModalVisible, setTherapistModalVisible] = useState(false); 
-  const [selectedTherapist, setSelectedTherapist] = useState<any>(null); 
-  
+  const [therapistModalVisible, setTherapistModalVisible] = useState(false);
+  const [selectedTherapist, setSelectedTherapist] = useState<any>(null);
 
   useEffect(() => {
     console.log("🛠️ Re-rendering: Selected Date changed:", selectedDate);
@@ -178,16 +184,37 @@ const handleConfirmBooking = () => {
   });
 };
 
-const handleOpenTherapistModal = (therapist: any) => {
-  setSelectedTherapist(therapist);
-  setTherapistModalVisible(true);
-};
+    const selectedTherapist = therapists.find(
+      (t) => t.skintherapistId === selectedExpert
+    );
+    const therapistName = selectedTherapist
+      ? selectedTherapist.name
+      : "Không rõ";
 
+    navigate(PagePath.BOOKING_INFO_CONFIRM, {
+      state: {
+        serviceName: serviceName,
+        amount: amount,
+        selectedDate: selectedDate,
+        selectedTime: selectedTime,
+        therapistName: therapistName,
+        bookingLocation: "HCM",
+        customerId: matchedCustomer.customerId,
+        selectedSlotId: selectedSlotId,
+        selectedExpert: selectedExpert,
+        serviceId: serviceId,
+      },
+    });
+  };
 
-const handleCloseTherapistModal = () => {
-  setTherapistModalVisible(false);
-};
+  const handleOpenTherapistModal = (therapist: any) => {
+    setSelectedTherapist(therapist);
+    setTherapistModalVisible(true);
+  };
 
+  const handleCloseTherapistModal = () => {
+    setTherapistModalVisible(false);
+  };
 
   return (
     <div style={{ backgroundColor: "#F1EBE4", borderRadius: "12px", textAlign: "center" }}>
@@ -252,8 +279,12 @@ const handleCloseTherapistModal = () => {
                           cursor: "pointer",
                         }}
                         hoverable
-                        onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-                        onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                        onMouseOver={(e) =>
+                          (e.currentTarget.style.transform = "scale(1.05)")
+                        }
+                        onMouseOut={(e) =>
+                          (e.currentTarget.style.transform = "scale(1)")
+                        }
                         onClick={() => handleOpenTherapistModal(expert)}
                       >
                         <Row justify="center" align="middle">
@@ -264,34 +295,54 @@ const handleCloseTherapistModal = () => {
                           </Col>
                         </Row>
 
-                        <Row gutter={[8, 8]} justify="center" style={{ marginTop: "10px" }}>
-                          
-  {getAvailableSlotsForTherapist(expert.skintherapistId).map(({ time, slotId }) => (
-    <Col key={`${expert.skintherapistId}-${slotId}`} xs={8} sm={8} md={8}>
-   <Button
-  type="default"
-  onClick={(event) => {
-    event.stopPropagation();
-    handleSelectExpert(expert.skintherapistId, time, slotId);
-  }}
-  style={{
-    width: "100%",
-    borderRadius: "20px",
-    fontSize: "14px",
-    padding: "8px 16px",
-    backgroundColor: selectedExpert === expert.skintherapistId && selectedTime === time ? "#A7C957" : "white", 
-    color: selectedExpert === expert.skintherapistId && selectedTime === time ? "white" : "#3A5A40", 
-    border: "1px solid #A7C957",
-    cursor: "pointer",
-  }}
->
-  {time}
-</Button>
-
-
-    </Col>
-  ))}
-</Row>
+                        <Row
+                          gutter={[8, 8]}
+                          justify="center"
+                          style={{ marginTop: "10px" }}
+                        >
+                          {getAvailableSlotsForTherapist(
+                            expert.skintherapistId
+                          ).map(({ time, slotId }) => (
+                            <Col
+                              key={`${expert.skintherapistId}-${slotId}`}
+                              xs={8}
+                              sm={8}
+                              md={8}
+                            >
+                              <Button
+                                type="default"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleSelectExpert(
+                                    expert.skintherapistId,
+                                    time,
+                                    slotId
+                                  );
+                                }}
+                                style={{
+                                  width: "100%",
+                                  borderRadius: "20px",
+                                  fontSize: "14px",
+                                  padding: "8px 16px",
+                                  backgroundColor:
+                                    selectedExpert === expert.skintherapistId &&
+                                    selectedTime === time
+                                      ? "#A7C957"
+                                      : "white",
+                                  color:
+                                    selectedExpert === expert.skintherapistId &&
+                                    selectedTime === time
+                                      ? "white"
+                                      : "#3A5A40",
+                                  border: "1px solid #A7C957",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                {time}
+                              </Button>
+                            </Col>
+                          ))}
+                        </Row>
                       </Card>
                     );
                   })}
@@ -303,76 +354,108 @@ const handleCloseTherapistModal = () => {
               </Text>
             )}
 
-{selectedExpert && selectedTime && selectedSlotId && (
-  <div style={{ marginTop: "20px" }}>
-    <Title level={4}>Xác nhận đặt lịch</Title>
-    <Text>
-      Bạn đã chọn{" "}
-      <strong>
-        {
-          therapists?.find(
-            (e) => e.skintherapistId === selectedExpert
-          )?.name
-        }
-      </strong>{" "}
-      vào lúc <strong>{selectedTime}</strong> ngày{" "}
-      <strong>{selectedDate}</strong>.
-    </Text>
-    <div style={{ marginTop: "20px" }}>
-      <Button
-        type="primary"
-        icon={<CheckCircleOutlined />}
-        onClick={handleConfirmBooking}
-        style={{
-          backgroundColor: "#A7C957",
-          border: "none",
-          fontSize: "16px",
-          padding: "12px 24px",
-          borderRadius: "8px",
-          transition: "all 0.3s ease-in-out",
-        }}
-        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#8AA851")}
-        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#A7C957")}
-      >
-        Xác nhận
-      </Button>
-    </div>
-  </div>
-)}
-
+            {selectedExpert && selectedTime && selectedSlotId && (
+              <div style={{ marginTop: "20px" }}>
+                <Title level={4}>Xác nhận đặt lịch</Title>
+                <Text>
+                  Bạn đã chọn{" "}
+                  <strong>
+                    {
+                      therapists?.find(
+                        (e) => e.skintherapistId === selectedExpert
+                      )?.name
+                    }
+                  </strong>{" "}
+                  vào lúc <strong>{selectedTime}</strong> ngày{" "}
+                  <strong>{selectedDate}</strong>.
+                </Text>
+                <div style={{ marginTop: "20px" }}>
+                  <Button
+                    type="primary"
+                    icon={<CheckCircleOutlined />}
+                    onClick={handleConfirmBooking}
+                    style={{
+                      backgroundColor: "#A7C957",
+                      border: "none",
+                      fontSize: "16px",
+                      padding: "12px 24px",
+                      borderRadius: "8px",
+                      transition: "all 0.3s ease-in-out",
+                    }}
+                    onMouseOver={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#8AA851")
+                    }
+                    onMouseOut={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#A7C957")
+                    }
+                  >
+                    Xác nhận
+                  </Button>
+                </div>
+              </div>
+            )}
           </Card>
         </Col>
       </Row>
       <Modal
-  title={<Title level={3} style={{ margin: 0, color: "#3A5A40" }}>Thông Tin Chuyên Viên</Title>}
-  visible={therapistModalVisible}
-  onCancel={handleCloseTherapistModal}
-  footer={null}
-  centered
->
-  {selectedTherapist && (
-    <div style={{ textAlign: "center", padding: "20px" }}>
-      {/* Therapist Avatar & Info */}
-      <Avatar
-        size={100}
-        src={selectedTherapist.image || "https://via.placeholder.com/100"} 
-        icon={!selectedTherapist.image && <UserOutlined />}
-        style={{ marginBottom: "15px" }}
-      />
-      <Title level={4} style={{ color: "#3A5A40" }}>{selectedTherapist.name}</Title>
+        title={
+          <Title level={3} style={{ margin: 0, color: "#3A5A40" }}>
+            Thông Tin Chuyên Viên
+          </Title>
+        }
+        visible={therapistModalVisible}
+        onCancel={handleCloseTherapistModal}
+        footer={null}
+        centered
+      >
+        {selectedTherapist && (
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            {/* Therapist Avatar & Info */}
+            <Avatar
+              size={100}
+              src={selectedTherapist.image || "https://via.placeholder.com/100"}
+              icon={!selectedTherapist.image && <UserOutlined />}
+              style={{ marginBottom: "15px" }}
+            />
+            <Title level={4} style={{ color: "#3A5A40" }}>
+              {selectedTherapist.name}
+            </Title>
 
-      {/* Therapist Details */}
-      <Row justify="center" style={{ marginTop: "15px" }}>
-        <Col span={20}>
-          <Card style={{ background: "#F9F9F9", borderRadius: "10px", padding: "10px", boxShadow: "0 2px 5px rgba(0,0,0,0.1)" }}>
-            <p><MailOutlined style={{ marginRight: "8px", color: "#3A5A40" }} /> <strong>Email:</strong> {selectedTherapist.email}</p>
-            <p><SolutionOutlined style={{ marginRight: "8px", color: "#3A5A40" }} /> <strong>Kinh nghiệm:</strong> {selectedTherapist.experience}</p>
-            <p><ReadOutlined style={{ marginRight: "8px", color: "#3A5A40" }} /> <strong>Bằng cấp:</strong> {selectedTherapist.degree}</p>
-          </Card>
-        </Col>
-      </Row>
-
-     
+            {/* Therapist Details */}
+            <Row justify="center" style={{ marginTop: "15px" }}>
+              <Col span={20}>
+                <Card
+                  style={{
+                    background: "#F9F9F9",
+                    borderRadius: "10px",
+                    padding: "10px",
+                    boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  <p>
+                    <MailOutlined
+                      style={{ marginRight: "8px", color: "#3A5A40" }}
+                    />{" "}
+                    <strong>Email:</strong> {selectedTherapist.email}
+                  </p>
+                  <p>
+                    <SolutionOutlined
+                      style={{ marginRight: "8px", color: "#3A5A40" }}
+                    />{" "}
+                    <strong>Kinh nghiệm:</strong> {selectedTherapist.experience}
+                  </p>
+                  <p>
+                    <ReadOutlined
+                      style={{ marginRight: "8px", color: "#3A5A40" }}
+                    />{" "}
+                    <strong>Bằng cấp:</strong> {selectedTherapist.degree}
+                  </p>
+                </Card>
+              </Col>
+            </Row>
+          </div>
+        )}
+      </Modal>
     </div>
   )}
 </Modal>

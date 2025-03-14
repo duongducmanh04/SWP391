@@ -462,6 +462,9 @@ const BookingDetail = () => {
               <Descriptions.Item label="Địa chỉ">
                 {booking.location}
               </Descriptions.Item>
+              <Descriptions.Item label="Dịch vụ">
+                {booking.serviceName}
+              </Descriptions.Item>
               <Descriptions.Item label="Ngày đặt lịch">
                 {dayjs(booking.date).format("DD/MM/YYYY HH:mm:ss")}
               </Descriptions.Item>

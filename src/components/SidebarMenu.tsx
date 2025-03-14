@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
 import {
   HomeOutlined,
-  AppstoreOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   BellFilled,
   UserOutlined,
   LogoutOutlined,
   CalendarOutlined,
+  ScheduleOutlined,
+  CustomerServiceOutlined,
+  HourglassOutlined,
+  SkinOutlined,
 } from "@ant-design/icons";
 import {
   Breadcrumb,
@@ -18,12 +21,14 @@ import {
   Modal,
   Popover,
 } from "antd";
+import type { MenuProps } from "antd";
 import { Link, useLocation, Outlet } from "react-router-dom";
 import "../style/Home.css";
 import useAuthStore from "../features/authentication/hooks/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import { PagePath } from "../enums/page-path.enum";
 import { RoleCode } from "../enums/role.enum";
+import { useGetTherapistProfile } from "../features/authentication/hooks/useGetTherapistProfile";
 
 const { Header, Content, Sider } = Layout;
 
@@ -42,11 +47,18 @@ const notificationContent = (
 
 const SidebarMenu = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   const { user, logout } = useAuthStore();
+  const { data: profileData } = useGetTherapistProfile(
+    user?.accountId,
+    user?.role
+  );
+
+  const profile = Array.isArray(profileData) ? profileData[0] : undefined;
+  const therapist = profile?.skinTherapists?.[0] ?? null;
 
   useEffect(() => {
     document.title = "Trang chủ";
@@ -85,16 +97,11 @@ const SidebarMenu = () => {
   // }, [token, user]);
 
   const handleOk = () => {
-    setIsModalVisible(false);
+    setIsModalOpen(false);
   };
 
   const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
+    setIsModalOpen(false);
   };
 
   const handleMenu = (key: string) => {
@@ -106,21 +113,18 @@ const SidebarMenu = () => {
     }
   };
 
-  const accountMenu = (
-    <Menu onClick={({ key }) => handleMenu(key)}>
-      <Menu.Item key="account" icon={<UserOutlined />}>
-        Thông tin tài khoản
-      </Menu.Item>
-      <Menu.Item
-        key="logout"
-        icon={<LogoutOutlined />}
-        onClick={() => handleLogout()}
-        style={{ color: "red" }}
-      >
-        Đăng xuất
-      </Menu.Item>
-    </Menu>
-  );
+  const items: MenuProps["items"] = [
+    {
+      key: "account",
+      label: "Thông tin tài khoản",
+      icon: <UserOutlined />,
+    },
+    {
+      key: "logout",
+      label: <span style={{ color: "red" }}>Đăng xuất</span>,
+      icon: <LogoutOutlined />,
+    },
+  ];
 
   const items2 = [
     {
@@ -131,9 +135,42 @@ const SidebarMenu = () => {
     ...(user?.role === RoleCode.ADMIN
       ? [
           {
-            key: PagePath.USER,
-            icon: <AppstoreOutlined />,
-            label: <Link to={PagePath.USER}>Người dùng</Link>,
+            key: PagePath.USER_MANAGEMENT,
+            icon: <UserOutlined />,
+            label: (
+              <Link to={PagePath.USER_MANAGEMENT}>Quản lý người dùng</Link>
+            ),
+          },
+        ]
+      : []),
+    ...(user?.role === RoleCode.ADMIN
+      ? [
+          {
+            key: PagePath.SERVICE_MANAGEMENT,
+            icon: <CustomerServiceOutlined />,
+            label: (
+              <Link to={PagePath.SERVICE_MANAGEMENT}>Quản lý dịch vụ</Link>
+            ),
+          },
+        ]
+      : []),
+    ...(user?.role === RoleCode.ADMIN
+      ? [
+          {
+            key: PagePath.SKIN_TYPE_MANAGEMENT,
+            icon: <SkinOutlined />,
+            label: (
+              <Link to={PagePath.SKIN_TYPE_MANAGEMENT}>Quản lý loại da</Link>
+            ),
+          },
+        ]
+      : []),
+    ...(user?.role === RoleCode.ADMIN || user?.role === RoleCode.STAFF
+      ? [
+          {
+            key: PagePath.SLOT_MANAGEMENT,
+            icon: <HourglassOutlined />,
+            label: <Link to={PagePath.SLOT_MANAGEMENT}>Quản lý slot</Link>,
           },
         ]
       : []),
@@ -165,7 +202,7 @@ const SidebarMenu = () => {
       ? [
           {
             key: PagePath.SCHEDULE_FOR_STAFF_MANAGEMENT,
-            icon: <CalendarOutlined />,
+            icon: <ScheduleOutlined />,
             label: (
               <Link to={PagePath.SCHEDULE_FOR_STAFF_MANAGEMENT}>
                 Lịch làm việc
@@ -178,7 +215,7 @@ const SidebarMenu = () => {
       ? [
           {
             key: PagePath.SCHEDULE_FOR_THERAPIST,
-            icon: <CalendarOutlined />,
+            icon: <ScheduleOutlined />,
             label: (
               <Link to={PagePath.SCHEDULE_FOR_THERAPIST}>Lịch làm việc</Link>
             ),
@@ -186,8 +223,6 @@ const SidebarMenu = () => {
         ]
       : []),
   ];
-
-  const isHomePage = location.pathname === "/home";
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -263,7 +298,7 @@ const SidebarMenu = () => {
               />
             </Popover>
 
-            <Dropdown overlay={accountMenu}>
+            <Dropdown menu={{ items, onClick: ({ key }) => handleMenu(key) }}>
               <span
                 style={{
                   cursor: "pointer",
@@ -272,7 +307,10 @@ const SidebarMenu = () => {
                 }}
               >
                 <img
-                  src="https://joesch.moe/api/v1/male/random?key=1"
+                  src={
+                    therapist?.image ||
+                    "https://joesch.moe/api/v1/male/random?key=1"
+                  }
                   style={{
                     marginRight: "10px",
                     width: "40px",
@@ -294,7 +332,7 @@ const SidebarMenu = () => {
             padding: "64px 24px 24px",
             backgroundColor: "#FFF",
           }}
-          className={isHomePage ? "home-background" : ""}
+          className={"home-background"}
         >
           <Breadcrumb
             style={{
@@ -316,7 +354,7 @@ const SidebarMenu = () => {
       </Layout>
       <Modal
         title="Quy định nhập liệu"
-        visible={isModalVisible}
+        open={isModalOpen}
         footer={null}
         onOk={handleOk}
         onCancel={handleCancel}

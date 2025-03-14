@@ -38,6 +38,9 @@ import ScheduleCalendarManagementPage from "./features/schedule/page/TherapistSc
 import BookingInfoConfirm from "./features/services/components/BookingInfoConfirm";
 import CustomerProfile from "./pages/CustomerProfilePage";
 import CustomerBookingDetail from "./pages/CustomerBookingDetail";
+import ServiceTable from "./features/services/components/ServiceTable";
+import SlotTable from "./features/services/components/SlotTable";
+import SkinTypeTable from "./features/skin_type/components/SkinTypeTable";
 
 const App = () => {
   return (
@@ -57,7 +60,7 @@ const App = () => {
           <Route element={<SidebarMenu />}>
             <Route path={PagePath.HOME} element={<Home />}></Route>
             <Route path={PagePath.WORK_VOLUME} element={<WorkVolume />} />
-            <Route path={PagePath.USER} element={<UserListPage />} />
+            <Route path={PagePath.USER_MANAGEMENT} element={<UserListPage />} />
             <Route path={PagePath.USER_DETAIL} element={<UserDetail />} />
             <Route path={PagePath.PROFILE} element={<Profile />} />
             <Route path={PagePath.BOOKING} element={<BookingListTable />} />
@@ -69,6 +72,15 @@ const App = () => {
             <Route
               path={PagePath.SCHEDULE_FOR_THERAPIST}
               element={<ScheduleCalendarManagementPage />}
+            />
+            <Route
+              path={PagePath.SERVICE_MANAGEMENT}
+              element={<ServiceTable />}
+            />
+            <Route path={PagePath.SLOT_MANAGEMENT} element={<SlotTable />} />
+            <Route
+              path={PagePath.SKIN_TYPE_MANAGEMENT}
+              element={<SkinTypeTable />}
             />
           </Route>
           <Route element={<NavbarMenu />}>
