@@ -39,8 +39,6 @@ const Register = () => {
       if (response.success) {
         message.success("Đăng ký thành công! Vui lòng đăng nhập.");
         form.resetFields();
-      } else {
-        message.error(response.message || "Đăng ký thất bại.");
       }
     },
     onError: (error) => {

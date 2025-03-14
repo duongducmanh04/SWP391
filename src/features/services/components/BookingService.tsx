@@ -24,18 +24,14 @@ import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
 import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { useAvailableSlot } from "../hooks/useAvailableSlot";
 import utc from "dayjs/plugin/utc";
-import { useGetCustomers } from "../hooks/useGetCustomers";
-import { useGetSchedule } from "../hooks/useGetSchedule";
+import { useCustomers } from "../../user/hook/useGetCustomer";
+import { useGetSchedule } from "../../schedule/hooks/useGetSchedule";
 import { useNavigate } from "react-router-dom";
-import { PagePath } from "../../../enums/page-path.enum"; 
+import { PagePath } from "../../../enums/page-path.enum";
 
-
-
- 
 dayjs.extend(utc);
 
 const { Title, Text } = Typography;
-
 
 const SkincareBooking = () => {
   const today = dayjs().format("YYYY-MM-DD");
@@ -44,11 +40,11 @@ const SkincareBooking = () => {
   const [selectedTime, setSelectedTime] = useState<string>("");
   const location = useLocation();
   const { user } = useAuthStore();
-  const { data: therapists =[] } = useTherapists();
-  const { data: availableSlots } = useAvailableSlot(); 
+  const { data: therapists = [] } = useTherapists();
+  const { data: availableSlots } = useAvailableSlot();
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
-  const { data: customers, isLoading, error } = useGetCustomers(); 
-  const { amount, serviceId,serviceName } = location.state || {};
+  const { data: customers, isLoading, error } = useCustomers();
+  const { amount, serviceId, serviceName } = location.state || {};
   const { data: schedules } = useGetSchedule(serviceId);
   const navigate = useNavigate();
   const [therapistModalVisible, setTherapistModalVisible] = useState(false);
@@ -69,120 +65,114 @@ const SkincareBooking = () => {
       console.warn("⚠️ No schedules or available slots found!");
       return [];
     }
-    
 
-   
-  
-    const flatSchedules = schedules.flat(); 
-  
-    console.log("📡 Debugging: Full Flattened Schedules Data:", JSON.stringify(flatSchedules, null, 2));
+    const flatSchedules = schedules.flat();
+
+    console.log(
+      "📡 Debugging: Full Flattened Schedules Data:",
+      JSON.stringify(flatSchedules, null, 2)
+    );
     console.log("📡 Debugging: Raw Available Slots:", availableSlots);
-  
-    const scheduleSlotIds = flatSchedules.map((schedule) => schedule.slotId || "MISSING_SLOT_ID");
+
+    const scheduleSlotIds = flatSchedules.map(
+      (schedule) => schedule.slotId || "MISSING_SLOT_ID"
+    );
     const availableSlotIds = availableSlots.map((slot) => slot.slotId);
-  
+
     console.log("🔍 All Schedule Slot IDs:", scheduleSlotIds);
     console.log("🔍 All Available Slot IDs:", availableSlotIds);
-  
+
     return flatSchedules
       .filter((schedule) => {
         const scheduleDate = dayjs(schedule.date).format("YYYY-MM-DD");
         const isDateMatch = scheduleDate === selectedDate;
         const isTherapistMatch = schedule.skinTherapistId === therapistId;
-  
+
         if (!schedule.slotId) {
           console.warn(`⚠️ Schedule missing slotId:`, schedule);
           return false;
         }
-  
-        const matchingSlot = availableSlots.find((slot) => slot.slotId === schedule.slotId && slot.status === "Available");
-  
-        console.log(`🧐 Checking Schedule - Date: ${scheduleDate}, Therapist ID: ${schedule.skinTherapistId}, Slot ID: ${schedule.slotId}, Match: ${!!matchingSlot}`);
-  
+
+        const matchingSlot = availableSlots.find(
+          (slot) =>
+            slot.slotId === schedule.slotId && slot.status === "Available"
+        );
+
+        console.log(
+          `🧐 Checking Schedule - Date: ${scheduleDate}, Therapist ID: ${
+            schedule.skinTherapistId
+          }, Slot ID: ${schedule.slotId}, Match: ${!!matchingSlot}`
+        );
+
         return isDateMatch && isTherapistMatch && matchingSlot;
       })
       .map((schedule) => {
-        const matchingSlot = availableSlots.find((slot) => slot.slotId === schedule.slotId && slot.status === "Available");
-  
-        console.log(`🔗 Matched Slot for Schedule Slot ID ${schedule.slotId}:`, matchingSlot);
-  
+        const matchingSlot = availableSlots.find(
+          (slot) =>
+            slot.slotId === schedule.slotId && slot.status === "Available"
+        );
+
+        console.log(
+          `🔗 Matched Slot for Schedule Slot ID ${schedule.slotId}:`,
+          matchingSlot
+        );
+
         return matchingSlot
           ? {
-              time: dayjs(matchingSlot.time, ["h:mm A", "HH:mm"]).format("HH:mm"),
+              time: dayjs(matchingSlot.time, ["h:mm A", "HH:mm"]).format(
+                "HH:mm"
+              ),
               slotId: matchingSlot.slotId,
             }
           : null;
       })
       .filter((slot) => slot !== null)
-      .sort((a, b) => dayjs(a.time, "HH:mm").isBefore(dayjs(b.time, "HH:mm")) ? -1 : 1); 
+      .sort((a, b) =>
+        dayjs(a.time, "HH:mm").isBefore(dayjs(b.time, "HH:mm")) ? -1 : 1
+      );
   };
-  
-  
-  
-  
 
   const handleSelectExpert = (id: number, time: string, slotId: number) => {
     setSelectedExpert(id);
     setSelectedTime(time);
-    setSelectedSlotId(slotId); 
+    setSelectedSlotId(slotId);
   };
-  
 
+  dayjs.extend(utc);
 
-dayjs.extend(utc); 
-
-const handleConfirmBooking = () => {
-  if (!selectedExpert || !selectedTime || !selectedSlotId) { 
-    message.warning("Vui lòng chọn chuyên viên, thời gian và slot!");
-    return;
-  }
-
-  if (!user || !user.accountId) {
-    message.error("Lỗi: Không tìm thấy thông tin tài khoản!");
-    console.error("❌ User object is missing:", user);
-    return;
-  } 
-
-  if (!customers || customers.length === 0) {
-    message.error("Lỗi: Danh sách khách hàng trống hoặc chưa tải xong!");
-    console.error("❌ Customers not loaded or empty:", customers);
-    return;
-  }
-
-  const matchedCustomer = customers.find(c => Number(c.accountId) === Number(user.accountId));
-
-  if (!matchedCustomer) {
-    message.error("Lỗi: Không tìm thấy khách hàng phù hợp!");
-    console.error("❌ No matching customer for accountId:", user.accountId);
-    return;
-  }
-
-  if (!selectedSlotId) {
-    message.error("Lỗi: Không tìm thấy slot đã chọn!");
-    console.error("❌ Missing slotId:", selectedSlotId);
-    return;
-  }
-
-  
-  const selectedTherapist = therapists.find(t => t.skintherapistId === selectedExpert);
-  const therapistName = selectedTherapist ? selectedTherapist.name : "Không rõ";
-
- 
-  navigate(PagePath.BOOKING_INFO_CONFIRM, { 
-    state: { 
-      serviceName: serviceName, 
-      amount: amount,
-      selectedDate: selectedDate,
-      selectedTime: selectedTime,
-      therapistName: therapistName,
-      bookingLocation: "HCM",
-      customerId: matchedCustomer.customerId,
-      selectedSlotId: selectedSlotId,
-      selectedExpert: selectedExpert,
-      serviceId: serviceId,
+  const handleConfirmBooking = () => {
+    if (!selectedExpert || !selectedTime || !selectedSlotId) {
+      message.warning("Vui lòng chọn chuyên viên, thời gian và slot!");
+      return;
     }
-  });
-};
+
+    if (!user || !user.accountId) {
+      message.error("Lỗi: Không tìm thấy thông tin tài khoản!");
+      console.error("❌ User object is missing:", user);
+      return;
+    }
+
+    if (!customers || customers.length === 0) {
+      message.error("Lỗi: Danh sách khách hàng trống hoặc chưa tải xong!");
+      console.error("❌ Customers not loaded or empty:", customers);
+      return;
+    }
+
+    const matchedCustomer = customers.find(
+      (c) => Number(c.accountId) === Number(user.accountId)
+    );
+
+    if (!matchedCustomer) {
+      message.error("Lỗi: Không tìm thấy khách hàng phù hợp!");
+      console.error("❌ No matching customer for accountId:", user.accountId);
+      return;
+    }
+
+    if (!selectedSlotId) {
+      message.error("Lỗi: Không tìm thấy slot đã chọn!");
+      console.error("❌ Missing slotId:", selectedSlotId);
+      return;
+    }
 
     const selectedTherapist = therapists.find(
       (t) => t.skintherapistId === selectedExpert
@@ -217,8 +207,22 @@ const handleConfirmBooking = () => {
   };
 
   return (
-    <div style={{ backgroundColor: "#F1EBE4", borderRadius: "12px", textAlign: "center" }}>
-      <Title level={2} style={{ color: "#3A5A40", fontSize: "32px", fontWeight: "bold", marginBottom: "40px" }}>
+    <div
+      style={{
+        backgroundColor: "#F1EBE4",
+        borderRadius: "12px",
+        textAlign: "center",
+      }}
+    >
+      <Title
+        level={2}
+        style={{
+          color: "#3A5A40",
+          fontSize: "32px",
+          fontWeight: "bold",
+          marginBottom: "40px",
+        }}
+      >
         Đặt Lịch Chăm Sóc Da
       </Title>
 
@@ -227,15 +231,16 @@ const handleConfirmBooking = () => {
           <Card
             title="Lịch làm việc"
             bordered={false}
-            style={{ borderRadius: "12px", boxShadow: "0 4px 10px rgba(0,0,0,0.1)" }}
+            style={{
+              borderRadius: "12px",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+            }}
           >
             <Calendar
               cellRender={(value) => {
                 const isPast = value.isBefore(dayjs(), "day");
                 return isPast ? null : (
-                  <div style={{ paddingLeft: "5px" }}>
-                    
-                  </div>
+                  <div style={{ paddingLeft: "5px" }}></div>
                 );
               }}
               disabledDate={(current) => current.isBefore(dayjs(), "day")}
@@ -251,19 +256,25 @@ const handleConfirmBooking = () => {
           </Card>
         </Col>
 
-     
         <Col xs={24} md={6}>
           <Card
             title="Thông tin chuyên viên"
             bordered={false}
-            style={{ borderRadius: "12px", boxShadow: "0 4px 10px rgba(0,0,0,0.1)" }}
+            style={{
+              borderRadius: "12px",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+            }}
           >
             {selectedDate ? (
               <div>
-                <Text strong style={{ fontSize: "16px" }}>Ngày đã chọn: {selectedDate}</Text>
+                <Text strong style={{ fontSize: "16px" }}>
+                  Ngày đã chọn: {selectedDate}
+                </Text>
                 <div style={{ marginTop: "20px" }}>
                   {therapists?.map((expert) => {
-                    const availableTimes = getAvailableSlotsForTherapist(expert.skintherapistId); 
+                    const availableTimes = getAvailableSlotsForTherapist(
+                      expert.skintherapistId
+                    );
                     if (availableTimes.length === 0) return null;
 
                     return (
@@ -289,7 +300,10 @@ const handleConfirmBooking = () => {
                       >
                         <Row justify="center" align="middle">
                           <Col span={24} style={{ textAlign: "center" }}>
-                            <Title level={4} style={{ marginTop: "10px", color: "#3A5A40" }}>
+                            <Title
+                              level={4}
+                              style={{ marginTop: "10px", color: "#3A5A40" }}
+                            >
                               {expert.name}
                             </Title>
                           </Col>
@@ -456,9 +470,6 @@ const handleConfirmBooking = () => {
           </div>
         )}
       </Modal>
-    </div>
-  )}
-</Modal>
     </div>
   );
 };

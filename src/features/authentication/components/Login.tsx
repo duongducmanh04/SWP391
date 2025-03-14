@@ -77,12 +77,12 @@ const LoginRegister = () => {
     },
     onSuccess: (response) => {
       console.log("📦 API Response Data:", response);
-      if (response.success) {
+      if (response.message.trim()==="Register Successfully!") {
         message.success("Đăng ký thành công! Vui lòng đăng nhập.");
-        setActiveTab("1");
-      } else {
-        message.error("Đăng ký thất bại.");
-      }
+        setTimeout(() => {
+          setActiveTab("1");
+        }, 100);
+      } 
     },
     onError: (error) => {
       message.error("Lỗi kết nối đến máy chủ: " + (error as Error).message);
@@ -103,55 +103,6 @@ const LoginRegister = () => {
     }
   };
 
-
-    const payload = {
-      accountName: values.accountName,
-      password: values.password,
-    };
-
-    const response = await fetch("https://localhost:7071/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        
-      },
-      body: JSON.stringify(payload),
-    });
-
-    console.log("📩 API Response received:", response);
-    return response.json();
-  },
-  onSuccess: (response) => {
-    console.log("📦 API Response Data:", response);
-    if (response.success) {
-      message.success("Đăng ký thành công! Vui lòng đăng nhập.");
-      setActiveTab("1");
-    } else {
-      message.error( "Đăng ký thất bại.");
-    }
-  },
-  onError: (error) => {
-    message.error("Lỗi kết nối đến máy chủ: " + (error as Error).message);
-  },
-});
-
-
-
-const onFinish = (values: any) => {
-  console.log("📌 Active Tab at Form Submit:", activeTab);
-
-  if (activeTab === "1") {
-    console.log("🔑 Logging in:", values);
-    loginMutation.mutate(values);
-  } else if (activeTab === "2") {
-    console.log("🆕 Registering:", values);
-    registerMutation.mutate(values);
-  } else {
-    console.error(" Unexpected Tab State:", activeTab);
-  }
-};
-
-
   return (
     <div className="login-page">
       <div className="login-container">
@@ -165,6 +116,7 @@ const onFinish = (values: any) => {
         <div className="login-form">
           <h2 className="login-title">Dịch vụ chăm sóc da</h2>
           <Tabs
+           activeKey={activeTab}
             defaultActiveKey="1"
             centered
             onChange={(key) => setActiveTab(key)}
@@ -227,7 +179,7 @@ const onFinish = (values: any) => {
                     "❌ Form submission failed. Errors:",
                     errorInfo
                   );
-                  alert("Form submission failed! Check console for errors.");
+                  alert("Đăng ký thất bại ! Hãy thử lại ");
                 }}
               >
                 <Form.Item
@@ -241,29 +193,43 @@ const onFinish = (values: any) => {
                 <Form.Item
                   name="password"
                   label="Mật khẩu"
-                  rules={[{ required: true, message: "Nhập mật khẩu" }]}
+                  rules={[
+                 { required: true, message: "Nhập mật khẩu" },
+                 { min: 8, message: "Mật khẩu phải có ít nhất 8 ký tự" } 
+                ]}
                 >
-                  <Input.Password
-                    placeholder="Mật khẩu"
-                    allowClear
-                    iconRender={(visible) =>
-                      visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                    }
-                  />
+                   <Input.Password
+                  placeholder="Mật khẩu"
+                  allowClear
+                  iconRender={(visible) =>
+                  visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                   }
+                   />
                 </Form.Item>
 
                 <Form.Item
-                  name="confirmPassword"
-                  label="Nhập lại mật khẩu"
-                  rules={[{ required: true, message: "Nhập lại mật khẩu" }]}
-                >
-                  <Input.Password
-                    placeholder="Nhập lại mật khẩu"
-                    allowClear
-                    iconRender={(visible) =>
-                      visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                    }
-                  />
+                 name="confirmPassword"
+                 label="Nhập lại mật khẩu"
+                 dependencies={["password"]} 
+                 rules={[
+                   { required: true, message: "Nhập lại mật khẩu" },
+                   ({ getFieldValue }) => ({
+                     validator(_, value) {
+                       if (!value || getFieldValue("password") === value) {
+                         return Promise.resolve();
+                       }
+                       return Promise.reject(new Error("Mật khẩu không khớp!"));
+                     },
+                   }),
+                 ]}
+               >
+                 <Input.Password
+                   placeholder="Nhập lại mật khẩu"
+                   allowClear
+                   iconRender={(visible) =>
+                     visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                   }
+                 />
                 </Form.Item>
 
                 <Form.Item>
