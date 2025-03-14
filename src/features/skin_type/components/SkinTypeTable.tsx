@@ -21,6 +21,7 @@ import {
 import { useSkinTypes } from "../hooks/useGetSkin";
 import { useDeleteSkin } from "../hooks/useDeleteSkin";
 import { useCreateSkin } from "../hooks/useCreateSkin";
+import { useUpdateSkin } from "../hooks/useUpdateSkin";
 import { TablePaginationConfig } from "antd/es/table";
 import { SkinDto } from "../dto/skin.dto";
 import { ColumnsType } from "antd/es/table";
@@ -29,10 +30,12 @@ const SkinTypeTable = () => {
   const { data: skinData, isLoading, refetch } = useSkinTypes();
   const { mutate: deleteSkinType } = useDeleteSkin();
   const { mutate: createSkinType } = useCreateSkin();
+  const { mutate: updateSkinType } = useUpdateSkin();
 
   const [searchText, setSearchText] = useState("");
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingSkin, setEditingSkin] = useState<any>(null);
   const [form] = Form.useForm();
 
   const filterSkins = skinData?.filter((skin: any) =>
@@ -70,6 +73,35 @@ const SkinTypeTable = () => {
         },
       });
     });
+  };
+
+  const handleEdit = (record: any) => {
+    setEditingSkin(record);
+    form.setFieldsValue(record);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdate = () => {
+    form
+      .validateFields()
+      .then((values) => {
+        updateSkinType(
+          { skintypeId: editingSkin.skintypeId, data: values },
+          {
+            onSuccess: () => {
+              message.success("Cập nhật loại da thành công");
+              setIsModalOpen(false);
+              setEditingSkin(null);
+            },
+            onError: (err) => {
+              message.error(`Lỗi cập nhật loại da: ${err.message}`);
+            },
+          }
+        );
+      })
+      .catch((info) => {
+        console.error("Validate Failed:", info);
+      });
   };
 
   const columns: ColumnsType<SkinDto> = [
@@ -115,7 +147,10 @@ const SkinTypeTable = () => {
       render: (_: unknown, record: SkinDto) => (
         <Space>
           <Tooltip title="Edit">
-            <Button icon={<EditOutlined />} />
+            <Button
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
+            />
           </Tooltip>
           <Tooltip title="Delete">
             <Button
@@ -146,7 +181,7 @@ const SkinTypeTable = () => {
           onChange={(e) => setSearchText(e.target.value)}
         />
       </Space>
-
+      <hr style={{ opacity: 0.1 }} />
       <Table
         columns={columns}
         dataSource={filterSkins}
@@ -162,10 +197,18 @@ const SkinTypeTable = () => {
       />
 
       <Modal
-        title="Thêm loại da"
+        title={editingSkin ? "Cập nhật loại da" : "Tạo loại da"}
         open={isModalOpen}
-        onOk={handleCreateSkin}
+        onOk={editingSkin ? handleUpdate : handleCreateSkin}
         onCancel={() => setIsModalOpen(false)}
+        okText={editingSkin ? "Cập nhật" : "Tạo"}
+        centered
+        footer={(_, { OkBtn, CancelBtn }) => (
+          <>
+            <CancelBtn />
+            <OkBtn />
+          </>
+        )}
       >
         <Form form={form} layout="vertical">
           <Form.Item
@@ -176,11 +219,51 @@ const SkinTypeTable = () => {
             <AntInput />
           </Form.Item>
           <Form.Item
+            name="introduction"
+            label="Giới thiệu"
+            rules={[{ required: true, message: "Vui lòng nhập giới thiệu" }]}
+          >
+            <AntInput />
+          </Form.Item>
+          <Form.Item
             name="description"
             label="Mô tả"
             rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
           >
             <AntInput.TextArea rows={4} />
+          </Form.Item>
+          <Form.Item
+            name="pros"
+            label="Lợi ích"
+            rules={[{ required: true, message: "Vui lòng nhập lợi ích" }]}
+          >
+            <AntInput />
+          </Form.Item>
+          <Form.Item
+            name="cons"
+            label="Bất lợi"
+            rules={[{ required: true, message: "Vui lòng nhập bất lợi" }]}
+          >
+            <AntInput />
+          </Form.Item>
+          <Form.Item
+            name="skincareGuide"
+            label="Hướng dẫn chăm sóc da"
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng nhập hướng dẫn chăm sóc da",
+              },
+            ]}
+          >
+            <AntInput />
+          </Form.Item>
+          <Form.Item
+            name="image"
+            label="Hình ảnh"
+            rules={[{ required: true, message: "Vui lòng nhập hình ảnh" }]}
+          >
+            <AntInput />
           </Form.Item>
         </Form>
       </Modal>

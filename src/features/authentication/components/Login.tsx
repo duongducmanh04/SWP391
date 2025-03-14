@@ -117,20 +117,15 @@ const LoginRegister = () => {
                 <Form.Item
                   name="username"
                   label="Tài khoản"
+                  labelCol={{ span: 9 }}
                   rules={[{ required: true, message: "Nhập tài khoản" }]}
                 >
                   <Input placeholder="Tài khoản" allowClear />
                 </Form.Item>
                 <Form.Item
-                  name="fullName"
-                  label="Họ & Tên"
-                  rules={[{ required: true, message: "Nhập họ & tên" }]}
-                >
-                  <Input placeholder="Họ & Tên" allowClear />
-                </Form.Item>
-                <Form.Item
                   name="password"
                   label="Mật khẩu"
+                  labelCol={{ span: 9 }}
                   rules={[{ required: true, message: "Nhập mật khẩu" }]}
                 >
                   <Input.Password

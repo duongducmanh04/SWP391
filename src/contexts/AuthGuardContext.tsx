@@ -75,6 +75,7 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
       Staff: [
         PagePath.HOME,
         PagePath.BOOKING,
+        PagePath.SLOT_MANAGEMENT,
         // PagePath.BOOKING_DETAIL.replace(":bookingId", ""),
         PagePath.BOOKING_DETAIL,
         PagePath.SCHEDULE_FOR_STAFF_MANAGEMENT,
