@@ -149,7 +149,8 @@ const CustomerBookingDetail = () => {
               </Button>
             )}
 
-            {booking.status !== "Cancelled" && (
+            {(booking.status === "Completed" ||
+              booking.status === "Finished") && (
               <div style={{ marginTop: "16px" }}>
                 <p>
                   <strong>Đánh giá dịch vụ:</strong>
