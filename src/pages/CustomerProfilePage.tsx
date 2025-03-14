@@ -1,17 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Layout,
-  Menu,
-  Card,
-  Spin,
-  Alert,
-  Avatar,
-  List,
-  Button,
-  Pagination,
-} from "antd";
+import { Layout, Menu, Card, Spin, Alert, Avatar, List, Button } from "antd";
 import {
   UserOutlined,
   ClockCircleOutlined,
@@ -23,12 +13,15 @@ import { BookingDto } from "../features/booking/dto/booking.dto";
 import { PagePath } from "../enums/page-path.enum";
 import useAuthStore from "../features/authentication/hooks/useAuthStore";
 import dayjs from "dayjs";
-import StatusTag from "../components/TagStatus";
+import { useLocation } from "react-router-dom";
 
 const { Sider, Content } = Layout;
 
 const CustomerProfile = () => {
-  const [activeTab, setActiveTab] = useState("personal");
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const initialTab = searchParams.get("tab") || "personal";
+  const [activeTab, setActiveTab] = useState(initialTab);
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
@@ -64,19 +57,10 @@ const CustomerProfile = () => {
   } = useBookingHistory();
 
   const handleNavigateToBookingDetail = (bookingId: number) => {
-    navigate(PagePath.CUSTOMER_BOOKING_DETAIL, {
-      state: {
-        bookingId: bookingId,
-      },
+    navigate(`${PagePath.CUSTOMER_BOOKING_DETAIL}?tab=schedule`, {
+      state: { bookingId },
     });
   };
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10; // Số kết quả mỗi trang
-
-  const indexOfLastItem = currentPage * pageSize;
-  const indexOfFirstItem = indexOfLastItem - pageSize;
-  const currentBookings = bookings?.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#f5f1eb" }}>
@@ -85,7 +69,10 @@ const CustomerProfile = () => {
           <Menu
             mode="inline"
             selectedKeys={[activeTab]}
-            onClick={(e) => setActiveTab(e.key)}
+            onClick={(e) => {
+              setActiveTab(e.key);
+              navigate(`?tab=${e.key}`);
+            }}
             style={{ borderRight: 0 }}
           >
             <Menu.Item key="personal" icon={<UserOutlined />}>
@@ -135,7 +122,7 @@ const CustomerProfile = () => {
                   ) : bookings && bookings.length > 0 ? (
                     <List
                       itemLayout="horizontal"
-                      dataSource={currentBookings}
+                      dataSource={bookings}
                       renderItem={(booking: BookingDto) => (
                         <List.Item
                           style={{ cursor: "pointer" }}
@@ -164,7 +151,6 @@ const CustomerProfile = () => {
                               booking.location
                             }`}
                           />
-                          <StatusTag status={booking.status} />
                         </List.Item>
                       )}
                     />
@@ -174,13 +160,6 @@ const CustomerProfile = () => {
                       type="warning"
                     />
                   )}
-                  <Pagination
-                    current={currentPage}
-                    pageSize={pageSize}
-                    total={bookings?.length ?? 0}
-                    onChange={(page) => setCurrentPage(page)} // Cập nhật trang khi bấm nút
-                    style={{ marginTop: "20px", textAlign: "center" }}
-                  />
                 </>
               )}
 
