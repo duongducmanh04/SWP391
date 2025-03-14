@@ -1,18 +1,26 @@
 import { useLocation } from "react-router-dom";
-import { Card, Spin, Alert, Button, message, Modal } from "antd";
+import { Card, Spin, Alert, Button, message, Modal, Rate } from "antd";
 import { useBookingById } from "../features/booking/hooks/useGetBookingId";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import dayjs from "dayjs";
 import StatusTag from "../components/TagStatus";
 
+import { useState } from "react";
+import { useGetCustomerId } from "../features/user/hook/useGetCustomerId";
+import { Status } from "../enums/status-booking";
+
 const API_BASE_URL =
   "http://skincare-sbs.southeastasia.azurecontainer.io:8080/api/Booking";
+const RATING_API_URL = "https://localhost:7071/api/Rating";
 
 const CustomerBookingDetail = () => {
   const location = useLocation();
   const { bookingId } = location.state || {};
   const queryClient = useQueryClient();
+
+  const { customerId } = useGetCustomerId();
+  const [rating, setRating] = useState(0);
 
   const validBookingId = bookingId ? String(bookingId) : "";
 
@@ -23,7 +31,6 @@ const CustomerBookingDetail = () => {
     error,
   } = useBookingById(validBookingId);
 
-  // Mutation để hủy đặt lịch
   const cancelBookingMutation = useMutation({
     mutationFn: async () => {
       if (!validBookingId) {
@@ -31,34 +38,44 @@ const CustomerBookingDetail = () => {
       }
 
       const cancelUrl = `${API_BASE_URL}/cancelled/${validBookingId}`;
-      console.log("🔄 Gửi request hủy booking:", cancelUrl);
 
-      try {
-        const response = await axios.put(cancelUrl);
-        console.log("✅ Phản hồi từ server:", response.data);
-        return response.data;
-      } catch (err) {
-        console.error("❌ Lỗi khi hủy booking:", err);
-        throw err;
-      }
+      const response = await axios.put(cancelUrl);
+      return response.data;
     },
     onSuccess: () => {
       message.success("✅ Đã hủy đặt lịch thành công!");
       queryClient.invalidateQueries({
         queryKey: ["getBookingById", validBookingId],
-      }); // Cập nhật lại dữ liệu mà không cần chuyển trang
+      });
     },
     onError: (error) => {
       const axiosError = error as AxiosError;
-      console.error(
-        "❌ Hủy thất bại:",
-        axiosError.response?.data || axiosError.message
-      );
       message.error(
         `❌ Hủy thất bại: ${axiosError.response?.data || axiosError.message}`
       );
     },
   });
+
+  const ratingMutation = useMutation({
+    mutationFn: async (value: number) => {
+      return await axios.post(RATING_API_URL, {
+        customerId,
+        stars: value,
+        serviceId: booking?.serviceId,
+      });
+    },
+    onSuccess: () => {
+      message.success("✅ Cảm ơn bạn đã đánh giá!");
+    },
+    onError: () => {
+      message.error("❌ Lỗi khi gửi đánh giá, vui lòng thử lại!");
+    },
+  });
+
+  const handleRatingChange = (value: number) => {
+    setRating(value);
+    ratingMutation.mutate(value);
+  };
 
   if (!validBookingId) {
     return (
@@ -114,17 +131,8 @@ const CustomerBookingDetail = () => {
             <p>
               <strong>Giá tiền:</strong> {booking.amount.toLocaleString()} VND
             </p>
-            <p>
-              <strong>Ngày tạo:</strong>{" "}
-              {dayjs(booking.createdAt).format("DD/MM/YYYY HH:mm")}
-            </p>
-            <p>
-              <strong>Ngày cập nhật:</strong>{" "}
-              {dayjs(booking.updateAt).format("DD/MM/YYYY HH:mm")}
-            </p>
 
-            {/* Nút Hủy Đặt Lịch */}
-            {booking.status !== "Cancelled" && (
+            {booking.status === "Booked" && (
               <Button
                 type="primary"
                 danger
@@ -137,10 +145,18 @@ const CustomerBookingDetail = () => {
                     onOk: () => cancelBookingMutation.mutate(),
                   });
                 }}
-                loading={cancelBookingMutation.isPending}
               >
                 Hủy Đặt Lịch
               </Button>
+            )}
+
+            {booking.status == Status.COMPLETED && (
+              <div style={{ marginTop: "16px" }}>
+                <p>
+                  <strong>Đánh giá dịch vụ:</strong>
+                </p>
+                <Rate value={rating} onChange={handleRatingChange} />
+              </div>
             )}
           </>
         ) : (
