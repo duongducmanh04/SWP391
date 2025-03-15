@@ -14,6 +14,8 @@ import {
   message,
   Flex,
   Tag,
+  DatePicker,
+  TimePicker,
 } from "antd";
 import { useSlots } from "../hooks/useGetSlot";
 import { useAvailableSlot } from "../hooks/useAvailableSlot";
@@ -26,10 +28,18 @@ import {
   SearchOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
+import type { DatePickerProps } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { SlotDto } from "../dto/slot.dto";
+import dayjs from "dayjs";
+import useAuthStore from "../../authentication/hooks/useAuthStore";
+import { RoleCode } from "../../../enums/role.enum";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(customParseFormat);
 
 const SlotTable = () => {
+  const { user } = useAuthStore();
   const { data: allSlots, isLoading: isLoadingAll } = useSlots();
   const { data: availableSlots, isLoading: isLoadingAvailable } =
     useAvailableSlot();
@@ -47,6 +57,11 @@ const SlotTable = () => {
       slot.slotId.toString().includes(searchText.toLowerCase())
     ) || [];
 
+  const dateFormat = "DD-MM-YYYY";
+
+  const customFormat: DatePickerProps["format"] = (value) =>
+    `${value.format(dateFormat)}`;
+
   const handleDeleteSlot = (slotId: number) => {
     deleteSlot(slotId, {
       onSuccess: () => {
@@ -62,6 +77,12 @@ const SlotTable = () => {
     { title: "ID", dataIndex: "slotId", key: "slotId" },
     { title: "Time", dataIndex: "time", key: "time" },
     {
+      title: "Date",
+      dataIndex: "date",
+      key: "date",
+      render: (date: string) => <div>{dayjs(date).format("DD/MM/YYYY")}</div>,
+    },
+    {
       title: "Status",
       dataIndex: "status",
       key: "status",
@@ -69,22 +90,26 @@ const SlotTable = () => {
         <Tag color={status === "Available" ? "green" : "red"}>{status}</Tag>
       ),
     },
-    {
-      title: "Actions",
-      render: (_: unknown, record: SlotDto) => (
-        <Space>
-          <Tooltip title="Edit">
-            <Button icon={<EditOutlined />} />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button
-              icon={<DeleteOutlined />}
-              onClick={() => handleDeleteSlot(record.slotId)}
-            />
-          </Tooltip>
-        </Space>
-      ),
-    },
+    ...(user?.role === RoleCode.STAFF
+      ? [
+          {
+            title: "Actions",
+            render: (_: unknown, record: SlotDto) => (
+              <Space>
+                <Tooltip title="Edit">
+                  <Button icon={<EditOutlined />} />
+                </Tooltip>
+                <Tooltip title="Delete">
+                  <Button
+                    icon={<DeleteOutlined />}
+                    onClick={() => handleDeleteSlot(record.slotId)}
+                  />
+                </Tooltip>
+              </Space>
+            ),
+          },
+        ]
+      : []),
   ];
 
   const renderTable = () => {
@@ -125,9 +150,11 @@ const SlotTable = () => {
     <div>
       <Flex gap="middle" justify="space-between">
         <div className="content-header">Danh sách slot</div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-          Tạo slot
-        </Button>
+        {user?.role === RoleCode.STAFF && (
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+            Tạo slot
+          </Button>
+        )}
       </Flex>
       <hr style={{ opacity: 0.1 }} />
       <Space direction="vertical" style={{ width: "100%" }}>
@@ -139,6 +166,7 @@ const SlotTable = () => {
           onChange={(e) => setSearchText(e.target.value)}
         />
       </Space>
+      <hr style={{ opacity: 0.1 }} />
       <Tabs
         activeKey={activeTab}
         onChange={(key) => setActiveTab(key)}
@@ -156,12 +184,19 @@ const SlotTable = () => {
         onOk={handleCreateSlot}
         onCancel={() => setIsModalOpen(false)}
       >
-        <Form form={form} layout="vertical">
-          <Form.Item name="status" label="Status" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{ status: "Available" }}
+        >
           <Form.Item name="time" label="Time" rules={[{ required: true }]}>
-            <Input />
+            <TimePicker format="HH:mm A" placeholder="Choose time" />
+          </Form.Item>
+          <Form.Item name="status" label="Status" rules={[{ required: true }]}>
+            <Input disabled />
+          </Form.Item>
+          <Form.Item name="date" label="Date" rules={[{ required: true }]}>
+            <DatePicker format={customFormat} />
           </Form.Item>
         </Form>
       </Modal>

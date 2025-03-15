@@ -8,6 +8,10 @@ import StatusTag from "../components/TagStatus";
 
 import { useState } from "react";
 import { useGetCustomerId } from "../features/user/hook/useGetCustomerId";
+<<<<<<< HEAD
+=======
+import { Status } from "../enums/status-booking";
+>>>>>>> 8baf2a27b6683d32d1c44d97505fb26f1a56f6d5
 
 const API_BASE_URL =
   "http://skincare-sbs.southeastasia.azurecontainer.io:8080/api/Booking";
@@ -149,8 +153,12 @@ const CustomerBookingDetail = () => {
               </Button>
             )}
 
+<<<<<<< HEAD
             {(booking.status === "Completed" ||
               booking.status === "Finished") && (
+=======
+            {booking.status == Status.COMPLETED && (
+>>>>>>> 8baf2a27b6683d32d1c44d97505fb26f1a56f6d5
               <div style={{ marginTop: "16px" }}>
                 <p>
                   <strong>Đánh giá dịch vụ:</strong>

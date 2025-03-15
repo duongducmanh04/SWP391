@@ -5,7 +5,6 @@ import {
   Typography,
   Button,
   List,
-  Divider,
   Spin,
   Input,
   Select,
@@ -139,7 +138,7 @@ const TherapistCard = ({
               borderTopLeftRadius: "10px",
               borderTopRightRadius: "10px",
               objectFit: "cover",
-              width: "70%",
+              width: "50%",
               margin: "0 auto",
             }}
           />
@@ -159,7 +158,7 @@ const TherapistCard = ({
         <Text type="secondary">Kinh nghiệm: {therapist.experience} năm</Text>
         <br />
         <Text type="secondary">Bằng cấp: {therapist.degree}</Text>
-        <Divider />
+        <br />
         <Title level={5}>Dịch vụ chuyên viên làm:</Title>
         {isLoading ? (
           <Spin size="small" />
