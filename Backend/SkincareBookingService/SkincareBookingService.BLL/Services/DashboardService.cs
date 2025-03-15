@@ -13,17 +13,20 @@ namespace SkincareBookingService.BLL.Services
         private readonly IGenericRepository<Customer> _customerRepository;
         private readonly IGenericRepository<SkinTherapist> _skinTherapistRepository;
         private readonly IGenericRepository<Account> _accountRepository;
+        private readonly IGenericRepository<Schedule> _scheduleRepository;
 
         public DashboardService(
             IGenericRepository<Booking> bookingRepository,
             IGenericRepository<Customer> customerRepository,
             IGenericRepository<SkinTherapist> skinTherapistRepository,
-            IGenericRepository<Account> accountRepository)
+            IGenericRepository<Account> accountRepository,
+            IGenericRepository<Schedule> scheduleRepository)
         {
             _bookingRepository = bookingRepository;
             _customerRepository = customerRepository;
             _skinTherapistRepository = skinTherapistRepository;
             _accountRepository = accountRepository;
+            _scheduleRepository = scheduleRepository;
         }
 
         public async Task<DashboardSummaryDTO> GetDashboardSummaryAsync()
@@ -94,6 +97,12 @@ namespace SkincareBookingService.BLL.Services
             return roleCounts;
         }
 
+        private async Task<string> GetSkinTherapistNameById(int skinTherapistId)
+        {
+            var skinTherapist = await _skinTherapistRepository.GetByIdAsync(skinTherapistId);
+            return skinTherapist?.Name;
+        }
+
         public async Task<int> GetTotalBookingsInMonthAsync(int year, int month)
         {
             var totalBookings = await _bookingRepository.Query()
@@ -110,6 +119,68 @@ namespace SkincareBookingService.BLL.Services
                 .SumAsync(b => b.Amount);
 
             return (decimal)totalRevenue;
+        }
+
+        public async Task<List<TopSkintherapistDTO>> GetTopSkintherapistByYearAsync(int year)
+        {
+            var schedules = await _scheduleRepository.Query()
+               .Where(s => s.Date.HasValue && s.Date.Value.Year == year)
+               .ToListAsync();
+
+            var groupedByMonth = schedules
+                .GroupBy(s => s.Date.Value.Month)
+                .Select(g => new
+                {
+                    Month = g.Key,
+                    SkinTherapists = g.GroupBy(s => s.SkinTherapistId)
+                                      .Select(st => new
+                                      {
+                                          SkinTherapistId = st.Key,
+                                          NumberOfBookings = st.Count()
+                                      })
+                                      .OrderByDescending(st => st.NumberOfBookings)
+                                      .ToList()
+                })
+                .ToList();
+
+            var topSkintherapists = new List<TopSkintherapistDTO>();
+
+            for (int month = 1; month <= 12; month++)
+            {
+                var monthGroup = groupedByMonth.FirstOrDefault(g => g.Month == month);
+                if (monthGroup != null)
+                {
+                    var maxBookings = monthGroup.SkinTherapists.First().NumberOfBookings;
+                    var topTherapists = monthGroup.SkinTherapists
+                        .Where(st => st.NumberOfBookings == maxBookings)
+                        .ToList();
+
+                    foreach (var therapist in topTherapists)
+                    {
+                        topSkintherapists.Add(new TopSkintherapistDTO
+                        {
+                            SkinTherapistId = (int)therapist.SkinTherapistId,
+                            SkinTherapistName = await GetSkinTherapistNameById((int)therapist.SkinTherapistId),
+                            Month = month,
+                            Year = year,
+                            NumberOfBookings = therapist.NumberOfBookings
+                        });
+                    }
+                }
+                else
+                {
+                    topSkintherapists.Add(new TopSkintherapistDTO
+                    {
+                        SkinTherapistId = 0,
+                        SkinTherapistName = "No bookings",
+                        Month = month,
+                        Year = year,
+                        NumberOfBookings = 0
+                    });
+                }
+            }
+
+            return topSkintherapists;
         }
     }
 }

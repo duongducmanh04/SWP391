@@ -95,6 +95,26 @@ namespace SkincareBookingService.BLL.Services
             }).ToList();
         }
 
+        public async Task<bool> UpdateSkintypeAsync(SkintypeDTO skintypeDTO)
+        {
+            var skintype = await _skintypeRepository.GetByIdAsync(skintypeDTO.SkintypeId);
+
+            if (skintype == null) return false;
+
+            skintype.SkintypeName = skintypeDTO.SkintypeName;
+            skintype.Description = skintypeDTO.Description;
+            skintype.Image = skintypeDTO.Image;
+            skintype.Status = skintypeDTO.Status;
+            skintype.Pros = skintypeDTO.Pros;
+            skintype.Cons = skintypeDTO.Cons;
+            skintype.SkincareGuide = skintypeDTO.SkincareGuide;
+            skintype.Introduction = skintypeDTO.Introduction;
+
+            await _skintypeRepository.UpdateAsync(skintype);
+            await _skintypeRepository.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<bool> UpdateSkintypeConsAsync(int skintypeId, string cons)
         {
             var skintype = await _skintypeRepository.GetByIdAsync(skintypeId);

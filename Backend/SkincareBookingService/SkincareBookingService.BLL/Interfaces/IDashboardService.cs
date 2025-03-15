@@ -20,5 +20,7 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<List<RoleCountDTO>> GetRoleCountsAsync();
 
+        Task<List<TopSkintherapistDTO>> GetTopSkintherapistByYearAsync(int year);
+
     }
 }
