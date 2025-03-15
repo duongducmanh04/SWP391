@@ -1,32 +1,28 @@
 import { useLocation } from "react-router-dom";
-import { Card, Spin, Alert, Button, message, Modal, Rate } from "antd";
+import { Card, Spin, Alert, Rate, message, Button } from "antd";
 import { useBookingById } from "../features/booking/hooks/useGetBookingId";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import dayjs from "dayjs";
 import StatusTag from "../components/TagStatus";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGetCustomerId } from "../features/user/hook/useGetCustomerId";
-<<<<<<< HEAD
-=======
-import { Status } from "../enums/status-booking";
->>>>>>> 8baf2a27b6683d32d1c44d97505fb26f1a56f6d5
+import { useRatingById } from "../features/user/hook/useRatingByID";
+import { useSlots } from "../features/services/hooks/useGetSlot";
+import { useBookingHistory } from "../features/booking/hooks/useBookingHistory";
 
-const API_BASE_URL =
-  "http://skincare-sbs.southeastasia.azurecontainer.io:8080/api/Booking";
 const RATING_API_URL = "https://localhost:7071/api/Rating";
+const CANCEL_API_URL =
+  "http://skincare-sbs.southeastasia.azurecontainer.io:8080/api/Booking/cancelled";
 
 const CustomerBookingDetail = () => {
   const location = useLocation();
   const { bookingId } = location.state || {};
-  const queryClient = useQueryClient();
-
   const { customerId } = useGetCustomerId();
-  const [rating, setRating] = useState(0);
+  const queryClient = useQueryClient();
+  const [rating, setRating] = useState<number>(0);
 
   const validBookingId = bookingId ? String(bookingId) : "";
-
   const {
     data: booking,
     isLoading,
@@ -34,41 +30,38 @@ const CustomerBookingDetail = () => {
     error,
   } = useBookingById(validBookingId);
 
-  const cancelBookingMutation = useMutation({
-    mutationFn: async () => {
-      if (!validBookingId) {
-        throw new Error("Booking ID không hợp lệ");
-      }
+  const validCustomerId = customerId ?? 0;
+  const validServiceId = booking?.serviceId ?? 0;
 
-      const cancelUrl = `${API_BASE_URL}/cancelled/${validBookingId}`;
+  const { data: bookingHistory } = useBookingHistory();
 
-      const response = await axios.put(cancelUrl);
-      return response.data;
-    },
-    onSuccess: () => {
-      message.success("✅ Đã hủy đặt lịch thành công!");
-      queryClient.invalidateQueries({
-        queryKey: ["getBookingById", validBookingId],
-      });
-    },
-    onError: (error) => {
-      const axiosError = error as AxiosError;
-      message.error(
-        `❌ Hủy thất bại: ${axiosError.response?.data || axiosError.message}`
-      );
-    },
-  });
+  const { data: ratingData, isLoading: isFetchingRating } = useRatingById(
+    validCustomerId,
+    validServiceId
+  );
+
+  useEffect(() => {
+    if (ratingData?.stars !== undefined && ratingData.stars !== rating) {
+      setRating(ratingData.stars);
+    }
+  }, [ratingData?.stars]);
 
   const ratingMutation = useMutation({
     mutationFn: async (value: number) => {
       return await axios.post(RATING_API_URL, {
-        customerId,
+        customerId: validCustomerId,
         stars: value,
-        serviceId: booking?.serviceId,
+        serviceId: validServiceId,
       });
     },
-    onSuccess: () => {
-      message.success("✅ Cảm ơn bạn đã đánh giá!");
+    onSuccess: (_, value) => {
+      message.success("Cảm ơn bạn đã đánh giá!");
+      queryClient.invalidateQueries([
+        "rating",
+        validCustomerId,
+        validServiceId,
+      ]);
+      setRating(value);
     },
     onError: () => {
       message.error("❌ Lỗi khi gửi đánh giá, vui lòng thử lại!");
@@ -76,8 +69,33 @@ const CustomerBookingDetail = () => {
   });
 
   const handleRatingChange = (value: number) => {
-    setRating(value);
     ratingMutation.mutate(value);
+  };
+
+  const { data: slots } = useSlots();
+  const slotTime =
+    slots?.find((slot) => slot.bookingId === booking?.bookingId)?.time ||
+    "Chưa có thông tin";
+
+  const therapistName =
+    bookingHistory?.find((b) => b.bookingId === booking?.bookingId)
+      ?.skintherapistName || "Chưa cập nhật";
+
+  const cancelBookingMutation = useMutation({
+    mutationFn: async () => {
+      await axios.put(`${CANCEL_API_URL}/${booking?.bookingId}`);
+    },
+    onSuccess: () => {
+      message.success("Hủy đặt lịch thành công!");
+      queryClient.invalidateQueries(["booking", validBookingId]);
+    },
+    onError: () => {
+      message.error("❌ Lỗi khi hủy đặt lịch, vui lòng thử lại!");
+    },
+  });
+
+  const handleCancelBooking = () => {
+    cancelBookingMutation.mutate();
   };
 
   if (!validBookingId) {
@@ -129,41 +147,38 @@ const CustomerBookingDetail = () => {
               <strong>Địa điểm:</strong> {booking.location}
             </p>
             <p>
-              <strong>Nhân viên:</strong> {booking.skintherapistName}
+              <strong>Nhân viên:</strong> {therapistName}
             </p>
             <p>
               <strong>Giá tiền:</strong> {booking.amount.toLocaleString()} VND
             </p>
+            <p>
+              <strong>Thời gian slot:</strong> {slotTime}
+            </p>
 
-            {booking.status === "Booked" && (
-              <Button
-                type="primary"
-                danger
-                onClick={() => {
-                  Modal.confirm({
-                    title: "Bạn có chắc chắn muốn hủy đặt lịch?",
-                    content: "Hành động này không thể hoàn tác!",
-                    okText: "Hủy lịch",
-                    cancelText: "Đóng",
-                    onOk: () => cancelBookingMutation.mutate(),
-                  });
-                }}
-              >
-                Hủy Đặt Lịch
-              </Button>
-            )}
-
-<<<<<<< HEAD
-            {(booking.status === "Completed" ||
-              booking.status === "Finished") && (
-=======
-            {booking.status == Status.COMPLETED && (
->>>>>>> 8baf2a27b6683d32d1c44d97505fb26f1a56f6d5
+            {booking.status === "Completed" && (
               <div style={{ marginTop: "16px" }}>
                 <p>
                   <strong>Đánh giá dịch vụ:</strong>
                 </p>
-                <Rate value={rating} onChange={handleRatingChange} />
+                {isFetchingRating ? (
+                  <Spin tip="🔄 Đang tải đánh giá..." />
+                ) : (
+                  <Rate value={rating} onChange={handleRatingChange} />
+                )}
+              </div>
+            )}
+
+            {booking.status === "Booked" && (
+              <div style={{ marginTop: "16px" }}>
+                <Button
+                  type="primary"
+                  danger
+                  loading={cancelBookingMutation.isLoading}
+                  onClick={handleCancelBooking}
+                >
+                  Hủy đặt lịch
+                </Button>
               </div>
             )}
           </>

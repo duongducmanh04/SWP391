@@ -17,6 +17,22 @@
   },
   {
     "ContainingType": "SkincareBookingService.Controllers.AuthController",
+    "Method": "ForgotPassword",
+    "RelativePath": "api/auth/forgotPassword",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "forgotPasswordDTO",
+        "Type": "SkincareBookingService.BLL.DTOs.EmailDTOs.ForgotPasswordDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.AuthController",
     "Method": "Login",
     "RelativePath": "api/auth/login",
     "HttpMethod": "POST",
@@ -42,6 +58,38 @@
       {
         "Name": "registerDTO",
         "Type": "SkincareBookingService.BLL.DTOs.AuthenticationDTOs.RegisterDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.AuthController",
+    "Method": "ResetPassword",
+    "RelativePath": "api/auth/resetPassword",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "resetPasswordDTO",
+        "Type": "SkincareBookingService.BLL.DTOs.EmailDTOs.ResetPasswordDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.AuthController",
+    "Method": "VerifyOtp",
+    "RelativePath": "api/auth/verifyOtp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "verifyOtpDTO",
+        "Type": "SkincareBookingService.BLL.DTOs.EmailDTOs.VerifyOtpDTO",
         "IsRequired": true
       }
     ],
@@ -1009,6 +1057,38 @@
   },
   {
     "ContainingType": "SkincareBookingService.Controllers.SkintherapistController",
+    "Method": "AddSkintherapist",
+    "RelativePath": "api/skintherapist/addSkintherapist",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "skintherapistDTO",
+        "Type": "SkincareBookingService.BLL.DTOs.SkinTherapistDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.SkintherapistController",
+    "Method": "DeleteSkintherapist",
+    "RelativePath": "api/skintherapist/deleteSkintherapist/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.SkintherapistController",
     "Method": "GetSkintherapists",
     "RelativePath": "api/skintherapist/getAllSkintherapist",
     "HttpMethod": "GET",
@@ -1044,6 +1124,22 @@
       {
         "Name": "id",
         "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.SkintherapistController",
+    "Method": "UpdateSkintherapist",
+    "RelativePath": "api/skintherapist/updateSkintherapist",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "skintherapistDTO",
+        "Type": "SkincareBookingService.BLL.DTOs.SkinTherapistDTO",
         "IsRequired": true
       }
     ],
@@ -1102,6 +1198,22 @@
       {
         "Name": "skintypeId",
         "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.SkintypeController",
+    "Method": "UpdateSkintype",
+    "RelativePath": "api/skintype/updateSkintype",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "skintypeDTO",
+        "Type": "SkincareBookingService.BLL.DTOs.SkintypeDTO",
         "IsRequired": true
       }
     ],
@@ -1428,6 +1540,38 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "SkincareBookingService.Controllers.AccountController",
+    "Method": "CreateAccount",
+    "RelativePath": "createAccount",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "account",
+        "Type": "SkincareBookingService.BLL.DTOs.AccountDTOs.CreateAccountDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.BlogController",
+    "Method": "CreateBlog",
+    "RelativePath": "createBlog",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "blogDTO",
+        "Type": "SkincareBookingService.BLL.DTOs.BlogDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "SkincareBookingService.Controllers.CustomerController",
     "Method": "CreateCustomer",
     "RelativePath": "createCustomer",
@@ -1438,6 +1582,38 @@
       {
         "Name": "customer",
         "Type": "SkincareBookingService.BLL.DTOs.CustomerDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.AccountController",
+    "Method": "DeleteAccount",
+    "RelativePath": "deleteAccount/{accountId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "accountId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.BlogController",
+    "Method": "DeleteBlog",
+    "RelativePath": "deleteBlog/{blogId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "blogId",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],
@@ -1507,6 +1683,16 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "SkincareBookingService.Controllers.BlogController",
+    "Method": "GetBlogs",
+    "RelativePath": "getAllBlogs",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "SkincareBookingService.Controllers.CustomerController",
     "Method": "GetAllCustomers",
     "RelativePath": "getAllCustomers",
@@ -1534,6 +1720,22 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.BlogController",
+    "Method": "GetBlogById",
+    "RelativePath": "getBlogById/{blogId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "blogId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {
@@ -1712,6 +1914,22 @@
   },
   {
     "ContainingType": "SkincareBookingService.Controllers.DashboardController",
+    "Method": "GetTopSkintherapistByYear",
+    "RelativePath": "getTopSkintherapistByYear/{year}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.DashboardController",
     "Method": "GetTotalBookingsInMonth",
     "RelativePath": "getTotalBookingsInMonth/{year}/{month}",
     "HttpMethod": "GET",
@@ -1811,6 +2029,59 @@
       {
         "Name": "request",
         "Type": "SkincareBookingService.BLL.DTOs.CustomerSurveyDTOs.SubmitSurveyDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.AccountController",
+    "Method": "UpdateAccount",
+    "RelativePath": "updateAccount",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "account",
+        "Type": "SkincareBookingService.BLL.DTOs.AccountDTOs.AccountDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.AccountController",
+    "Method": "UpdateAccountPassword",
+    "RelativePath": "updateAccountPassword/{accountId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "accountId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "password",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SkincareBookingService.Controllers.BlogController",
+    "Method": "UpdateBlog",
+    "RelativePath": "updateBlog",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "blogDTO",
+        "Type": "SkincareBookingService.BLL.DTOs.BlogDTO",
         "IsRequired": true
       }
     ],

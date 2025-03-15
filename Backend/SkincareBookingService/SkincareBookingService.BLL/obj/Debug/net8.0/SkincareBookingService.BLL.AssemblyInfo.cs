@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SkincareBookingService.BLL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c61fa863b03f80c7cba5988023776a157fd01e6b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+45f130231e5f941537e319e8f048b92f036d24d5")]
 [assembly: System.Reflection.AssemblyProductAttribute("SkincareBookingService.BLL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SkincareBookingService.BLL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
