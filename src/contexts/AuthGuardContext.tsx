@@ -40,7 +40,7 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
   useEffect(() => {
     const publicPages: PagePath[] = [
       PagePath.LOGIN,
-      PagePath.REGISTER,
+      PagePath.RESET_PASSWORD,
       PagePath.VERIFY_EMAIL,
       PagePath.VERIFY_OTP,
       PagePath.HOME_PAGE,
