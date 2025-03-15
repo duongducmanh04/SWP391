@@ -3,6 +3,7 @@ export enum PagePath {
   REGISTER = "/Register",
   VERIFY_EMAIL = "/VerifyEmail",
   VERIFY_OTP = "/VerifyOTP",
+  RESET_PASSWORD = "/ResetPassword",
   NOT_FOUND = "/404",
   HOME = "/Home",
   WORK_VOLUME = "/Home/Workvolume",

@@ -77,11 +77,11 @@ const LoginRegister = () => {
     },
     onSuccess: (response) => {
       console.log("📦 API Response Data:", response);
-      if (response.success) {
+      if (response.message.trim() === "Register Successfully!") {
         message.success("Đăng ký thành công! Vui lòng đăng nhập.");
-        setActiveTab("1");
-      } else {
-        message.error("Đăng ký thất bại.");
+        setTimeout(() => {
+          setActiveTab("1");
+        }, 100);
       }
     },
     onError: (error) => {
@@ -116,6 +116,7 @@ const LoginRegister = () => {
         <div className="login-form">
           <h2 className="login-title">Dịch vụ chăm sóc da</h2>
           <Tabs
+            activeKey={activeTab}
             defaultActiveKey="1"
             centered
             onChange={(key) => setActiveTab(key)}
@@ -178,7 +179,7 @@ const LoginRegister = () => {
                     "❌ Form submission failed. Errors:",
                     errorInfo
                   );
-                  alert("Form submission failed! Check console for errors.");
+                  alert("Đăng ký thất bại ! Hãy thử lại ");
                 }}
               >
                 <Form.Item
@@ -192,7 +193,10 @@ const LoginRegister = () => {
                 <Form.Item
                   name="password"
                   label="Mật khẩu"
-                  rules={[{ required: true, message: "Nhập mật khẩu" }]}
+                  rules={[
+                    { required: true, message: "Nhập mật khẩu" },
+                    { min: 8, message: "Mật khẩu phải có ít nhất 8 ký tự" },
+                  ]}
                 >
                   <Input.Password
                     placeholder="Mật khẩu"
@@ -206,7 +210,20 @@ const LoginRegister = () => {
                 <Form.Item
                   name="confirmPassword"
                   label="Nhập lại mật khẩu"
-                  rules={[{ required: true, message: "Nhập lại mật khẩu" }]}
+                  dependencies={["password"]}
+                  rules={[
+                    { required: true, message: "Nhập lại mật khẩu" },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (!value || getFieldValue("password") === value) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(
+                          new Error("Mật khẩu không khớp!")
+                        );
+                      },
+                    }),
+                  ]}
                 >
                   <Input.Password
                     placeholder="Nhập lại mật khẩu"

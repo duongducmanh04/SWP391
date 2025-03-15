@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { LoginDto } from "../dto/login.dto";
 import { PagePath } from "../../../enums/page-path.enum";
 import type { GetProps } from "antd";
+import { useVerifyOTP } from "../hooks/useVerifyOTP";
 
 type OTPProps = GetProps<typeof Input.OTP>;
 
@@ -14,6 +15,7 @@ const VerifyOTP = () => {
   const [form] = Form.useForm();
   const { login } = useAuthStore();
   const navigate = useNavigate();
+  const { mutate: verifyOTP } = useVerifyOTP();
   const onChange: OTPProps["onChange"] = (text) => {
     console.log("onChange:", text);
   };
@@ -56,10 +58,10 @@ const VerifyOTP = () => {
 
   return (
     <div>
-      <img
+      {/* <img
         src="https://cdn.fpt-is.com/vi/FPT-IS-set-logo-08-1715516291.svg"
         style={{ width: "200px" }}
-      />
+      /> */}
       <h2 style={{ fontWeight: 700, fontSize: "30px", margin: 0 }}>Skincare</h2>
       <p style={{ marginTop: 0 }}>Xác thực OTP</p>
       <div className="form-container">
@@ -78,7 +80,7 @@ const VerifyOTP = () => {
             <Button
               className="login-btn"
               type="primary"
-              onClick={() => navigate(PagePath.VERIFY_OTP)}
+              onClick={() => navigate(PagePath.RESET_PASSWORD)}
             >
               Xác thực OTP
             </Button>
