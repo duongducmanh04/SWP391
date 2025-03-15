@@ -77,12 +77,12 @@ const LoginRegister = () => {
     },
     onSuccess: (response) => {
       console.log("📦 API Response Data:", response);
-      if (response.message.trim()==="Register Successfully!") {
+      if (response.message.trim() === "Register Successfully!") {
         message.success("Đăng ký thành công! Vui lòng đăng nhập.");
         setTimeout(() => {
           setActiveTab("1");
         }, 100);
-      } 
+      }
     },
     onError: (error) => {
       message.error("Lỗi kết nối đến máy chủ: " + (error as Error).message);
@@ -116,7 +116,7 @@ const LoginRegister = () => {
         <div className="login-form">
           <h2 className="login-title">Dịch vụ chăm sóc da</h2>
           <Tabs
-           activeKey={activeTab}
+            activeKey={activeTab}
             defaultActiveKey="1"
             centered
             onChange={(key) => setActiveTab(key)}
@@ -194,9 +194,9 @@ const LoginRegister = () => {
                   name="password"
                   label="Mật khẩu"
                   rules={[
-                 { required: true, message: "Nhập mật khẩu" },
-                 { min: 8, message: "Mật khẩu phải có ít nhất 8 ký tự" } 
-                ]}
+                    { required: true, message: "Nhập mật khẩu" },
+                    { min: 8, message: "Mật khẩu phải có ít nhất 8 ký tự" },
+                  ]}
                 >
                    <Input.Password
                   placeholder="Mật khẩu"
@@ -208,28 +208,30 @@ const LoginRegister = () => {
                 </Form.Item>
 
                 <Form.Item
-                 name="confirmPassword"
-                 label="Nhập lại mật khẩu"
-                 dependencies={["password"]} 
-                 rules={[
-                   { required: true, message: "Nhập lại mật khẩu" },
-                   ({ getFieldValue }) => ({
-                     validator(_, value) {
-                       if (!value || getFieldValue("password") === value) {
-                         return Promise.resolve();
-                       }
-                       return Promise.reject(new Error("Mật khẩu không khớp!"));
-                     },
-                   }),
-                 ]}
-               >
-                 <Input.Password
-                   placeholder="Nhập lại mật khẩu"
-                   allowClear
-                   iconRender={(visible) =>
-                     visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                   }
-                 />
+                  name="confirmPassword"
+                  label="Nhập lại mật khẩu"
+                  dependencies={["password"]}
+                  rules={[
+                    { required: true, message: "Nhập lại mật khẩu" },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (!value || getFieldValue("password") === value) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(
+                          new Error("Mật khẩu không khớp!")
+                        );
+                      },
+                    }),
+                  ]}
+                >
+                  <Input.Password
+                    placeholder="Nhập lại mật khẩu"
+                    allowClear
+                    iconRender={(visible) =>
+                      visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                    }
+                  />
                 </Form.Item>
 
                 <Form.Item>

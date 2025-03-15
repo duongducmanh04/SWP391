@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Button, Form, Input, message } from "antd";
 import { useMutation } from "@tanstack/react-query";
 import useAuthStore from "../hooks/useAuthStore";
@@ -6,11 +5,13 @@ import "../../../style/App.css";
 import { useNavigate } from "react-router-dom";
 import { LoginDto } from "../dto/login.dto";
 import { PagePath } from "../../../enums/page-path.enum";
+import { useForgotPassword } from "../hooks/useForgotPassword";
 
 const VerifyEmail = () => {
   const [form] = Form.useForm();
   const { login } = useAuthStore();
   const navigate = useNavigate();
+  const { mutate: forgotPassword } = useForgotPassword();
 
   const mutation = useMutation<
     { success: boolean; message: string },
@@ -35,16 +36,12 @@ const VerifyEmail = () => {
     mutation.mutate(values);
   };
 
-  useEffect(() => {
-    document.title = "Xác thực email";
-  }, []);
-
   return (
     <div>
-      <img
+      {/* <img
         src="https://cdn.fpt-is.com/vi/FPT-IS-set-logo-08-1715516291.svg"
         style={{ width: "200px" }}
-      />
+      /> */}
       <h2 style={{ fontWeight: 700, fontSize: "30px", margin: 0 }}>Skincare</h2>
       <p style={{ marginTop: 0 }}>Xác thực email</p>
       <div className="form-container">
