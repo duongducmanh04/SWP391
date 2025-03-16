@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
 export interface ResetPasswordDto {
@@ -7,14 +7,26 @@ export interface ResetPasswordDto {
   newPassword: string;
 }
 
+const resetPassword = async (data: ResetPasswordDto) => {
+  console.log("🔹 Sending reset password request:", data); 
+
+  const response = await axios.post(
+    "https://localhost:7071/api/auth/resetPassword",
+    data,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+    }
+  );
+
+  console.log("✅ API Response:", response.data); 
+  return response.data;
+};
+
 export const useResetPassword = () => {
-  return useQuery({
-    queryKey: ["resetPassword"],
-    queryFn: async () => {
-      const response = await axios.post<ResetPasswordDto[]>(
-        "https://localhost:7071/api/auth/resetPassword"
-      );
-      return response.data;
-    },
+  return useMutation({
+    mutationFn: resetPassword,
   });
 };

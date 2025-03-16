@@ -1,72 +1,59 @@
 import { Button, Form, Input, message } from "antd";
-import { useMutation } from "@tanstack/react-query";
-import useAuthStore from "../hooks/useAuthStore";
-import "../../../style/App.css";
 import { useNavigate } from "react-router-dom";
-import { LoginDto } from "../dto/login.dto";
 import { PagePath } from "../../../enums/page-path.enum";
 import { useForgotPassword } from "../hooks/useForgotPassword";
 
 const VerifyEmail = () => {
   const [form] = Form.useForm();
-  const { login } = useAuthStore();
   const navigate = useNavigate();
-  const { mutate: forgotPassword } = useForgotPassword();
+  const { mutate: forgotPassword, isPending } = useForgotPassword();
 
-  const mutation = useMutation<
-    { success: boolean; message: string },
-    unknown,
-    LoginDto
-  >({
-    mutationFn: login,
-    onSuccess: (response) => {
-      if (response.success) {
-        navigate(PagePath.HOME);
-        message.success("Đăng nhập thành công");
-      } else {
-        message.error(response.message);
-      }
-    },
-    onError: (error) => {
-      message.error("Login failed: " + (error as Error).message);
-    },
-  });
+  const onFinish = (values: { email: string }) => {
+    forgotPassword(values.email, {
+      onSuccess: () => {
+        message.success("OTP đã được gửi đến email của bạn!");
 
-  const onFinish = (values: LoginDto) => {
-    mutation.mutate(values);
+        
+        sessionStorage.setItem("user_email", values.email);
+
+        
+        navigate(PagePath.VERIFY_OTP, { state: { email: values.email } });
+      },
+      onError: (error) => {
+        message.error("Gửi OTP thất bại: " + (error as Error).message);
+      },
+    });
   };
 
   return (
     <div>
-      {/* <img
-        src="https://cdn.fpt-is.com/vi/FPT-IS-set-logo-08-1715516291.svg"
-        style={{ width: "200px" }}
-      /> */}
       <h2 style={{ fontWeight: 700, fontSize: "30px", margin: 0 }}>Skincare</h2>
       <p style={{ marginTop: 0 }}>Xác thực email</p>
       <div className="form-container">
         <Form
           form={form}
-          name="control-hooks"
+          name="forgot-password"
           onFinish={onFinish}
-          initialValues={{
-            username: "ADMIN@GMAIL.COM",
-          }}
+          initialValues={{ email: "ADMIN@GMAIL.COM" }}
         >
           <Form.Item
-            name="username"
-            label="Tài khoản"
-            rules={[{ required: true, message: "Nhập tài khoản" }]}
+            name="email"
+            label="Email"
+            rules={[
+              { required: true, message: "Nhập email của bạn" },
+              { type: "email", message: "Email không hợp lệ" },
+            ]}
           >
-            <Input allowClear placeholder="Username" />
+            <Input allowClear placeholder="Nhập email của bạn" />
           </Form.Item>
           <Form.Item>
             <Button
               className="login-btn"
               type="primary"
-              onClick={() => navigate(PagePath.VERIFY_OTP)}
+              htmlType="submit"
+              loading={isPending}
             >
-              Xác thực email
+              Nhận OTP
             </Button>
           </Form.Item>
         </Form>

@@ -1,19 +1,27 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
-export interface VerifyOTPDto {
+export interface VerifyOtpDto {
   email: string;
   otp: string;
 }
 
+const verifyOtp = async (data: VerifyOtpDto) => {
+  const response = await axios.post(
+    "https://localhost:7071/api/auth/verifyOtp",
+    JSON.stringify(data),
+    {
+      headers: {
+        "Content-Type": "application/json", 
+        "Accept": "application/json",
+      },
+    }
+  );
+  return response.data;
+};
+
 export const useVerifyOTP = () => {
-  return useQuery({
-    queryKey: ["verifyOtp"],
-    queryFn: async () => {
-      const response = await axios.post<VerifyOTPDto[]>(
-        "https://localhost:7071/api/auth/verifyOtp"
-      );
-      return response.data;
-    },
+  return useMutation({
+    mutationFn: verifyOtp,
   });
 };

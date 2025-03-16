@@ -1,87 +1,67 @@
 import { useEffect } from "react";
 import { Button, Form, Input, message } from "antd";
-import { useMutation } from "@tanstack/react-query";
-import useAuthStore from "../hooks/useAuthStore";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../../../style/App.css";
-import { useNavigate } from "react-router-dom";
-import { LoginDto } from "../dto/login.dto";
 import { PagePath } from "../../../enums/page-path.enum";
-import type { GetProps } from "antd";
 import { useVerifyOTP } from "../hooks/useVerifyOTP";
-
-type OTPProps = GetProps<typeof Input.OTP>;
 
 const VerifyOTP = () => {
   const [form] = Form.useForm();
-  const { login } = useAuthStore();
   const navigate = useNavigate();
-  const { mutate: verifyOTP } = useVerifyOTP();
-  const onChange: OTPProps["onChange"] = (text) => {
-    console.log("onChange:", text);
-  };
-
-  const onInput: OTPProps["onInput"] = (value) => {
-    console.log("onInput:", value);
-  };
-
-  const sharedProps: OTPProps = {
-    onChange,
-    onInput,
-  };
-
-  const mutation = useMutation<
-    { success: boolean; message: string },
-    unknown,
-    LoginDto
-  >({
-    mutationFn: login,
-    onSuccess: (response) => {
-      if (response.success) {
-        navigate(PagePath.HOME);
-        message.success("Đăng nhập thành công");
-      } else {
-        message.error(response.message);
-      }
-    },
-    onError: (error) => {
-      message.error("Login failed: " + (error as Error).message);
-    },
-  });
-
-  const onFinish = (values: LoginDto) => {
-    mutation.mutate(values);
-  };
+  const location = useLocation();
+  
+  
+  const email = location.state?.email || sessionStorage.getItem("user_email");
 
   useEffect(() => {
     document.title = "Xác thực OTP";
-  }, []);
+
+    
+    if (!email) {
+      message.error("Lỗi: Không có email! Quay lại trang trước.");
+      navigate(PagePath.VERIFY_EMAIL);
+    }
+  }, [email, navigate]);
+
+  const { mutate: verifyOTP, isPending } = useVerifyOTP();
+
+  const onFinish = (values: { otp: string }) => {
+    if (!email) {
+      message.error("Lỗi: Không có email! Quay lại trang trước.");
+      return;
+    }
+
+    verifyOTP(
+      { email, otp: values.otp },
+      {
+        onSuccess: () => {
+          message.success("OTP hợp lệ! Bạn có thể đặt lại mật khẩu...");
+          sessionStorage.setItem("user_email", email);
+          sessionStorage.setItem("otp", values.otp);
+          navigate(PagePath.RESET_PASSWORD, { state: { email } });
+        },
+        onError: (error) => {
+          message.error("Xác thực OTP thất bại: " + (error as Error).message);
+        },
+      }
+    );
+  };
 
   return (
     <div>
-      {/* <img
-        src="https://cdn.fpt-is.com/vi/FPT-IS-set-logo-08-1715516291.svg"
-        style={{ width: "200px" }}
-      /> */}
       <h2 style={{ fontWeight: 700, fontSize: "30px", margin: 0 }}>Skincare</h2>
       <p style={{ marginTop: 0 }}>Xác thực OTP</p>
       <div className="form-container">
-        <Form form={form} name="control-hooks" onFinish={onFinish}>
+        <Form form={form} name="verify-otp" onFinish={onFinish}>
           <Form.Item
-            name="OTP"
+            name="otp"
             label="OTP"
             rules={[{ required: true, message: "Nhập OTP" }]}
           >
-            <Input.OTP
-              formatter={(str) => str.replace(/\D/g, "")}
-              {...sharedProps}
-            />
+            <Input maxLength={6} allowClear placeholder="Nhập mã OTP" />
           </Form.Item>
           <Form.Item>
-            <Button
-              className="login-btn"
-              type="primary"
-              onClick={() => navigate(PagePath.RESET_PASSWORD)}
-            >
+            <Button className="login-btn" type="primary" htmlType="submit" loading={isPending}>
               Xác thực OTP
             </Button>
           </Form.Item>
