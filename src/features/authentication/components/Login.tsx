@@ -62,6 +62,7 @@ const LoginRegister = () => {
       const payload = {
         accountName: values.accountName,
         password: values.password,
+        email:values.email,
       };
 
       const response = await fetch("https://localhost:7071/api/auth/register", {
@@ -77,7 +78,7 @@ const LoginRegister = () => {
     },
     onSuccess: (response) => {
       console.log("📦 API Response Data:", response);
-      if (response.message.trim() === "Register Successfully!") {
+      if (response.message.trim() === "Account registered successfully!") {
         message.success("Đăng ký thành công! Vui lòng đăng nhập.");
         setTimeout(() => {
           setActiveTab("1");
@@ -191,6 +192,14 @@ const LoginRegister = () => {
                 </Form.Item>
 
                 <Form.Item
+                  name="email"
+                  label="Email"
+                  rules={[{ required: true, message: "Nhập Email" }]}
+                >
+                  <Input placeholder="Email" allowClear />
+                </Form.Item>
+
+                <Form.Item
                   name="password"
                   label="Mật khẩu"
                   rules={[
@@ -239,12 +248,7 @@ const LoginRegister = () => {
                     type="primary"
                     htmlType="submit"
                     className="submit-btn"
-                    onClick={() => {
-                      console.log(
-                        "🖱️ Đăng ký button clicked! Submitting form..."
-                      );
-                      loginForm.submit();
-                    }}
+                   
                   >
                     Đăng ký
                   </Button>
