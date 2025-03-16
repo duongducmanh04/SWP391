@@ -3,10 +3,11 @@ import axios from "axios";
 import { SkintypeServiceDto } from "../dto/skintype-service.dto";
 
 export const useSkintypeServiceByServiceId = (serviceId: string) => {
-  return useQuery<SkintypeServiceDto, Error>({
+  return useQuery<SkintypeServiceDto[], Error>({
+    // 🛠 Đổi từ object sang array
     queryKey: ["getSkintypeServiceByServiceId", serviceId],
     queryFn: async () => {
-      const response = await axios.get<SkintypeServiceDto>(
+      const response = await axios.get<SkintypeServiceDto[]>( // 🛠 Đổi kiểu dữ liệu trả về thành array
         `https://localhost:7071/getSkintypeServiceByServiceId/${serviceId}`
       );
       return response.data;

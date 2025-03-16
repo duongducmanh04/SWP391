@@ -19,6 +19,8 @@ import {
 } from "@ant-design/icons";
 import { useBookingHistory } from "../features/booking/hooks/useBookingHistory";
 import { BookingDto } from "../features/booking/dto/booking.dto";
+import type { MenuProps } from "antd";
+import "../style/CustomerInformation.css"; // ✅ Import file CSS mới
 
 const { Sider, Content } = Layout;
 const PAGE_SIZE = 5;
@@ -46,37 +48,32 @@ const ProfilePage = () => {
     }
   }, [bookings, currentPage]);
 
-  const handleNavigateToBookingDetail = (bookingId: number) => {
-    navigate(`/CustomerBookingDetail/${bookingId}`);
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
+    setActiveTab(e.key);
   };
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
-
+  const handleEditClick = () => setIsEditing(true);
   const handleCancelClick = () => {
     setTempInfo({ ...customerInfo });
     setIsEditing(false);
   };
-
   const handleSaveClick = () => {
     setCustomerInfo({ ...tempInfo });
     setIsEditing(false);
     message.success("Cập nhật thông tin thành công!");
   };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTempInfo({ ...tempInfo, [e.target.name]: e.target.value });
   };
 
   return (
-    <Layout style={{ minHeight: "100vh", background: "#f5f1eb" }}>
+    <Layout className="profile-layout">
       <Layout>
-        <Sider width={250} theme="light">
+        <Sider className="profile-sider">
           <Menu
             mode="inline"
             selectedKeys={[activeTab]}
-            onClick={(e) => setActiveTab(e.key)}
+            onClick={handleMenuClick}
           >
             <Menu.Item key="personal" icon={<UserOutlined />}>
               Thông tin cá nhân
@@ -90,58 +87,50 @@ const ProfilePage = () => {
           </Menu>
         </Sider>
 
-        <Layout style={{ padding: "24px" }}>
-          <Content
-            style={{ padding: "24px", background: "#fff", borderRadius: "8px" }}
-          >
+        <Layout>
+          <Content className="profile-content">
             {activeTab === "personal" ? (
-              <Card
-                title="Thông tin cá nhân"
-                style={{ maxWidth: 600, margin: "0 auto" }}
-              >
-                <div style={{ marginBottom: 10 }}>
+              <Card title="Thông tin cá nhân" className="card-container">
+                <div>
                   <b>Tên:</b>{" "}
                   {isEditing ? (
                     <Input
                       name="name"
                       value={tempInfo.name}
                       onChange={handleChange}
-                      style={{ width: "100%" }}
+                      className="input-full"
                     />
                   ) : (
                     customerInfo.name
                   )}
                 </div>
-
-                <div style={{ marginBottom: 10 }}>
+                <div>
                   <b>Email:</b>{" "}
                   {isEditing ? (
                     <Input
                       name="email"
                       value={tempInfo.email}
                       onChange={handleChange}
-                      style={{ width: "100%" }}
+                      className="input-full"
                     />
                   ) : (
                     customerInfo.email
                   )}
                 </div>
-
-                <div style={{ marginBottom: 10 }}>
+                <div>
                   <b>Số điện thoại:</b>{" "}
                   {isEditing ? (
                     <Input
                       name="phone"
                       value={tempInfo.phone}
                       onChange={handleChange}
-                      style={{ width: "100%" }}
+                      className="input-full"
                     />
                   ) : (
                     customerInfo.phone
                   )}
                 </div>
-
-                <div style={{ marginTop: 20, textAlign: "center" }}>
+                <div className="text-center">
                   {isEditing ? (
                     <>
                       <Button
@@ -161,7 +150,7 @@ const ProfilePage = () => {
                 </div>
               </Card>
             ) : (
-              <Card title="Lịch sử đặt lịch" bordered={false}>
+              <Card title="Lịch sử đặt lịch">
                 {isLoading ? (
                   <Spin tip="Đang tải lịch sử đặt lịch..." />
                 ) : isError ? (
@@ -174,36 +163,29 @@ const ProfilePage = () => {
                     <List
                       dataSource={currentBookings}
                       renderItem={(booking: BookingDto) => (
-                        <List.Item
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "flex-start",
-                            width: "100%",
-                            padding: "12px",
-                            marginBottom: "10px",
-                            borderRadius: "8px",
-                            border: "1px solid #e0e0e0",
-                          }}
-                        >
-                          <div>
-                            <b>Dịch vụ:</b> {booking.serviceName}
-                          </div>
-                          <div>
-                            <b>Ngày đặt:</b> {booking.date}
-                          </div>
-                          <div>
-                            <b>Trạng thái:</b> {booking.status}
-                          </div>
-                          <div>
-                            <b>Địa điểm:</b> {booking.location}
+                        <List.Item className="booking-list-item">
+                          <div className="booking-info">
+                            <div className="booking-row">
+                              <b>Dịch vụ:</b> {booking.serviceName}
+                            </div>
+                            <div className="booking-row">
+                              <b>Ngày đặt:</b> {booking.date}
+                            </div>
+                            <div className="booking-row">
+                              <b>Trạng thái:</b> {booking.status}
+                            </div>
+                            <div className="booking-row">
+                              <b>Địa điểm:</b> {booking.location}
+                            </div>
                           </div>
                           <Button
                             type="primary"
-                            style={{ marginTop: "10px", alignSelf: "start" }}
+                            className="booking-button"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleNavigateToBookingDetail(booking.bookingId);
+                              navigate(
+                                `/CustomerBookingDetail/${booking.bookingId}`
+                              );
                             }}
                           >
                             Xem Chi Tiết
@@ -211,12 +193,13 @@ const ProfilePage = () => {
                         </List.Item>
                       )}
                     />
+
                     <Pagination
                       current={currentPage}
                       total={bookings.length}
                       pageSize={PAGE_SIZE}
                       onChange={(page) => setCurrentPage(page)}
-                      style={{ textAlign: "center", marginTop: "20px" }}
+                      className="pagination-container"
                     />
                   </>
                 ) : (
