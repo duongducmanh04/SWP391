@@ -85,6 +85,7 @@ namespace SkincareBookingService.BLL.Services
             };
 
             await _ratingRepository.AddAsync(rating);
+            await SumAllRatings();
             return await MapToDto(rating);
         }
 
@@ -95,6 +96,7 @@ namespace SkincareBookingService.BLL.Services
             if (rating == null) return false;
             rating.Stars = dto.Stars;
             await _ratingRepository.UpdateAsync(rating);
+            await SumAllRatings();
             return true;
         }
 
@@ -104,6 +106,7 @@ namespace SkincareBookingService.BLL.Services
             var rating = await _ratingRepository.GetByIdAsync(id);
             if (rating == null) return false;
             await _ratingRepository.DeleteAsync(rating);
+            await SumAllRatings();
             return true;
         }
 
@@ -122,6 +125,22 @@ namespace SkincareBookingService.BLL.Services
                 CustomerName = customer?.Name,
                 ServiceName = service?.Name
             };
+        }
+        private async Task SumAllRatings()
+        {
+            var ratings = await _ratingRepository.GetAllAsync();
+            var services = await _serviceRepository.GetAllAsync();
+
+            foreach (var service in services)
+            {
+                var serviceRatings = ratings.Where(r => r.ServiceId == service.ServiceId);
+                if (serviceRatings.Any())
+                {
+                    service.AverageStars = serviceRatings.Average(r => r.Stars);
+                    await _serviceRepository.UpdateAsync(service);
+                    await _serviceRepository.SaveChangesAsync();
+                }
+            }
         }
     }
 }
