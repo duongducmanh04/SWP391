@@ -1,4 +1,5 @@
-﻿using SkincareBookingService.DAL.Entities;
+﻿using SkincareBookingService.BLL.DTOs.AccountDTOs;
+using SkincareBookingService.DAL.Entities;
 
 namespace SkincareBookingService.BLL.Interfaces
 {
@@ -6,7 +7,7 @@ namespace SkincareBookingService.BLL.Interfaces
     {
         Task<Account> AuthenticateAsync(string accountName, string password);
 
-        Task<Account> RegisterAsync(string accountName, string password);
+        Task<AccountDTO> RegisterAsync(string accountName, string email, string password);
 
         Task SendEmailAsync(string to, string subject, string body);
         Task<bool> ForgotPasswordAsync(string email);

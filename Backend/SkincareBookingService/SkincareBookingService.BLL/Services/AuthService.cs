@@ -1,4 +1,6 @@
-﻿using SkincareBookingService.BLL.Interfaces;
+﻿using SkincareBookingService.BLL.DTOs;
+using SkincareBookingService.BLL.DTOs.AccountDTOs;
+using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
 using System.Collections.Concurrent;
@@ -36,7 +38,7 @@ namespace SkincareBookingService.BLL.Services
             return true;
         }
 
-        public async Task<Account> RegisterAsync(string accountName, string password)
+        public async Task<AccountDTO> RegisterAsync(string accountName, string email, string password)
         {
             var account = new Account
             {
@@ -46,9 +48,41 @@ namespace SkincareBookingService.BLL.Services
                 Active = true
             };
 
+            var customer = new Customer
+            {
+                Name = accountName,
+                Email = email,
+                SkintypeId = null,
+                AccountId = account.AccountId,
+                PhoneNumber = null,
+                Image = null
+            };
+
+            account.Customers = new List<Customer> { customer };
+
             await _accountRepository.AddAsync(account);
             await _accountRepository.SaveChangesAsync();
-            return account;
+
+            return new AccountDTO
+            {
+                AccountId = account.AccountId,
+                AccountName = account.AccountName,
+                Password = account.Password,
+                Role = account.Role,
+                Active = account.Active,
+                Customer = new List<CustomerDTO>
+                {
+                    new CustomerDTO
+                    {
+                        Name = customer.Name,
+                        Email = customer.Email,
+                        SkintypeId = customer.SkintypeId,
+                        AccountId = customer.AccountId,
+                        PhoneNumber = customer.PhoneNumber,
+                        Image = customer.Image
+                    }
+                }
+            };
         }
 
         public async Task<bool> ResetPasswordAsync(string email, string otp, string newPassword)
