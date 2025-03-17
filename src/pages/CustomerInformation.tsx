@@ -130,6 +130,10 @@ const ProfilePage = () => {
                     customerInfo.phone
                   )}
                 </div>
+                useEffect(() => {
+  console.log("isEditing thay đổi:", isEditing);
+}, [isEditing]);
+                return (
                 <div className="text-center">
                   {isEditing ? (
                     <>
@@ -148,6 +152,7 @@ const ProfilePage = () => {
                     </Button>
                   )}
                 </div>
+                );
               </Card>
             ) : (
               <Card title="Lịch sử đặt lịch">

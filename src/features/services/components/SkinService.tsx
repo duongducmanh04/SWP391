@@ -2,42 +2,21 @@ import { useEffect, useState } from "react";
 import { Card, Button, Row, Col, Typography, Input } from "antd";
 import { HeartOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { useServices } from "../hooks/useGetService";
 import { useServiceStore } from "../hooks/useServiceStore";
-import { useSkinTypes } from "../../skin_type/hooks/useGetSkin";
 import { PagePath } from "../../../enums/page-path.enum";
 import { ServiceDto } from "../dto/get-service.dto";
 
 const { Title, Text } = Typography;
-const { Option } = Select;
-
-interface ServiceSkinType extends ServiceDto {
-  skinTypeIds?: number[];
-  skinTypeNames?: string;
-}
-
-const fetchSkinTypeByServiceId = async (
-  serviceId: number
-): Promise<number[]> => {
-  try {
-    console.log(`Fetching skin types for serviceId: ${serviceId}`);
-    const response = await axios.get<SkintypeServiceDto[]>(
-      `https://localhost:7071/getSkintypeServiceByServiceId/${serviceId}`
-    );
-    return response.data.map((item) => item.skintypeId) ?? [];
-  } catch (error: unknown) {
-    console.error(
-      `Lỗi khi tải loại da cho serviceId ${serviceId}:`,
-      error instanceof Error ? error.message : "Lỗi không xác định"
-    );
-    return [];
-  }
-};
 
 const SkincareServices = () => {
   const navigate = useNavigate();
-  const { data: serviceData } = useServices();
+  const {
+    data: serviceData,
+    isLoading: isLoadingService,
+    error: errorService,
+  } = useServices();
+
   const { setServices } = useServiceStore();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filteredTherapists, setFilteredTherapists] = useState<ServiceDto[]>(
@@ -70,19 +49,17 @@ const SkincareServices = () => {
   };
 
   useEffect(() => {
-    if (serviceSkinTypes) {
-      setServices(serviceSkinTypes);
-      setFilteredData(serviceSkinTypes);
+    if (serviceData && !isLoadingService && !errorService) {
+      setServices(serviceData);
     }
-  }, [serviceSkinTypes, setServices]);
-
-  const handleNavigate = (serviceId: number) => {
-    navigate(PagePath.SKIN_SERVICE_DETAIL, { state: { serviceId } });
-  };
+  }, [serviceData, isLoadingService, errorService, setServices]);
 
   return (
-    <div className="skincare-container">
-      <Title level={2} className="skincare-title">
+    <div style={{ padding: "20px" }}>
+      <Title
+        level={2}
+        style={{ textAlign: "center", marginBottom: "30px", color: "#6f4e37" }}
+      >
         Dịch Vụ Chăm Sóc Da Chuyên Nghiệp
       </Title>
       <div
