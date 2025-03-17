@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
 export interface ResetPasswordDto {
@@ -8,11 +8,11 @@ export interface ResetPasswordDto {
 }
 
 export const useResetPassword = () => {
-  return useQuery({
-    queryKey: ["resetPassword"],
-    queryFn: async () => {
-      const response = await axios.post<ResetPasswordDto[]>(
-        "https://localhost:7071/api/auth/resetPassword"
+  return useMutation({
+    mutationFn: async (resetPassword: ResetPasswordDto) => {
+      const response = await axios.post(
+        `https://localhost:7071/api/auth/resetPassword`,
+        resetPassword
       );
       return response.data;
     },
