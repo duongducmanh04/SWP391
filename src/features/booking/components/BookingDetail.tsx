@@ -38,6 +38,8 @@ import TextArea from "antd/es/input/TextArea";
 import { PagePath } from "../../../enums/page-path.enum";
 import { useUpdateNote } from "../hooks/useUpdateNoteBooking";
 import { useUpdateTherapist } from "../hooks/useUpdateTherapist";
+import { useSlots } from "../../services/hooks/useGetSlot";
+import { SlotDto } from "../../services/dto/slot.dto";
 const { Title } = Typography;
 
 const BookingDetail = () => {
@@ -60,6 +62,7 @@ const BookingDetail = () => {
   const { data: service } = useServices();
   const { data: therapists } = useTherapists();
   const { data: customers } = useCustomers();
+  const { data: slots } = useSlots();
 
   const { mutate: updateServiceName } = useUpdateServiceName();
   const { mutate: updateServiceAmount } = useUpdateServiceAmount();
@@ -105,6 +108,13 @@ const BookingDetail = () => {
   if (customers) {
     customers.forEach((customer) => {
       customerMap.set(customer.customerId, customer);
+    });
+  }
+
+  const slotMap = new Map<number, SlotDto>();
+  if (slots) {
+    slots.forEach((slot) => {
+      slotMap.set(slot.bookingId, slot);
     });
   }
 
@@ -172,10 +182,6 @@ const BookingDetail = () => {
       setSelectedServiceAmount(selected.price);
     }
   };
-
-  // const handleTherapistChange = (value: number) => {
-  //   setSelectedTherapist(value);
-  // };
 
   const handleUpdateNote = () => {
     updateNote(
@@ -267,81 +273,6 @@ const BookingDetail = () => {
       editable: false,
     },
   ];
-
-  // const serviceColumns = [
-  //   {
-  //     title: "Thông tin",
-  //     dataIndex: "name",
-  //     key: "name",
-  //     width: "30%",
-  //   },
-  //   {
-  //     title: "Giá trị",
-  //     dataIndex: "value",
-  //     key: "value",
-  //     render: (text: string, record: any) => {
-  //       if (record.editable && isEditing && record.key === "1") {
-  //         return (
-  //           <Select
-  //             style={{ width: "100%" }}
-  //             value={selectedService}
-  //             onChange={handleServiceChange}
-  //           >
-  //             {service?.map((service: any) => (
-  //               <Select.Option key={service.serviceId} value={service.name}>
-  //                 {service.name}
-  //               </Select.Option>
-  //             ))}
-  //           </Select>
-  //         );
-  //       }
-  //       return text;
-  //     },
-  //   },
-  //   {
-  //     title: "Thao tác",
-  //     key: "action",
-  //     width: "20%",
-  //     render: (_: any, record: any) => {
-  //       if (record.editable) {
-  //         if (isEditing && record.key === "1") {
-  //           return (
-  //             <>
-  //               <Button
-  //                 type="primary"
-  //                 icon={<SaveOutlined />}
-  //                 onClick={handleUpdateService}
-  //                 style={{ marginRight: 8 }}
-  //               >
-  //                 Lưu
-  //               </Button>
-  //               <Button
-  //                 icon={<CloseOutlined />}
-  //                 onClick={() => setIsEditing(false)}
-  //               >
-  //                 Hủy
-  //               </Button>
-  //             </>
-  //           );
-  //         }
-  //         return (
-  //           <Button
-  //             type="primary"
-  //             icon={<EditOutlined />}
-  //             onClick={() => {
-  //               setSelectedService(booking.serviceName);
-  //               setIsEditing(true);
-  //             }}
-  //             disabled={isEditing}
-  //           >
-  //             Sửa
-  //           </Button>
-  //         );
-  //       }
-  //       return null;
-  //     },
-  //   },
-  // ];
 
   const serviceColumns = [
     {
@@ -466,7 +397,10 @@ const BookingDetail = () => {
                 {booking.serviceName}
               </Descriptions.Item>
               <Descriptions.Item label="Ngày đặt lịch">
-                {dayjs(booking.date).format("DD/MM/YYYY HH:mm:ss")}
+                {dayjs(booking.date).format("DD/MM/YYYY")}{" "}
+                {slotMap.get(booking.bookingId)?.time
+                  ? ` - ${slotMap.get(booking.bookingId)?.time}`
+                  : ""}
               </Descriptions.Item>
               <Descriptions.Item label="Tình trạng thanh toán">
                 <StatusTag status={booking.status} />

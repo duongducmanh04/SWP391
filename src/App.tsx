@@ -42,6 +42,7 @@ import ServiceTable from "./features/services/components/ServiceTable";
 import SlotTable from "./features/services/components/SlotTable";
 import SkinTypeTable from "./features/skin_type/components/SkinTypeTable";
 import ResetPassword from "./features/authentication/components/ResetPassword";
+import QuizTable from "./features/quiz/components/QuizTable";
 
 const App = () => {
   return (
@@ -75,6 +76,7 @@ const App = () => {
               path={PagePath.SCHEDULE_FOR_THERAPIST}
               element={<ScheduleCalendarManagementPage />}
             />
+            <Route path={PagePath.QUIZ_MANAGEMENT} element={<QuizTable />} />
             <Route
               path={PagePath.SERVICE_MANAGEMENT}
               element={<ServiceTable />}
