@@ -1,19 +1,11 @@
-import {
-  Card,
-  Typography,
-  Row,
-  Col,
-  Image,
-  Divider,
-  Spin
-} from "antd";
-import { UserOutlined, CalendarOutlined } from "@ant-design/icons";
 import { useLocation } from "react-router-dom";
+import { Typography, Card, Divider, Avatar } from "antd";
+import { UserOutlined } from "@ant-design/icons";
 import { useBlogById } from "../hooks/useGetBlogId";
 import dayjs from "dayjs";
 import { useCustomers } from "../../user/hook/useGetCustomer";
 
-const { Title, Text  } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
 const BlogDetail = () => {
   const location = useLocation();
@@ -41,12 +33,16 @@ const BlogDetail = () => {
     adImage: "https://via.placeholder.com/800x100",
   };
 
-  if (isError || !blog) {
-    return <div>Không tìm thấy bài viết</div>;
-  }
-
   return (
-    <div style={{ padding: "20px" }}>
+    <div
+      style={{
+        padding: "20px",
+        maxWidth: "800px",
+        margin: "0 auto",
+        background: "#fff",
+      }}
+    >
+      {/* Tiêu đề bài viết */}
       <Card
         cover={
           <img
@@ -57,11 +53,10 @@ const BlogDetail = () => {
         }
         bordered={false}
         style={{
-          maxWidth: 1200,
-          margin: "20px auto",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          borderRadius: "10px",
+          overflow: "hidden",
+          marginBottom: "20px",
         }}
-        bodyStyle={{ padding: 24 }}
       >
         <Title level={2}>{blog?.title}</Title>
         <div

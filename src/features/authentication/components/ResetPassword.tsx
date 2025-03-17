@@ -9,13 +9,9 @@ const ResetPassword = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const location = useLocation();
-
-  
   const email = location.state?.email || sessionStorage.getItem("user_email");
   const otp = location.state?.otp || sessionStorage.getItem("otp");
-
   const { mutate: resetPassword, isPending } = useResetPassword();
-
   const onFinish = (values: { newPassword: string; confirmNewPassword: string }) => {
     if (!email || !otp) {
       message.error("Lỗi: Không tìm thấy email hoặc OTP!");
