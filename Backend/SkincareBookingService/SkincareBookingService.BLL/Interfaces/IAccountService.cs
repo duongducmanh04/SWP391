@@ -8,6 +8,8 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<List<AccountDTO>> GetAllAccountAsync();
 
+        Task<bool> GetAccountByAccountNameAndEmail(string accountName, string email);
+
         Task<List<AccountDTO>> GetAccountByRoleAsync(string role);
 
         Task<List<AccountDTO>> GetAccountByIdAndRoleAsync(int accountId, string role);

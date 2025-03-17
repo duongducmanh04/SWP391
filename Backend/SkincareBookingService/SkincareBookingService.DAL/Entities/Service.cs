@@ -22,6 +22,7 @@ public partial class Service
     public int? Duration { get; set; }
 
     public string ProcedureDescription { get; set; }
+
     public double? AverageStars { get; set; }
 
     public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
