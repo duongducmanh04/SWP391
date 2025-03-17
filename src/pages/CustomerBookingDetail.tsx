@@ -9,6 +9,8 @@ import StatusTag from "../components/TagStatus";
 import { useState } from "react";
 import { useGetCustomerId } from "../features/user/hook/useGetCustomerId";
 import { Status } from "../enums/status-booking";
+import { useSlots } from "../features/services/hooks/useGetSlot";
+import { SlotDto } from "../features/services/dto/slot.dto";
 
 const API_BASE_URL =
   "http://skincare-sbs.southeastasia.azurecontainer.io:8080/api/Booking";
@@ -18,6 +20,7 @@ const CustomerBookingDetail = () => {
   const location = useLocation();
   const { bookingId } = location.state || {};
   const queryClient = useQueryClient();
+  const { data: slots } = useSlots();
 
   const { customerId } = useGetCustomerId();
   const [rating, setRating] = useState(0);
@@ -30,6 +33,13 @@ const CustomerBookingDetail = () => {
     isError,
     error,
   } = useBookingById(validBookingId);
+
+  const slotMap = new Map<number, SlotDto>();
+  if (slots) {
+    slots.forEach((slot) => {
+      slotMap.set(slot.bookingId, slot);
+    });
+  }
 
   const cancelBookingMutation = useMutation({
     mutationFn: async () => {
@@ -116,8 +126,11 @@ const CustomerBookingDetail = () => {
               <strong>Dịch vụ:</strong> {booking.serviceName}
             </p>
             <p>
-              <strong>Ngày đặt:</strong>{" "}
-              {dayjs(booking.date).format("DD/MM/YYYY HH:mm")}
+              <strong>Ngày đặt làm:</strong>{" "}
+              {dayjs(booking.date).format("DD/MM/YYYY")}{" "}
+              {slotMap.get(booking.bookingId)?.time
+                ? ` - ${slotMap.get(booking.bookingId)?.time}`
+                : ""}
             </p>
             <p>
               <strong>Trạng thái:</strong> <StatusTag status={booking.status} />

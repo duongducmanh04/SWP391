@@ -174,6 +174,15 @@ const SidebarMenu = () => {
           },
         ]
       : []),
+    ...(user?.role === RoleCode.ADMIN
+      ? [
+          {
+            key: PagePath.QUIZ_MANAGEMENT,
+            icon: <HourglassOutlined />,
+            label: <Link to={PagePath.QUIZ_MANAGEMENT}>Quản lý quiz</Link>,
+          },
+        ]
+      : []),
     // {
     //   key: "2",
     //   icon: <AppstoreOutlined />,
