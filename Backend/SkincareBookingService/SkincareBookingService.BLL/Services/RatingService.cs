@@ -1,4 +1,5 @@
-﻿using SkincareBookingService.BLL.DTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
@@ -18,52 +19,52 @@ namespace SkincareBookingService.BLL.Services
             _customerRepository = customerRepository;
         }
 
-        public async Task<IEnumerable<RatingDto>> GetRatingsAsync()
+        public async Task<IEnumerable<GetRatingDto>> GetRatingsAsync()
         {
             var ratings = await _ratingRepository.GetAllAsync();
-            List<RatingDto> ratingDtos = new List<RatingDto>();
+            List<GetRatingDto> ratingDtos = new List<GetRatingDto>();
             foreach (var rating in ratings)
             {
-                ratingDtos.Add(await MapToDto(rating));
+                ratingDtos.Add(await MapToGetDto(rating));
             }
 
             return ratingDtos;
         }
 
-        public async Task<RatingDto> GetRatingByIdAsync(int id)
+        public async Task<GetRatingDto> GetRatingByIdAsync(int id)
         {
             if(id <= 0) return null;
             var rating = await _ratingRepository.GetByIdAsync(id);
-            return rating == null ? null : await MapToDto(rating);
+            return rating == null ? null : await MapToGetDto(rating);
         }
 
-        public async Task<IEnumerable<RatingDto>> GetRatingsByServiceIdAsync(int serviceId)
+        public async Task<IEnumerable<GetRatingDto>> GetRatingsByServiceIdAsync(int serviceId)
         {
             if (serviceId <= 0) return null;
             var ratings = await _ratingRepository.FindAsync(r => r.ServiceId == serviceId);
-            List<RatingDto> ratingDtos = new List<RatingDto>();
+            List<GetRatingDto> ratingDtos = new List<GetRatingDto>();
             foreach (var rating in ratings)
             {
-                ratingDtos.Add(await MapToDto(rating));
+                ratingDtos.Add(await MapToGetDto(rating));
             }
 
             return ratingDtos;
         }
 
-        public async Task<IEnumerable<RatingDto>> GetRatingsByCustomerIdAsync(int customerId)
+        public async Task<IEnumerable<GetRatingDto>> GetRatingsByCustomerIdAsync(int customerId)
         {
             if (customerId <= 0) return null;
             var ratings = await _ratingRepository.FindAsync(r => r.CustomerId == customerId);
-            List<RatingDto> ratingDtos = new List<RatingDto>();
+            List<GetRatingDto> ratingDtos = new List<GetRatingDto>();
             foreach (var rating in ratings)
             {
-                ratingDtos.Add(await MapToDto(rating));
+                ratingDtos.Add(await MapToGetDto(rating));
             }
 
             return ratingDtos;
         }
 
-        public async Task<RatingDto> CreateRatingAsync(PostRatingDto dto)
+        public async Task<GetRatingDto> CreateRatingAsync(PostRatingDto dto)
         {
             var existingRating = (await _ratingRepository.FindAsync(r => r.CustomerId == dto.CustomerId && r.ServiceId == dto.ServiceId))
                                  .FirstOrDefault();
@@ -73,7 +74,7 @@ namespace SkincareBookingService.BLL.Services
                 existingRating.Stars = dto.Stars;
                 existingRating.CreateAt = DateTime.UtcNow;
                 await _ratingRepository.UpdateAsync(existingRating);
-                return await MapToDto(existingRating);
+                return await MapToGetDto(existingRating);
             }
 
             var rating = new Rating
@@ -85,8 +86,7 @@ namespace SkincareBookingService.BLL.Services
             };
 
             await _ratingRepository.AddAsync(rating);
-            await SumAllRatings();
-            return await MapToDto(rating);
+            return await MapToGetDto(rating);
         }
 
         public async Task<bool> UpdateRatingAsync(int id, PutRatingDto dto)
@@ -96,7 +96,6 @@ namespace SkincareBookingService.BLL.Services
             if (rating == null) return false;
             rating.Stars = dto.Stars;
             await _ratingRepository.UpdateAsync(rating);
-            await SumAllRatings();
             return true;
         }
 
@@ -106,16 +105,15 @@ namespace SkincareBookingService.BLL.Services
             var rating = await _ratingRepository.GetByIdAsync(id);
             if (rating == null) return false;
             await _ratingRepository.DeleteAsync(rating);
-            await SumAllRatings();
             return true;
         }
 
-        private async Task<RatingDto> MapToDto(Rating rating)
+        private async Task<GetRatingDto> MapToGetDto(Rating rating)
         {
             var customer = await _customerRepository.GetByIdAsync(rating.CustomerId);
             var service = await _serviceRepository.GetByIdAsync(rating.ServiceId);
 
-            return new RatingDto
+            return new GetRatingDto
             {
                 RatingId = rating.RatingId,
                 CustomerId = rating.CustomerId,
@@ -126,10 +124,32 @@ namespace SkincareBookingService.BLL.Services
                 ServiceName = service?.Name
             };
         }
-        private async Task SumAllRatings()
+
+        public async Task<bool> SumRatingByServiceId(int serviceId)
+        {
+            if(serviceId <= 0) return false;
+
+            var rating = await _ratingRepository
+                .Query()
+                .Where(r => r.ServiceId == serviceId)
+                .ToListAsync();
+            var service = await _serviceRepository.GetByIdAsync(serviceId);
+
+            if (rating == null || rating.Count == 0 || service == null) return false;
+
+            service.AverageStars = rating.Average(r => r.Stars);
+
+            await _serviceRepository.UpdateAsync(service);
+            await _serviceRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> SumAllServiceAverageStar()
         {
             var ratings = await _ratingRepository.GetAllAsync();
             var services = await _serviceRepository.GetAllAsync();
+
+            if(ratings == null || ratings.Count() == 0 || services == null || services.Count() == 0) return false;
 
             foreach (var service in services)
             {
@@ -141,6 +161,8 @@ namespace SkincareBookingService.BLL.Services
                     await _serviceRepository.SaveChangesAsync();
                 }
             }
+
+            return true;
         }
     }
 }

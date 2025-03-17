@@ -61,5 +61,25 @@ namespace SkincareBookingService.Controllers
             if (!deleted) return NotFound();
             return NoContent();
         }
+        [HttpGet("/sumAverageStar/{serviceId}")]
+        public async Task<IActionResult> SumAverageStarByServiceId(int serviceId)
+        {
+            var result = await _ratingService.SumRatingByServiceId(serviceId);
+            if(result == false)
+            {
+                return BadRequest("Invalid service id or service hasn't have any rating yet");
+            }
+            return Ok();
+        }
+        [HttpGet("/sumAverageStar/allSerivces")]
+        public async Task<IActionResult> SumAverageStarOfAllServices()
+        {
+            var result = await _ratingService.SumAllServiceAverageStar();
+            if(result == false)
+            {
+                return BadRequest("There is no service or rating yet");
+            }
+            return Ok();
+        }
     }
 }
