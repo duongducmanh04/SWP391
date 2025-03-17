@@ -10,6 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import useAuthStore from "../hooks/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import { LoginDto } from "../dto/login.dto";
+import { useRegister } from "../hooks/useRegister";
 import { PagePath } from "../../../enums/page-path.enum";
 import { RoleCode } from "../../../enums/role.enum";
 import "../../../style/Login.css";
@@ -23,6 +24,7 @@ const LoginRegister = () => {
   const [activeTab, setActiveTab] = useState("1");
   const { login } = useAuthStore();
   const navigate = useNavigate();
+  const { mutate: createAccount } = useRegister();
 
   const loginMutation = useMutation<
     { success: boolean; message: string; role: string },
@@ -51,56 +53,33 @@ const LoginRegister = () => {
     },
   });
 
-  const registerMutation = useMutation<
-    { success: boolean; message: string },
-    unknown,
-    any
-  >({
-    mutationFn: async (values) => {
-      console.log("🚀 Sending register request to API:", values);
-
-      const payload = {
-        accountName: values.accountName,
-        password: values.password,
-        email:values.email,
-      };
-
-      const response = await fetch("https://localhost:7071/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+  const handleCreateAccount = () => {
+    registerForm
+      .validateFields()
+      .then((values) => {
+        createAccount(values, {
+          onSuccess: () => {
+            message.success("Tạo tài khoản thành công! Hãy đăng nhập.");
+            setTimeout(() => {
+              setActiveTab("1");
+              registerForm.resetFields();
+            }, 100);
+          },
+          onError: (err: { message: any }) => {
+            message.error(`Lỗi tạo tài khoản: ${err.message}`);
+          },
+        });
+      })
+      .catch((info) => {
+        console.error("Validate Failed:", info);
       });
-
-      console.log("📩 API Response received:", response);
-      return response.json();
-    },
-    onSuccess: (response) => {
-      console.log("📦 API Response Data:", response);
-      if (response.message.trim() === "Account registered successfully!") {
-        message.success("Đăng ký thành công! Vui lòng đăng nhập.");
-        setTimeout(() => {
-          setActiveTab("1");
-        }, 100);
-      }
-    },
-    onError: (error) => {
-      message.error("Lỗi kết nối đến máy chủ: " + (error as Error).message);
-    },
-  });
+  };
 
   const onFinish = (values: any) => {
-    console.log("📌 Active Tab at Form Submit:", activeTab);
-
     if (activeTab === "1") {
-      console.log("🔑 Logging in:", values);
       loginMutation.mutate(values);
     } else if (activeTab === "2") {
-      console.log("🆕 Registering:", values);
-      registerMutation.mutate(values);
-    } else {
-      console.error("Unexpected Tab State:", activeTab);
+      handleCreateAccount();
     }
   };
 
@@ -180,7 +159,7 @@ const LoginRegister = () => {
                     "❌ Form submission failed. Errors:",
                     errorInfo
                   );
-                  alert("Đăng ký thất bại ! Hãy thử lại ");
+                  message.error("Đăng ký thất bại ! Hãy thử lại ");
                 }}
               >
                 <Form.Item
@@ -194,7 +173,16 @@ const LoginRegister = () => {
                 <Form.Item
                   name="email"
                   label="Email"
-                  rules={[{ required: true, message: "Nhập Email" }]}
+                  rules={[
+                    {
+                      type: "email",
+                      message: "Email không hợp lệ",
+                    },
+                    {
+                      required: true,
+                      message: "Nhập email",
+                    },
+                  ]}
                 >
                   <Input placeholder="Email" allowClear />
                 </Form.Item>
@@ -248,7 +236,6 @@ const LoginRegister = () => {
                     type="primary"
                     htmlType="submit"
                     className="submit-btn"
-                   
                   >
                     Đăng ký
                   </Button>

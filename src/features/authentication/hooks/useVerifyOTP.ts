@@ -6,22 +6,14 @@ export interface VerifyOtpDto {
   otp: string;
 }
 
-const verifyOtp = async (data: VerifyOtpDto) => {
-  const response = await axios.post(
-    "https://localhost:7071/api/auth/verifyOtp",
-    JSON.stringify(data),
-    {
-      headers: {
-        "Content-Type": "application/json", 
-        "Accept": "application/json",
-      },
-    }
-  );
-  return response.data;
-};
-
 export const useVerifyOTP = () => {
   return useMutation({
-    mutationFn: verifyOtp,
+    mutationFn: async (verifyOTP: VerifyOtpDto) => {
+      const response = await axios.post(
+        `https://localhost:7071/api/auth/verifyOtp`,
+        verifyOTP
+      );
+      return response.data;
+    },
   });
 };

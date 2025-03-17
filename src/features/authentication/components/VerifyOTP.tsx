@@ -1,50 +1,52 @@
-import { useEffect } from "react";
 import { Button, Form, Input, message } from "antd";
-import { useNavigate, useLocation } from "react-router-dom";
 import "../../../style/App.css";
+import { useLocation, useNavigate } from "react-router-dom";
 import { PagePath } from "../../../enums/page-path.enum";
 import { useVerifyOTP } from "../hooks/useVerifyOTP";
+import { OTPProps } from "antd/es/input/OTP";
 
 const VerifyOTP = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const { mutate: verifyOTP } = useVerifyOTP();
   const location = useLocation();
-  
-  
-  const email = location.state?.email || sessionStorage.getItem("user_email");
+  const storedEmail = localStorage.getItem("email");
+  const email = location.state?.email || storedEmail;
 
-  useEffect(() => {
-    document.title = "Xác thực OTP";
-
-    
+  const handleFinish = (values: { otp: string }) => {
     if (!email) {
-      message.error("Lỗi: Không có email! Quay lại trang trước.");
-      navigate(PagePath.VERIFY_EMAIL);
-    }
-  }, [email, navigate]);
-
-  const { mutate: verifyOTP, isPending } = useVerifyOTP();
-
-  const onFinish = (values: { otp: string }) => {
-    if (!email) {
-      message.error("Lỗi: Không có email! Quay lại trang trước.");
+      message.error("Không tìm thấy email. Vui lòng nhập lại!");
       return;
     }
 
-    verifyOTP(
-      { email, otp: values.otp },
-      {
-        onSuccess: () => {
-          message.success("OTP hợp lệ! Bạn có thể đặt lại mật khẩu...");
-          sessionStorage.setItem("user_email", email);
-          sessionStorage.setItem("otp", values.otp);
-          navigate(PagePath.RESET_PASSWORD, { state: { email } });
-        },
-        onError: (error) => {
-          message.error("Xác thực OTP thất bại: " + (error as Error).message);
-        },
-      }
-    );
+    const payload = { email, otp: values.otp };
+
+    localStorage.setItem("otp", values.otp);
+
+    verifyOTP(payload, {
+      onSuccess: () => {
+        message.success("OTP hợp lệ! Bạn có thể đặt lại mật khẩu");
+        navigate(PagePath.RESET_PASSWORD, {
+          state: { email, otp: values.otp },
+        });
+      },
+      onError: (error: Error) => {
+        message.error("Xác thực OTP thất bại: " + error.message);
+      },
+    });
+  };
+
+  const onChange: OTPProps["onChange"] = (text) => {
+    console.log("onChange:", text);
+  };
+
+  const onInput: OTPProps["onInput"] = (value) => {
+    console.log("onInput:", value);
+  };
+
+  const sharedProps: OTPProps = {
+    onChange,
+    onInput,
   };
 
   return (
@@ -52,7 +54,7 @@ const VerifyOTP = () => {
       <h2 style={{ fontWeight: 700, fontSize: "30px", margin: 0 }}>Skincare</h2>
       <p style={{ marginTop: 0 }}>Xác thực OTP</p>
       <div className="form-container">
-        <Form form={form} name="verify-otp" onFinish={onFinish}>
+        <Form form={form} name="control-hooks" onFinish={handleFinish}>
           <Form.Item
             name="otp"
             label="OTP"
@@ -61,7 +63,7 @@ const VerifyOTP = () => {
             <Input maxLength={6} allowClear placeholder="Nhập mã OTP" />
           </Form.Item>
           <Form.Item>
-            <Button className="login-btn" type="primary" htmlType="submit" loading={isPending}>
+            <Button type="primary" htmlType="submit" className="submit-btn">
               Xác thực OTP
             </Button>
           </Form.Item>

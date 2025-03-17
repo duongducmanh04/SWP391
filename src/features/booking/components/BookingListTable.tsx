@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Table, Button, Space, Tooltip, Flex, Tabs } from "antd";
 import {
   // CheckCircleOutlined,
@@ -78,14 +78,31 @@ const BookingListTable = () => {
   const { data: customerData } = useCustomers();
 
   const { setBookings } = useBookingStore();
-  // const { mutate: updateCheckIn } = useCheckInBooking();
-  // const { mutate: updateCompleted } = useCompletedBooking();
-  // const { mutate: updateCancelled } = useCancelledBooking();
-  // const { mutate: updateDenied } = useDeniedBooking();
   const navigate = useNavigate();
   const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
   const [activeTab, setActiveTab] = useState("all");
   const { user } = useAuthStore();
+  const accountId = user?.accountId;
+
+  const skintherapistId = useMemo(() => {
+    if (!therapistData || therapistData.length === 0 || !accountId)
+      return undefined;
+
+    const therapist = therapistData.find(
+      (t) => Number(t.accountId) === Number(accountId)
+    );
+
+    return therapist?.skintherapistId;
+  }, [therapistData, accountId]);
+
+  const filteredBookings = useMemo(() => {
+    if (!bookingData || !skintherapistId) return bookingData;
+    return bookingData.filter(
+      (booking) =>
+        booking.skintherapistId === skintherapistId &&
+        booking.status === Status.CHECK_IN
+    );
+  }, [bookingData, skintherapistId]);
 
   const therapistMap = new Map<number, TherapistDto>();
   if (therapistData) {
@@ -148,38 +165,9 @@ const BookingListTable = () => {
     setBookings,
   ]);
 
-  // const handleConfirmAction = async (
-  //   action: "checkin" | "checkout" | "cancel" | "deny",
-  //   bookingId: number
-  // ): Promise<void> => {
-  //   const actionFunctions = {
-  //     checkin: updateCheckIn,
-  //     checkout: updateCompleted,
-  //     cancel: updateCancelled,
-  //     deny: updateDenied,
-  //   };
-
-  //   actionFunctions[action](
-  //     { BookingId: bookingId },
-  //     {
-  //       onSuccess: () => {
-  //         if (action === "checkin" || action === "cancel") {
-  //           refetchBooked();
-  //         } else {
-  //           refetchFinished();
-  //         }
-  //       },
-  //     }
-  //   );
-  // };
-
   const handleTableChange = (pagination: any) => {
     setPagination(pagination);
   };
-
-  // const handleNavigate = (bookingId: number) => {
-  //   navigate(`/Home/Booking/${bookingId}`);
-  // };
 
   const handleNavigate = (bookingId: number) => {
     navigate(PagePath.BOOKING_DETAIL, {
@@ -404,7 +392,7 @@ const BookingListTable = () => {
         </Tabs>
       ) : (
         <Table
-          dataSource={checkInData}
+          dataSource={filteredBookings}
           columns={columns}
           loading={isLoadingCheckIn}
           rowKey="bookingId"

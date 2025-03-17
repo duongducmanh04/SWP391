@@ -1,10 +1,11 @@
-import { useEffect } from "react";
-import { Card, Button, Row, Col, Typography } from "antd";
+import { useEffect, useState } from "react";
+import { Card, Button, Row, Col, Typography, Input } from "antd";
 import { HeartOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useServices } from "../hooks/useGetService";
 import { useServiceStore } from "../hooks/useServiceStore";
 import { PagePath } from "../../../enums/page-path.enum";
+import { ServiceDto } from "../dto/get-service.dto";
 
 const { Title, Text } = Typography;
 
@@ -17,6 +18,10 @@ const SkincareServices = () => {
   } = useServices();
 
   const { setServices } = useServiceStore();
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [filteredTherapists, setFilteredTherapists] = useState<ServiceDto[]>(
+    []
+  );
 
   // const handleNavigate = (serviceId: number) => {
   //   navigate(`/Homepage/Service/${serviceId}`);
@@ -27,6 +32,20 @@ const SkincareServices = () => {
         serviceId: serviceId,
       },
     });
+  };
+
+  useEffect(() => {
+    const filtered = serviceData?.filter((service: ServiceDto) => {
+      const matchesSearch = service.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      return matchesSearch;
+    });
+    setFilteredTherapists(filtered || []);
+  }, [searchTerm, serviceData]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
   };
 
   useEffect(() => {
@@ -43,8 +62,23 @@ const SkincareServices = () => {
       >
         Dịch Vụ Chăm Sóc Da Chuyên Nghiệp
       </Title>
+      <div
+        style={{
+          marginBottom: "20px",
+          display: "flex",
+          gap: "10px",
+          justifyContent: "end",
+        }}
+      >
+        <Input
+          placeholder="Tìm kiếm dịch vụ..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          style={{ width: 300 }}
+        />
+      </div>
       <Row gutter={[16, 16]} justify="start">
-        {serviceData?.map((service) => (
+        {filteredTherapists?.map((service) => (
           <Col
             key={service.serviceId}
             xs={24}

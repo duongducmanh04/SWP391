@@ -1,7 +1,7 @@
 import { Button, Form, Input, message } from "antd";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import "../../../style/App.css";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { PagePath } from "../../../enums/page-path.enum";
 import { useResetPassword } from "../hooks/useResetPassword";
 
@@ -9,34 +9,31 @@ const ResetPassword = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email || sessionStorage.getItem("user_email");
-  const otp = location.state?.otp || sessionStorage.getItem("otp");
-  const { mutate: resetPassword, isPending } = useResetPassword();
-  const onFinish = (values: { newPassword: string; confirmNewPassword: string }) => {
-    if (!email || !otp) {
-      message.error("Lỗi: Không tìm thấy email hoặc OTP!");
-      navigate(PagePath.VERIFY_EMAIL);
+  const { mutate: resetPassword } = useResetPassword();
+  const storedEmail = localStorage.getItem("email");
+  const email = location.state?.email || storedEmail;
+  const storedOtp = localStorage.getItem("otp");
+  const otp = location.state?.otp || storedOtp;
+
+  const handleFinish = (values: { newPassword: string }) => {
+    if (!email) {
+      message.error("Không tìm thấy email. Vui lòng nhập lại!");
       return;
     }
 
-    if (values.newPassword !== values.confirmNewPassword) {
-      message.error("Mật khẩu mới không trùng khớp!");
-      return;
-    }
+    const payload = { email, otp, newPassword: values.newPassword };
 
-    resetPassword(
-      { email, otp, newPassword: values.newPassword },
-      {
-        onSuccess: () => {
-          message.success("Đặt lại mật khẩu thành công! Bạn có thể đăng nhập lại...");
-          navigate(PagePath.LOGIN);
-        },
-        onError: (error) => {
-          console.error("❌ API Error:", error);
-          message.error("Đặt lại mật khẩu thất bại: " + (error as Error).message);
-        },
-      }
-    );
+    resetPassword(payload, {
+      onSuccess: () => {
+        message.success(
+          "Đặt lại mật khẩu thành công! Bạn có thể đăng nhập lại..."
+        );
+        navigate(PagePath.HOME);
+      },
+      onError: (error: Error) => {
+        message.error("Đặt lại mật khẩu thất bại: " + (error as Error).message);
+      },
+    });
   };
 
   return (
@@ -44,8 +41,8 @@ const ResetPassword = () => {
       <h2 style={{ fontWeight: 700, fontSize: "30px", margin: 0 }}>Skincare</h2>
       <p style={{ marginTop: 0 }}>Đặt lại mật khẩu</p>
       <div className="form-container">
-        <Form form={form} name="reset-password" onFinish={onFinish}>
-        <Form.Item
+        <Form form={form} name="control-hooks" onFinish={handleFinish}>
+          <Form.Item
             name="newPassword"
             label="Mật khẩu mới"
             rules={[
@@ -63,8 +60,18 @@ const ResetPassword = () => {
           </Form.Item>
           <Form.Item
             name="confirmNewPassword"
-            label="Nhập lại mật khẩu"
-            rules={[{ required: true, message: "Nhập lại mật khẩu mới" }]}
+            label="Nhập lại mật khẩu mới"
+            rules={[
+              { required: true, message: "Nhập lại mật khẩu mới" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("newPassword") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error("Mật khẩu không khớp!"));
+                },
+              }),
+            ]}
           >
             <Input.Password
               placeholder="Xác nhận mật khẩu mới"
@@ -75,7 +82,7 @@ const ResetPassword = () => {
             />
           </Form.Item>
           <Form.Item>
-            <Button className="login-btn" type="primary" htmlType="submit" loading={isPending}>
+            <Button className="login-btn" type="primary" htmlType="submit" >
               Lưu
             </Button>
           </Form.Item>
