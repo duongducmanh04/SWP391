@@ -41,6 +41,7 @@ import CustomerBookingDetail from "./pages/CustomerBookingDetail";
 import ServiceTable from "./features/services/components/ServiceTable";
 import SlotTable from "./features/services/components/SlotTable";
 import SkinTypeTable from "./features/skin_type/components/SkinTypeTable";
+import ResetPassword from "./features/authentication/components/ResetPassword";
 
 const App = () => {
   return (
@@ -55,6 +56,7 @@ const App = () => {
           <Route path={PagePath.REGISTER} element={<Register />} />
           <Route path={PagePath.VERIFY_EMAIL} element={<VerifyEmail />} />
           <Route path={PagePath.VERIFY_OTP} element={<VerifyOTP />} />
+          <Route path={PagePath.RESET_PASSWORD} element={<ResetPassword />} />
           <Route path={PagePath.ANY} element={<NotFoundPage />} />
           <Route path={PagePath.FORBIDDEN} element={<ForbiddenPage />} />
           <Route element={<SidebarMenu />}>

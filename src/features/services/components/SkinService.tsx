@@ -1,31 +1,13 @@
 import { useEffect, useState } from "react";
-import {
-  Card,
-  Button,
-  Row,
-  Col,
-  Typography,
-  Modal,
-  Slider,
-  Select,
-} from "antd";
-import {
-  HeartOutlined,
-  ShoppingCartOutlined,
-  FilterOutlined,
-} from "@ant-design/icons";
+import { Card, Button, Row, Col, Typography, Input } from "antd";
+import { HeartOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useServices } from "../hooks/useGetService";
 import { useServiceStore } from "../hooks/useServiceStore";
 import { useSkinTypes } from "../../skin_type/hooks/useGetSkin";
 import { PagePath } from "../../../enums/page-path.enum";
-import axios from "axios";
-import { SkinDto } from "../../skin_type/dto/skin.dto";
 import { ServiceDto } from "../dto/get-service.dto";
-import { SkintypeServiceDto } from "../../services/dto/skintype-service.dto";
-
-import "../../../style/Service.css";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -57,35 +39,35 @@ const SkincareServices = () => {
   const navigate = useNavigate();
   const { data: serviceData } = useServices();
   const { setServices } = useServiceStore();
-  const { data: skinTypes } = useSkinTypes();
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [filteredTherapists, setFilteredTherapists] = useState<ServiceDto[]>(
+    []
+  );
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-  const [selectedSkinType, setSelectedSkinType] = useState<number | null>(null);
-  const [filteredData, setFilteredData] = useState<ServiceSkinType[]>([]);
+  // const handleNavigate = (serviceId: number) => {
+  //   navigate(`/Homepage/Service/${serviceId}`);
+  // };
+  const handleNavigate = (serviceId: number) => {
+    navigate(PagePath.SKIN_SERVICE_DETAIL, {
+      state: {
+        serviceId: serviceId,
+      },
+    });
+  };
 
-  const { data: serviceSkinTypes, isFetching } = useQuery<ServiceSkinType[]>({
-    queryKey: ["serviceSkinTypes", serviceData],
-    queryFn: async () => {
-      if (!serviceData || !skinTypes) return [];
-      return await Promise.all(
-        serviceData.map(async (service) => {
-          const skinData = await fetchSkinTypeByServiceId(service.serviceId);
-          const matchedSkinTypes = skinTypes.filter((st) =>
-            skinData.includes(st.skintypeId)
-          );
-          return {
-            ...service,
-            skinTypeIds: skinData,
-            skinTypeNames: matchedSkinTypes.length
-              ? matchedSkinTypes.map((st) => st.skintypeName).join(", ")
-              : "Không xác định",
-          } as ServiceSkinType;
-        })
-      );
-    },
-    enabled: !!serviceData && !!skinTypes,
-  });
+  useEffect(() => {
+    const filtered = serviceData?.filter((service: ServiceDto) => {
+      const matchesSearch = service.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      return matchesSearch;
+    });
+    setFilteredTherapists(filtered || []);
+  }, [searchTerm, serviceData]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
 
   useEffect(() => {
     if (serviceSkinTypes) {
@@ -103,103 +85,70 @@ const SkincareServices = () => {
       <Title level={2} className="skincare-title">
         Dịch Vụ Chăm Sóc Da Chuyên Nghiệp
       </Title>
-
-      <div className="filter-container">
-        <Button
-          type="primary"
-          icon={<FilterOutlined />}
-          onClick={() => setIsModalOpen(true)}
-        >
-          Bộ lọc
-        </Button>
-      </div>
-
-      <Modal
-        title="Bộ lọc"
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        onOk={() => {
-          let filtered = serviceSkinTypes || [];
-          filtered = filtered.filter(
-            (service) =>
-              service.price >= priceRange[0] && service.price <= priceRange[1]
-          );
-          if (selectedSkinType !== null) {
-            filtered = filtered.filter((service) =>
-              service.skinTypeIds?.includes(selectedSkinType)
-            );
-          }
-          setFilteredData(filtered);
-          setIsModalOpen(false);
+      <div
+        style={{
+          marginBottom: "20px",
+          display: "flex",
+          gap: "10px",
+          justifyContent: "end",
         }}
       >
-        <Title level={4}>Lọc theo giá</Title>
-        <Slider
-          range
-          min={0}
-          max={1000}
-          step={10}
-          value={priceRange}
-          onChange={(value) => setPriceRange(value as [number, number])}
+        <Input
+          placeholder="Tìm kiếm dịch vụ..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          style={{ width: 300 }}
         />
-
-        <Title level={4} style={{ marginTop: "16px" }}>
-          Lọc theo loại da
-        </Title>
-        <Select
-          placeholder="Chọn loại da"
-          allowClear
-          style={{ width: "100%" }}
-          value={selectedSkinType}
-          onChange={(value) => setSelectedSkinType(value)}
-        >
-          {skinTypes?.map((skin: SkinDto) => (
-            <Option key={skin.skintypeId} value={skin.skintypeId}>
-              {skin.skintypeName ?? `Loại da ${skin.skintypeId}`}
-            </Option>
-          ))}
-        </Select>
-      </Modal>
-
+      </div>
       <Row gutter={[16, 16]} justify="start">
-        {isFetching ? (
-          <Col span={24}>
-            <Text>Đang tải dữ liệu...</Text>
-          </Col>
-        ) : (
-          filteredData.map((service) => (
-            <Col key={service.serviceId} xs={24} sm={12} md={8} lg={6}>
-              <Card
-                hoverable
-                cover={
-                  <img
-                    alt={service.name}
-                    src={service.image}
-                    className="service-image"
-                  />
-                }
-                actions={[
-                  <Button type="text" icon={<HeartOutlined />} key="wishlist">
-                    Yêu thích
-                  </Button>,
-                  <Button
-                    type="primary"
-                    icon={<ShoppingCartOutlined />}
-                    key="book"
-                    onClick={() => handleNavigate(service.serviceId)}
-                  >
-                    Chi tiết
-                  </Button>,
-                ]}
+        {filteredTherapists?.map((service) => (
+          <Col
+            key={service.serviceId}
+            xs={24}
+            sm={12}
+            md={8}
+            lg={6}
+            style={{ display: "flex" }}
+          >
+            <Card
+              hoverable
+              cover={
+                <img
+                  alt={service.name}
+                  src={service.image}
+                  style={{ height: 222 }}
+                />
+              }
+              actions={[
+                <Button type="text" icon={<HeartOutlined />} key="wishlist">
+                  Yêu thích
+                </Button>,
+                <Button
+                  type="primary"
+                  icon={<ShoppingCartOutlined />}
+                  key="book"
+                  style={{ background: "#af8d70" }}
+                  onClick={() => handleNavigate(service.serviceId)}
+                >
+                  Chi tiết
+                </Button>,
+              ]}
+              style={{ width: "-webkit-fill-available" }}
+            >
+              <Title level={4}>{service.name}</Title>
+              <Text>{service.description}</Text>
+              <div
+                style={{
+                  marginTop: "10px",
+                  fontWeight: "bold",
+                  color: "#fa541c",
+                }}
               >
-                <Title level={4}>{service.name}</Title>
-                <Text>{service.description}</Text>
-                <Text strong>Giá: {service.price.toLocaleString()} VNĐ</Text>
-                <Text type="secondary">Loại da: {service.skinTypeNames}</Text>
-              </Card>
-            </Col>
-          ))
-        )}
+                {service.price}
+              </div>
+            </Card>
+          </Col>
+        ))}
       </Row>
     </div>
   );

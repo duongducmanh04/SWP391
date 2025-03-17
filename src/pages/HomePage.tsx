@@ -64,6 +64,10 @@ const HomePage = () => {
     });
   };
 
+  const topTherapists = [...therapists]
+    .sort((a, b) => parseInt(b.experience) - parseInt(a.experience))
+    .slice(0, 4);
+
   return (
     <Layout>
       <Layout
@@ -222,12 +226,12 @@ const HomePage = () => {
         </Row>
       </Content>
 
-      <Content style={{ padding: "50px", background: "#f5f5f5" }}>
-        <Title level={3} style={{ textAlign: "center" }}>
-          Chuyên viên trị liệu da
+      <div style={{ padding: "20px", backgroundColor: "#FBFEFB" }}>
+        <Title level={3} style={{ textAlign: "center", marginBottom: "30px" }}>
+          Top các chuyên viên trị liệu da có nhiều kinh nghiệm
         </Title>
         <Row gutter={[16, 16]}>
-          {therapists.map((therapist) => (
+          {topTherapists.map((therapist) => (
             <Col xs={24} sm={12} md={8} lg={6} key={therapist.skintherapistId}>
               <Card
                 hoverable

@@ -54,7 +54,7 @@ form {
   align-items: center;
 }
 
-body:has(.form-container) {
+/* body:has(.form-container) {
   background-image: url("https://dev.ddc.fis.vn/econstruction_web_client/assets/background-login-BeIlyCyv.png");
   background-position: center !important;
   background-repeat: no-repeat !important;
@@ -64,7 +64,7 @@ body:has(.form-container) {
   display: flex;
   justify-content: center;
   margin: 0;
-}
+} */
 
 #root:has(.form-container) {
   text-align: center;
