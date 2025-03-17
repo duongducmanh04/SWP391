@@ -51,6 +51,13 @@ namespace SkincareBookingService.BLL.Services
             return true;
         }
 
+        public async Task<bool> GetAccountByAccountNameAndEmail(string accountName, string email)
+        {
+            var account = await _accountRepository.FirstOrDefaultAsync(a => a.AccountName == accountName && a.Customers.Any(c => c.Email == email));
+
+            return account != null;
+        }
+
         public async Task<List<AccountDTO>> GetAccountByIdAndRoleAsync(int accountId, string role)
         {
 

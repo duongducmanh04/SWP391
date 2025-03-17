@@ -11,11 +11,13 @@ namespace SkincareBookingService.Controllers
     {
         private readonly IAuthService _authService;
         private readonly IJwtService _jwtService;
+        private readonly IAccountService _accountService;
 
-        public AuthController(IAuthService authService, IJwtService jwtService)
+        public AuthController(IAuthService authService, IJwtService jwtService, IAccountService accountService)
         {
             _authService = authService;
             _jwtService = jwtService;
+            _accountService = accountService;
         }
 
         [HttpPost("login")]
@@ -50,16 +52,24 @@ namespace SkincareBookingService.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
         {
-            if (string.IsNullOrEmpty(registerDTO.AccountName) || string.IsNullOrEmpty(registerDTO.Email) || string.IsNullOrEmpty(registerDTO.Password))
+            if (await _accountService.GetAccountByAccountNameAndEmail(registerDTO.AccountName, registerDTO.Email) == false)
             {
-                return BadRequest(new { message = "Please enter account, email and password!" });
+                return BadRequest(new { message = "Account name or email already exists!" });
             }
-            var account = await _authService.RegisterAsync(registerDTO.AccountName, registerDTO.Email, registerDTO.Password);
-            if (account == null)
+            else
             {
-                return BadRequest(new { message = "Failed to register account!" });
+                if (string.IsNullOrEmpty(registerDTO.AccountName) || string.IsNullOrEmpty(registerDTO.Email) || string.IsNullOrEmpty(registerDTO.Password))
+                {
+                    return BadRequest(new { message = "Please enter account, email and password!" });
+                }
+
+                var account = await _authService.RegisterAsync(registerDTO.AccountName, registerDTO.Email, registerDTO.Password);
+                if (account == null)
+                {
+                    return BadRequest(new { message = "Failed to register account!" });
+                }
+                return Ok(new { message = "Account registered successfully!" });
             }
-            return Ok(new { message = "Account registered successfully!" });
         }
 
         [HttpPost("forgotPassword")]

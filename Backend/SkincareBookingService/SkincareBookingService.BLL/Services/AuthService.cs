@@ -11,12 +11,14 @@ namespace SkincareBookingService.BLL.Services
     {
         private readonly IGenericRepository<Account> _accountRepository;
         private readonly IEmailService _emailService;
+        private readonly IAccountService _accountService;
         private static readonly ConcurrentDictionary<string, (string Otp, DateTime Expires)> OtpStore = new();
 
-        public AuthService(IGenericRepository<Account> accountRepository, IEmailService emailService)
+        public AuthService(IGenericRepository<Account> accountRepository, IEmailService emailService, IAccountService accountService)
         {
             _accountRepository = accountRepository;
             _emailService = emailService;
+            _accountService = accountService;
         }
 
         public async Task<Account> AuthenticateAsync(string accountName, string password)
