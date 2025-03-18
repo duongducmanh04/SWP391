@@ -8,48 +8,32 @@ interface Rating {
   customerId: number;
   serviceId: number;
   stars: number;
-  createAt: string;
+  createdAt: string;
+  customerName?: string;
+  serviceName?: string;
 }
 
-// 🟢 Lấy tất cả đánh giá
-const fetchAllRatings = async (): Promise<Rating[]> => {
-  const response = await axios.get<Rating[]>(RATING_API_URL);
-  return response.data;
-};
+// 🟢 Hàm fetch rating theo ID
+const fetchRatingById = async (ratingId?: number): Promise<Rating | null> => {
+  if (!ratingId) return null;
 
-// 🔍 Lấy rating theo customerId và serviceId
-const fetchRatingById = async (
-  customerId: number,
-  serviceId: number
-): Promise<Rating | null> => {
   try {
-    const response = await axios.get<Rating>(
-      `${RATING_API_URL}/${customerId}/${serviceId}`
-    );
+    const response = await axios.get<Rating>(`${RATING_API_URL}/${ratingId}`);
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi lấy đánh giá:", error);
+    console.error("❌ Lỗi khi lấy đánh giá:", error);
     return null;
   }
 };
 
-export const useRatings = () => {
-  return useQuery<Rating[], Error>({
-    queryKey: ["ratings"],
-    queryFn: fetchAllRatings,
-    staleTime: 60000, // Giữ cache 1 phút để tránh refetch quá nhiều
-    refetchOnMount: "always", // Luôn cập nhật dữ liệu khi vào trang
-    refetchOnWindowFocus: false, // Không refetch khi chuyển tab
-  });
-};
-
-export const useRatingById = (customerId: number, serviceId: number) => {
+// 🔍 Hook lấy rating theo ID
+export const useRatingById = (ratingId?: number) => {
   return useQuery<Rating | null, Error>({
-    queryKey: ["rating", customerId, serviceId],
-    queryFn: () => fetchRatingById(customerId, serviceId),
-    enabled: !!customerId && !!serviceId, // Chỉ fetch khi có đủ ID
-    staleTime: 0, // Luôn lấy dữ liệu mới từ API
-    refetchOnMount: "always", // Luôn cập nhật dữ liệu khi vào trang
-    refetchOnWindowFocus: false, // Không refetch khi chuyển tab
+    queryKey: ["rating", ratingId],
+    queryFn: () => fetchRatingById(ratingId),
+    enabled: Boolean(ratingId),
+    staleTime: 1000 * 60 * 5,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
   });
 };

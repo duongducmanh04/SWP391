@@ -121,36 +121,53 @@ const CustomerProfile = () => {
                     />
                   ) : bookings && bookings.length > 0 ? (
                     <List
-                      itemLayout="horizontal"
+                      itemLayout="vertical"
                       dataSource={bookings}
+                      pagination={{
+                        pageSize: 10, // Hiển thị 5 lịch mỗi trang
+                        showSizeChanger: true, // Cho phép chọn số lượng lịch trên mỗi trang
+                        pageSizeOptions: ["5", "10", "20"], // Các lựa chọn số lịch mỗi trang
+                      }}
                       renderItem={(booking: BookingDto) => (
                         <List.Item
-                          style={{ cursor: "pointer" }}
+                          style={{
+                            cursor: "pointer",
+                            width: "100%",
+                            padding: "16px",
+                            border: "1px solid #ddd",
+                            borderRadius: "8px",
+                            marginBottom: "12px",
+                          }}
                           onClick={() =>
                             handleNavigateToBookingDetail(booking.bookingId)
                           }
-                          actions={[
-                            <Button
-                              type="primary"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleNavigateToBookingDetail(
-                                  booking.bookingId
-                                );
-                              }}
-                            >
-                              Xem Chi Tiết
-                            </Button>,
-                          ]}
                         >
                           <List.Item.Meta
-                            title={`Dịch vụ: ${booking.serviceName}`}
-                            description={`Ngày: ${dayjs(booking.date).format(
-                              "DD-MM-YYYY"
-                            )} | Trạng thái: ${booking.status} | Địa điểm: ${
-                              booking.location
-                            }`}
+                            title={<strong>{booking.serviceName}</strong>}
+                            description={
+                              <>
+                                <p>
+                                  <strong>Ngày:</strong>{" "}
+                                  {dayjs(booking.date).format("DD-MM-YYYY")}
+                                </p>
+                                <p>
+                                  <strong>Trạng thái:</strong> {booking.status}
+                                </p>
+                                <p>
+                                  <strong>Địa điểm:</strong> {booking.location}
+                                </p>
+                              </>
+                            }
                           />
+                          <Button
+                            type="primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleNavigateToBookingDetail(booking.bookingId);
+                            }}
+                          >
+                            Xem Chi Tiết
+                          </Button>
                         </List.Item>
                       )}
                     />

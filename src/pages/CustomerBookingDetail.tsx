@@ -6,8 +6,9 @@ import axios, { AxiosError } from "axios";
 import dayjs from "dayjs";
 import StatusTag from "../components/TagStatus";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGetCustomerId } from "../features/user/hook/useGetCustomerId";
+import { useRatingsByService } from "../features/user/hook/useRatingsByServiceID";
 import { Status } from "../enums/status-booking";
 
 const API_BASE_URL =
@@ -20,9 +21,8 @@ const CustomerBookingDetail = () => {
   const queryClient = useQueryClient();
 
   const { customerId } = useGetCustomerId();
-  const [rating, setRating] = useState(0);
-
   const validBookingId = bookingId ? String(bookingId) : "";
+  const validCustomerId = customerId ?? 0;
 
   const {
     data: booking,
@@ -30,15 +30,31 @@ const CustomerBookingDetail = () => {
     isError,
     error,
   } = useBookingById(validBookingId);
+  const validServiceId = booking?.serviceId ?? 0;
 
+  // 🔹 Lấy danh sách rating từ API
+  const { data: ratings, isLoading: isRatingsLoading } =
+    useRatingsByService(validServiceId);
+
+  // 🔹 Tìm rating của khách hàng hiện tại
+  const existingRating = ratings?.find(
+    (rating) => rating.customerId === validCustomerId
+  );
+  const [rating, setRating] = useState<number>(existingRating?.stars ?? 0);
+
+  useEffect(() => {
+    if (existingRating?.stars !== undefined) {
+      setRating(existingRating.stars);
+    }
+  }, [existingRating]);
+
+  // ✅ Hủy đặt lịch
   const cancelBookingMutation = useMutation({
     mutationFn: async () => {
       if (!validBookingId) {
         throw new Error("Booking ID không hợp lệ");
       }
-
       const cancelUrl = `${API_BASE_URL}/cancelled/${validBookingId}`;
-
       const response = await axios.put(cancelUrl);
       return response.data;
     },
@@ -56,16 +72,30 @@ const CustomerBookingDetail = () => {
     },
   });
 
+  // ✅ Đánh giá dịch vụ (POST hoặc PUT)
   const ratingMutation = useMutation({
     mutationFn: async (value: number) => {
-      return await axios.post(RATING_API_URL, {
-        customerId,
-        stars: value,
-        serviceId: booking?.serviceId,
-      });
+      if (existingRating) {
+        // Cập nhật đánh giá nếu đã tồn tại
+        return await axios.put(`${RATING_API_URL}/${existingRating.ratingId}`, {
+          customerId: validCustomerId,
+          stars: value,
+          serviceId: validServiceId,
+        });
+      } else {
+        // Tạo đánh giá mới
+        return await axios.post(RATING_API_URL, {
+          customerId: validCustomerId,
+          stars: value,
+          serviceId: validServiceId,
+        });
+      }
     },
     onSuccess: () => {
       message.success("✅ Cảm ơn bạn đã đánh giá!");
+      queryClient.invalidateQueries({
+        queryKey: ["ratings", validServiceId],
+      });
     },
     onError: () => {
       message.error("❌ Lỗi khi gửi đánh giá, vui lòng thử lại!");
@@ -150,12 +180,16 @@ const CustomerBookingDetail = () => {
               </Button>
             )}
 
-            {booking.status == Status.COMPLETED && (
+            {booking.status === Status.COMPLETED && (
               <div style={{ marginTop: "16px" }}>
                 <p>
                   <strong>Đánh giá dịch vụ:</strong>
                 </p>
-                <Rate value={rating} onChange={handleRatingChange} />
+                {isRatingsLoading ? (
+                  <Spin tip="🔄 Đang tải đánh giá..." />
+                ) : (
+                  <Rate value={rating} onChange={handleRatingChange} />
+                )}
               </div>
             )}
           </>
