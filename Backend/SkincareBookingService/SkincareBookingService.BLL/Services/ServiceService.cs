@@ -149,7 +149,8 @@ namespace SkincareBookingService.BLL.Services
                 Price = serviceDTO.Price,
                 Duration = serviceDTO.Duration,
                 ProcedureDescription = serviceDTO.ProcedureDescription,
-                Image = serviceDTO.Image
+                Image = serviceDTO.Image,
+                AverageStars = 0
             };
 
             await _serviceRepository.AddAsync(service);
@@ -163,7 +164,8 @@ namespace SkincareBookingService.BLL.Services
                 Price = service.Price,
                 Duration = service.Duration,
                 ProcedureDescription = service.ProcedureDescription,
-                Image = service.Image
+                Image = service.Image,
+                AverageStars = service.AverageStars
             };
         }
 

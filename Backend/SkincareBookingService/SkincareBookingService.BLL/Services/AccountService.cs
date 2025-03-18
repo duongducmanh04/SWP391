@@ -133,7 +133,7 @@ namespace SkincareBookingService.BLL.Services
             }).ToList();
         }
 
-        public async Task<bool> UpdateAccountAsync(AccountDTO accountDto)
+        public async Task<bool> UpdateAccountAsync(int accountId, AccountDTO accountDto)
         {
             var account = await _accountRepository.FirstOrDefaultAsync(a => a.AccountId == accountDto.AccountId);
             if (account == null)

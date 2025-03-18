@@ -42,11 +42,11 @@ namespace SkincareBookingService.Controllers
             return Ok(blog);
         }
 
-        [HttpPut("updateBlog")]
-        public async Task<IActionResult> UpdateBlog([FromBody] BlogDTO blogDTO)
+        [HttpPut("updateBlog/{blogId}")]
+        public async Task<IActionResult> UpdateBlog(int blogId, [FromBody] BlogDTO blogDTO)
         {
-            var updatedBlog = await _blogService.UpdateBlogAsync(blogDTO);
-            if (updatedBlog == null)
+            var result = await _blogService.UpdateBlogAsync(blogId, blogDTO);
+            if (!result)
             {
                 return NotFound("Blog not found");
             }

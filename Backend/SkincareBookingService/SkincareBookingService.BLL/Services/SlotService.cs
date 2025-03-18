@@ -30,7 +30,7 @@ namespace SkincareBookingService.BLL.Services
                 SlotId = slot.SlotId,
                 Time = slot.Time,
                 Status = slot.Status,
-                BookingId = slot.BookingId
+                BookingId = null
             };
         }
 

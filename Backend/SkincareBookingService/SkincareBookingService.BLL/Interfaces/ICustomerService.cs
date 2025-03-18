@@ -19,7 +19,7 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<bool> UpdateCustomerSkintypeAsync(int customerId, int skintypeId);
 
-        Task<bool> UpdateCustomerAsync(int customerId, string name, string email, string phoneNumber, int skintypeId);
+        Task<bool> UpdateCustomerAsync(int customerId, CustomerDTO customer);
 
     }
 }
