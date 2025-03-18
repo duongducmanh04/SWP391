@@ -14,7 +14,7 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<AccountDTO> GetAccountByIdAsync(int accountId);
 
-        Task<bool> UpdateAccountAsync(AccountDTO account);
+        Task<bool> UpdateAccountAsync(int accountId, AccountDTO account);
 
         Task<bool> UpdateAccountPasswordAsync(int accountId, string password);
 

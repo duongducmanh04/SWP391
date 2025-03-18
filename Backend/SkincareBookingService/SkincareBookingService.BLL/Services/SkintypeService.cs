@@ -95,7 +95,7 @@ namespace SkincareBookingService.BLL.Services
             }).ToList();
         }
 
-        public async Task<bool> UpdateSkintypeAsync(SkintypeDTO skintypeDTO)
+        public async Task<bool> UpdateSkintypeAsync(int skintypeId, SkintypeDTO skintypeDTO)
         {
             var skintype = await _skintypeRepository.GetByIdAsync(skintypeDTO.SkintypeId);
 

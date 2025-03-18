@@ -22,7 +22,7 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<bool> UpdateSkintypeIntroductionAsync(int skintypeId, string introduction);
 
-        Task<bool >UpdateSkintypeAsync(SkintypeDTO skintypeDTO);
+        Task<bool >UpdateSkintypeAsync(int skintypeId, SkintypeDTO skintypeDTO);
 
         Task<List<SkintypeDTO>> GetSkintypesAsync();
 

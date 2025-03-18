@@ -85,7 +85,7 @@ namespace SkincareBookingService.BLL.Services
             };
         }
 
-        public async Task<bool> UpdateBlogAsync(BlogDTO blogDTO)
+        public async Task<bool> UpdateBlogAsync(int blogId, BlogDTO blogDTO)
         {
             var blog = await _blogRepository.FirstOrDefaultAsync(b => b.BlogId == blogDTO.BlogId);
 
