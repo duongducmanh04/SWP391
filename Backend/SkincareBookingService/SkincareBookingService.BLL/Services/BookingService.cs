@@ -303,5 +303,37 @@ namespace SkincareBookingService.BLL.Services
             }
             return bookings;
         }
+
+        public async Task<bool> CancelBookingByBookingId(int bookingId)
+        {
+            if (bookingId <= 0) return false;
+
+            var booking = await _bookingRepository
+                .Query()
+                .Where(b => b.BookingId == bookingId)
+                .FirstOrDefaultAsync();
+
+            if(booking == null) return false;
+
+            booking.Status = BookingStatus.Cancelled.ToString();
+            await _bookingRepository.UpdateAsync(booking);
+            await _bookingRepository.SaveChangesAsync();
+
+            var slots = await _slotRepository
+                .Query()
+                .Where(s => s.BookingId == bookingId)
+                .ToListAsync();
+
+            foreach(var slot in slots)
+            {
+                slot.Status = SlotStatus.Available.ToString();
+                slot.BookingId = null;
+                slot.Booking = null;
+                await _slotRepository.UpdateAsync(slot);
+            }
+
+            await _slotRepository.SaveChangesAsync();
+            return true;
+        }
     }
 }
