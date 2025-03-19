@@ -123,6 +123,11 @@ const CustomerProfile = () => {
                     <List
                       itemLayout="horizontal"
                       dataSource={bookings}
+                      pagination={{
+                        pageSize: 10,
+                        showSizeChanger: true,
+                        pageSizeOptions: ["10", "20", "30", "40"],
+                      }}
                       renderItem={(booking: BookingDto) => (
                         <List.Item
                           style={{ cursor: "pointer" }}

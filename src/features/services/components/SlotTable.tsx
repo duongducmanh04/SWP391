@@ -37,7 +37,11 @@ dayjs.extend(customParseFormat);
 
 const SlotTable = () => {
   const { user } = useAuthStore();
-  const { data: allSlots, isLoading: isLoadingAll } = useSlots();
+  const {
+    data: allSlots,
+    isLoading: isLoadingAll,
+    refetch: refetchSlot,
+  } = useSlots();
   const { data: availableSlots, isLoading: isLoadingAvailable } =
     useAvailableSlot();
   const { data: bookedSlots, isLoading: isLoadingBooked } = useBookedSlot();
@@ -137,6 +141,7 @@ const SlotTable = () => {
                 message.success("Tạo slot và lịch thành công");
                 setIsModalOpen(false);
                 form.resetFields();
+                refetchSlot();
               },
               onError: (scheduleError: any) => {
                 message.error(`Tạo lịch thất bại: ${scheduleError.message}`);
