@@ -37,9 +37,11 @@ import { Status } from "../../../enums/status-booking";
 import TextArea from "antd/es/input/TextArea";
 import { PagePath } from "../../../enums/page-path.enum";
 import { useUpdateNote } from "../hooks/useUpdateNoteBooking";
-import { useUpdateTherapist } from "../hooks/useUpdateTherapist";
+// import { useUpdateTherapist } from "../hooks/useUpdateTherapist";
 import { useSlots } from "../../services/hooks/useGetSlot";
 import { SlotDto } from "../../services/dto/slot.dto";
+import { useGetServiceByTherapistId } from "../../services/hooks/useGetServiceByTherapistId";
+import { ServiceDto } from "../../services/dto/get-service.dto";
 const { Title } = Typography;
 
 const BookingDetail = () => {
@@ -64,14 +66,18 @@ const BookingDetail = () => {
   const { data: customers } = useCustomers();
   const { data: slots } = useSlots();
 
+  const { data: serviceTherapist } = useGetServiceByTherapistId(
+    booking?.skintherapistId || 0
+  );
+
   const { mutate: updateServiceName } = useUpdateServiceName();
   const { mutate: updateServiceAmount } = useUpdateServiceAmount();
-  const { mutate: updateTherapist } = useUpdateTherapist();
+  // const { mutate: updateTherapist } = useUpdateTherapist();
   const { mutate: updateNote, isPending: isUpdatingNote } = useUpdateNote();
 
   const [isEditing, setIsEditing] = useState(false);
   const [selectedService, setSelectedService] = useState<string>("");
-  const [selectedTherapist, setSelectedTherapist] = useState<number>(0);
+  // const [selectedTherapist, setSelectedTherapist] = useState<number>(0);
   const [selectedServiceAmount, setSelectedServiceAmount] = useState<number>(0);
   const [note, setNote] = useState<string>(booking?.note || "");
 
@@ -85,7 +91,7 @@ const BookingDetail = () => {
     if (booking) {
       setSelectedService(booking.serviceName);
       setSelectedServiceAmount(booking.amount);
-      setSelectedTherapist(booking.skintherapistId);
+      // setSelectedTherapist(booking.skintherapistId);
     }
   }, [booking]);
 
@@ -231,18 +237,18 @@ const BookingDetail = () => {
         );
       });
 
-      await new Promise((resolve, reject) => {
-        updateTherapist(
-          { bookingId: booking.bookingId, skintherapistId: selectedTherapist },
-          {
-            onSuccess: () => {
-              message.success("Cập nhật chuyên viên thành công");
-              resolve(null);
-            },
-            onError: reject,
-          }
-        );
-      });
+      // await new Promise((resolve, reject) => {
+      //   updateTherapist(
+      //     { bookingId: booking.bookingId, skintherapistId: selectedTherapist },
+      //     {
+      //       onSuccess: () => {
+      //         message.success("Cập nhật chuyên viên thành công");
+      //         resolve(null);
+      //       },
+      //       onError: reject,
+      //     }
+      //   );
+      // });
 
       await refetch();
       setIsEditing(false);
@@ -294,7 +300,12 @@ const BookingDetail = () => {
                 value={selectedService}
                 onChange={handleServiceChange}
               >
-                {service?.map((service: any) => (
+                {/* {service?.map((service: any) => (
+                  <Select.Option key={service.serviceId} value={service.name}>
+                    {service.name}
+                  </Select.Option>
+                ))} */}
+                {serviceTherapist?.map((service: ServiceDto) => (
                   <Select.Option key={service.serviceId} value={service.name}>
                     {service.name}
                   </Select.Option>
@@ -358,7 +369,7 @@ const BookingDetail = () => {
               icon={<EditOutlined />}
               onClick={() => {
                 setSelectedService(booking.serviceName);
-                setSelectedTherapist(booking.skintherapistId);
+                // setSelectedTherapist(booking.skintherapistId);
                 setIsEditing(true);
               }}
             >

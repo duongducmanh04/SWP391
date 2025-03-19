@@ -4,12 +4,12 @@ import { useQuizQuestion } from "../hooks/useGetQuizQuestion";
 import { useQuizAnswer } from "../hooks/useGetQuizAnswer";
 import { useSubmitQuiz } from "../hooks/useSubmitQuiz";
 import { useSkinTypes } from "../../skin_type/hooks/useGetSkin";
-import { useSkintypeServiceBySkintypeId } from "../../services/hooks/useGetSkintypeServiceBySkintypeId";
 import { useServices } from "../../services/hooks/useGetService";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../../../style/Quiz.css";
 import { PagePath } from "../../../enums/page-path.enum";
-import { useSkintypeServiceByServiceId } from "../../services/hooks/useGetSkintypeServiceByServiceId";
+import { SkintypeServiceDto } from "../../services/dto/skintype-service.dto";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -18,6 +18,8 @@ const QuizTest = () => {
     useQuizQuestion();
   const { data: skinTypeData = [] } = useSkinTypes();
   const { data: answerData = [], isLoading: isLoadingAnswer } = useQuizAnswer();
+  const { data: allServices = [] } = useServices();
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<
     Record<number, number>
@@ -25,44 +27,61 @@ const QuizTest = () => {
   const [recommendedSkinType, setRecommendedSkinType] = useState<string | null>(
     null
   );
-  const [skintypeId, setSkintypeId] = useState<number | null>(null);
-  const [serviceId] = useState<number | null>(null);
-  const navigate = useNavigate();
+  const [serviceList, setServiceList] = useState<
+    {
+      serviceId: number;
+      name: string;
+      price: number;
+      duration: number;
+      image: string;
+      skintypes: string[];
+    }[]
+  >([]);
 
-  const { mutate: submitQuiz, isPending: isSubmitting } = useSubmitQuiz();
+  const submitQuiz = useSubmitQuiz();
+  const navigate = useNavigate();
   const customerId = Number(localStorage.getItem("customerId") || "1");
 
-  const { data: skintypeServiceData = [] } = useSkintypeServiceBySkintypeId(
-    skintypeId ? skintypeId.toString() : ""
-  );
-
-  const { data: skintypeServiceIdData = [] } = useSkintypeServiceByServiceId(
-    serviceId ? serviceId.toString() : ""
-  );
-
-  const { data: allServices = [] } = useServices();
-
-  const handleNavigate = (serviceId: number) => {
-    navigate(PagePath.SKIN_SERVICE_DETAIL, {
-      state: {
-        serviceId: serviceId,
-      },
-    });
+  // **Lấy tất cả loại da phù hợp với dịch vụ**
+  const fetchSkinTypeByServiceId = async (
+    serviceId: number
+  ): Promise<string[]> => {
+    try {
+      const response = await axios.get<SkintypeServiceDto[]>(
+        `https://localhost:7071/getSkintypeServiceByServiceId/${serviceId}`
+      );
+      return response.data.map((item) => {
+        const skin = skinTypeData.find((s) => s.skintypeId === item.skintypeId);
+        return skin ? skin.skintypeName : "Không xác định";
+      });
+    } catch (error) {
+      console.error(`Lỗi khi tải loại da cho serviceId ${serviceId}:`, error);
+      return ["Không xác định"];
+    }
   };
 
+  // **Fetch danh sách dịch vụ sau khi có kết quả loại da**
   useEffect(() => {
-    console.log("Recommended Skin Type:", recommendedSkinType);
-    console.log("Skin Type Data:", skinTypeData);
-    if (recommendedSkinType) {
-      const matchedSkin = skinTypeData.find(
-        (skin) =>
-          skin.skintypeName.toLowerCase() === recommendedSkinType.toLowerCase()
-      );
-      if (matchedSkin) {
-        setSkintypeId(matchedSkin.skintypeId);
-      }
+    if (recommendedSkinType && allServices.length > 0) {
+      const fetchServices = async () => {
+        const updatedServices = await Promise.all(
+          allServices.map(async (service) => {
+            const skinTypes = await fetchSkinTypeByServiceId(service.serviceId);
+            return { ...service, skintypes: skinTypes };
+          })
+        );
+
+        // **Lọc chỉ các dịch vụ có chứa loại da được đề xuất**
+        const filteredServices = updatedServices.filter((service) =>
+          service.skintypes.includes(recommendedSkinType)
+        );
+
+        setServiceList(filteredServices);
+      };
+
+      fetchServices();
     }
-  }, [recommendedSkinType, skinTypeData]);
+  }, [allServices, skinTypeData, recommendedSkinType]);
 
   if (isLoadingQuestion || isLoadingAnswer)
     return <Spin tip="Đang tải câu hỏi..." />;
@@ -95,7 +114,7 @@ const QuizTest = () => {
       })),
     };
 
-    submitQuiz(submitData, {
+    submitQuiz.mutate(submitData, {
       onSuccess: (data) => {
         message.success("Bài quiz đã được gửi thành công!");
         setRecommendedSkinType(data.recommendedSkinType || "Không xác định");
@@ -110,21 +129,6 @@ const QuizTest = () => {
     (skin) =>
       skin.skintypeName.toLowerCase() === recommendedSkinType?.toLowerCase()
   );
-
-  const matchedServices = Array.isArray(skintypeServiceData)
-    ? (skintypeServiceData as { serviceId: number }[])
-        .map((skintypeService) =>
-          allServices.find(
-            (service) => service.serviceId === skintypeService.serviceId
-          )
-        )
-        .filter((service) => service !== undefined)
-    : [];
-
-  console.log("serviceId được truyền vào API:", serviceId);
-  console.log("skintypeServiceIdData:", skintypeServiceIdData);
-  console.log("allServices:", allServices);
-  console.log("skinTypeData:", skinTypeData);
 
   return (
     <div className="quiz-container">
@@ -156,7 +160,6 @@ const QuizTest = () => {
             className="quiz-button"
             style={{ marginTop: 20 }}
             onClick={handleNext}
-            loading={isSubmitting}
           >
             {currentQuestionIndex < questionData.length - 1
               ? "Tiếp theo"
@@ -165,7 +168,7 @@ const QuizTest = () => {
         </Card>
       )}
 
-      {recommendedSkinType && matchedSkinType && (
+      {matchedSkinType && (
         <Card className="result-card" style={{ marginTop: 20 }}>
           <Title level={4}>Loại da của bạn:</Title>
           <Text strong style={{ fontSize: "18px", color: "#1890ff" }}>
@@ -180,54 +183,31 @@ const QuizTest = () => {
         </Card>
       )}
 
-      {matchedServices.length > 0 && (
-        <div
-          className="service-list"
-          style={{
-            marginTop: 20,
-            gap: "20px",
-          }}
-        >
+      {serviceList.length > 0 && (
+        <div className="service-list" style={{ marginTop: 20 }}>
           <Title level={4}>Dịch vụ phù hợp:</Title>
-          <hr />
-          <Row gutter={[16, 16]} justify="start">
-            {matchedServices.map((service) => (
-              <Col
-                key={service.serviceId}
-                xs={24}
-                sm={12}
-                md={8}
-                lg={6}
-                style={{ display: "flex" }}
-              >
+          <Row gutter={[16, 16]}>
+            {serviceList.map((service) => (
+              <Col key={service.serviceId} xs={24} sm={12} md={8} lg={6}>
                 <Card
                   hoverable
-                  cover={
-                    <img
-                      alt={service.name}
-                      src={service.image}
-                      style={{ height: 222 }}
-                    />
-                  }
-                  style={{ width: "-webkit-fill-available" }}
+                  cover={<img alt={service.name} src={service.image} />}
                 >
-                  <Title level={5} style={{ marginTop: "10px" }}>
-                    {service.name}
-                  </Title>
-                  {/* <Text>
-                    {getSkinTypesForService(service.serviceId) ||
-                      "Không có thông tin"}
-                  </Text> */}
+                  <Title level={5}>{service.name}</Title>
                   <Text strong>Giá: {service.price} VNĐ</Text>
                   <br />
                   <Text>Thời gian: {service.duration} phút</Text>
+                  <br />
+                  <Text>Loại da phù hợp: {service.skintypes.join(", ")}</Text>
+                  <br />
                   <Button
                     type="primary"
-                    style={{
-                      marginTop: "10px",
-                      background: "rgb(193, 154, 107)",
-                    }}
-                    onClick={() => handleNavigate(service.serviceId)}
+                    style={{ marginTop: 10 }}
+                    onClick={() =>
+                      navigate(PagePath.SKIN_SERVICE_DETAIL, {
+                        state: { serviceId: service.serviceId },
+                      })
+                    }
                   >
                     Chi tiết
                   </Button>

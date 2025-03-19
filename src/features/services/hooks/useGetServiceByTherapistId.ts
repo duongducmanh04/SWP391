@@ -15,7 +15,7 @@ const fetchServiceBySkinTherapistId = async (
 
 export const useGetServiceByTherapistId = (skintherapistId: number) => {
   return useQuery<ServiceDto[], Error>({
-    queryKey: ["getSchedule", skintherapistId],
+    queryKey: ["getServiceBySkintherapistId", skintherapistId],
     queryFn: () => fetchServiceBySkinTherapistId(skintherapistId),
     enabled: !!skintherapistId,
   });
