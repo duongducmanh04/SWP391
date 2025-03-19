@@ -28,6 +28,7 @@ import { TherapistDto } from "../../skin_therapist/dto/get-therapist.dto";
 import { useCustomers } from "../../user/hook/useGetCustomer";
 import { CustomerDto } from "../../user/dto/customer.dto";
 import { PagePath } from "../../../enums/page-path.enum";
+import { SlotDto } from "../../services/dto/slot.dto";
 import { useSlots } from "../../services/hooks/useGetSlot";
 
 const BookingListTable = () => {
@@ -77,7 +78,7 @@ const BookingListTable = () => {
 
   const { data: therapistData } = useTherapists();
   const { data: customerData } = useCustomers();
-  const { data: slotData } = useSlots();
+
   const { setBookings } = useBookingStore();
   const navigate = useNavigate();
   const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
@@ -85,11 +86,6 @@ const BookingListTable = () => {
   const { data: slots } = useSlots();
   const { user } = useAuthStore();
   const accountId = user?.accountId;
-
-  useEffect(() => {
-    console.log("Slot Data:", slotData);
-   
-  }, [slotData]);
 
   const skintherapistId = useMemo(() => {
     if (!therapistData || therapistData.length === 0 || !accountId)
@@ -122,19 +118,13 @@ const BookingListTable = () => {
       customerMap.set(customer.customerId, customer);
     });
   }
-  const slotTimeMap = useMemo(() => {
-    const map = new Map<number, string>();
 
-    if (slotData) {
-      slotData.forEach((slot) => {
-        if (slot.bookingId) {
-          console.log("Mapping bookingId:", slot.bookingId, "to slot time:", slot.time);
-          map.set(slot.bookingId, slot.time || "Không có giờ");
-        }
-      });
-    }
-    return map;
-  }, [slotData]);
+  const slotMap = new Map<number, SlotDto>();
+  if (slots) {
+    slots.forEach((slot: SlotDto) => {
+      slotMap.set(slot.bookingId, slot);
+    });
+  }
 
   useEffect(() => {
     if (bookingData && !isLoadingBooking && !errorBooking) {
@@ -214,9 +204,10 @@ const BookingListTable = () => {
       title: "Ngày đặt làm",
       dataIndex: "date",
       key: "date",
-      render: (text: string, record) => {
-        const slotTime = slotTimeMap.get(record.bookingId) || "Không có giờ";
-        return `${dayjs(text).format("DD/MM/YYYY HH:mm:ss")} (Slot: ${slotTime})`;
+      render: (text: string, record: BookingDto) => {
+        const formattedDate = dayjs(text).format("DD/MM/YYYY");
+        const slotTime = slotMap.get(record.bookingId)?.time;
+        return `${formattedDate}${slotTime ? ` - ${slotTime}` : ""}`;
       },
       sorter: (a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf(),
     },

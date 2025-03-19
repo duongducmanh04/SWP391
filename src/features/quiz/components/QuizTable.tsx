@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import {
   Table,
@@ -8,332 +7,232 @@ import {
   message,
   Button,
   Modal,
-  Flex,
-  Image,
-  Skeleton,
-  Empty,
   Tooltip,
 } from "antd";
-import { useQuizAnswer } from "../hooks/useGetQuizAnswer";
-import { useQuizQuestion } from "../hooks/useGetQuizQuestion";
-import { useCreateQuizAnswer } from "../hooks/useCreateQuizAnswer";
-import { useCreateQuizQuestion } from "../hooks/useCreateQuizQuesion";
-import { useUpdateQuizAnswer } from "../hooks/useUpdateQuizAnswer";
-import { useUpdateQuizQuestion } from "../hooks/useUpdateQuizQuestion";
-import { useDeleteQuizAnswer } from "../hooks/useDeleteQuizAnswer";
-import { useDeleteQuizQuestion } from "../hooks/useDeleteQuizQuestion";
 import {
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
-  SearchOutlined,
 } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
+import { useQuizQuestion } from "../hooks/useGetQuizQuestion";
+import { useDeleteQuizQuestion } from "../hooks/useDeleteQuizQuestion";
+import { useUpdateQuizQuestion } from "../hooks/useUpdateQuizQuestion";
+import { useCreateQuizQuestion } from "../hooks/useCreateQuizQuesion";
+import { useQuizAnswer } from "../hooks/useGetQuizAnswer";
+import { useCreateQuizAnswer } from "../hooks/useCreateQuizAnswer";
+import { useDeleteQuizAnswer } from "../hooks/useDeleteQuizAnswer";
+import { useUpdateQuizAnswer } from "../hooks/useUpdateQuizAnswer";
 
 const QuizTable = () => {
-  const { data: quizAnswer, isLoadingQuizAnswer } = useQuizAnswer();
-  const { data: quizQuestion, isLoadingQuizQuestion } = useQuizQuestion();
+  const { data: quizQuestions, isLoading: isLoadingQuizQuestion } = useQuizQuestion();
+  const { data: quizAnswers, isLoading: isLoadingQuizAnswer } = useQuizAnswer();
   const { mutate: createQuizAnswer } = useCreateQuizAnswer();
-  const { mutate: createQuizQuestion } = useCreateQuizQuestion();
-  const { mutate: updateQuizAnswer } = useUpdateQuizAnswer();
-  const { mutate: updateQuizQuestion } = useUpdateQuizQuestion();
-  const { mutate: deleteQuizQuestion } = useDeleteQuizQuestion();
   const { mutate: deleteQuizAnswer } = useDeleteQuizAnswer();
+  const { mutate: updateQuizAnswer } = useUpdateQuizAnswer();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingQuizQuestion, setEditingQuizQuestion] = useState<any>(null);
-  const [editingQuizAnswer, setEditingQuizAnswer] = useState<any>(null);
+  const [selectedQuizId, setSelectedQuizId] = useState<number | null>(null);
   const [form] = Form.useForm();
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [quizAnswerToDelete, setQuizAnswerToDelete] = useState<any>(null);
-  const [quizQuestionToDelete, setQuizQuestionToDelete] = useState<any>(null);
-  const [searchText, setSearchText] = useState("");
-  const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
+  
 
-  const handleCreate = () => {
+  const handleAddAnswers = (quizquestionId: number) => {
+    setSelectedQuizId(quizquestionId);
     setIsModalOpen(true);
     form.resetFields();
   };
-
-  const handleCreateQuizAnswer = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        createQuizAnswer(values, {
-          onSuccess: () => {
-            message.success("Tạo câu trả lời thành công");
-            setIsModalOpen(false);
-            form.resetFields();
-          },
-          onError: (err: { message: any }) => {
-            message.error(`Lỗi tạo câu trả lời: ${err.message}`);
-          },
-        });
-      })
-      .catch((info) => {
-        console.error("Validate Failed:", info);
-      });
-  };
-
-  const handleEdit = (record: any) => {
-    setEditingQuizAnswer(record);
-    form.setFieldsValue(record);
-    setIsModalOpen(true);
-  };
-
-  const handleDelete = (serviceId: string) => {
-    setQuizAnswerToDelete(serviceId);
-    setDeleteModalOpen(true);
-  };
-
-  const confirmDelete = () => {
-    if (quizAnswerToDelete) {
-      deleteQuizAnswer(quizAnswerToDelete, {
-        onSuccess: () => {
-          message.success("Xóa câu trả lời thành công");
-          setDeleteModalOpen(false);
-          setQuizAnswerToDelete(null);
-        },
-        onError: (err: { message: any }) => {
-          message.error(`Lỗi xóa câu trả lời: ${err.message}`);
-        },
-      });
+  const handleDeleteAnswer = (answerId: number) => {
+    console.log("Deleting answer with ID:", answerId, "Type:", typeof answerId);
+    
+    if (typeof answerId !== "number") {
+      message.error("Invalid answer ID");
+      return;
     }
+  
+    deleteQuizAnswer(answerId, {
+      onSuccess: () => message.success("Deleted answer successfully"),
+    });
   };
 
-  const handleUpdate = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        updateQuizAnswer(
-          { id: editingQuizAnswer.answerId, data: values },
-          {
+
+ 
+
+  const handleSubmitAnswers = () => {
+    form.validateFields().then((values) => {
+      if (selectedQuizId !== null) {
+        const answers = values.answers;
+  
+        if (!answers || answers.length === 0) {
+          message.error("Please add at least one answer.");
+          return;
+        }
+  
+        answers.forEach((answer: any) => {
+          const answerData = {
+            content: answer.answer,  
+            quizquestionId: selectedQuizId,  
+            skintypeId: Number(answer.skintypeId), 
+            serviceImpact: answer.serviceImpact, 
+           
+          };
+  
+          console.log(`Submitting answer :`, answerData);
+  
+          createQuizAnswer(answerData, {
             onSuccess: () => {
-              message.success("Cập nhật câu trả lời thành công");
-              setIsModalOpen(false);
-              setEditingQuizAnswer(null);
+             
+                message.success("All answers added successfully");
+                setIsModalOpen(false);
+                form.resetFields();
+              
             },
-            onError: (err: { message: any }) => {
-              message.error(`Lỗi cập nhật câu trả lời: ${err.message}`);
+            onError: () => {
+              console.error(`Error submitting answer `);
+              message.error(`Failed to submit answer `);
             },
-          }
-        );
-      })
-      .catch((info) => {
-        console.error("Validate Failed:", info);
-      });
+          });
+        });
+      }
+    });
   };
+  
 
-  const handleTableChange = (pagination: any) => {
-    setPagination(pagination);
-  };
-
-  const filteredQuizQuestions = quizQuestion?.filter((quizQuestion: any) =>
-    quizQuestion.content.toLowerCase().includes(searchText.toLowerCase())
-  );
-
-  const columns: ColumnsType<ServiceDto> = [
+  const quizColumns: ColumnsType<any> = [
     {
       title: "No",
       dataIndex: "No",
-      fixed: "left",
       width: 50,
-      render: (_value: any, _record: any, index: number) => {
-        return (pagination.current - 1) * pagination.pageSize + index + 1;
-      },
+      render: (_value, _record, index) => index + 1,
     },
     {
-      title: "ID",
-      dataIndex: "serviceId",
-      key: "serviceId",
-      render: (text: string) => <a>{text}</a>,
+      title: "Question",
+      dataIndex: "content",
+      key: "content",
     },
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "dateofbirth",
-    },
-    {
-      title: "Price",
-      dataIndex: "price",
-      key: "price",
-    },
-    {
-      title: "Duration",
-      dataIndex: "duration",
-      key: "duration",
-    },
-    {
-      title: "Image",
-      dataIndex: "image",
-      key: "image",
-      render: (image: string) => (
-        <Image
-          src={image}
-          width={50}
-          height={50}
-          style={{ borderRadius: "50%" }}
-        />
-      ),
-    },
-    {
-      title: "Procedure Description",
-      dataIndex: "procedureDescription",
-      key: "procedureDescription",
-    },
+ 
     {
       title: "Actions",
       key: "actions",
-      render: (_: unknown, record: any) => (
+      render: (_, record) => (
         <Space>
-          <Tooltip title="Chi tiết">
-            <Button
-              icon={<EditOutlined />}
-              onClick={() => handleEdit(record)}
-            />
-          </Tooltip>
-          <Tooltip title="Xóa">
-            <Button
-              icon={<DeleteOutlined />}
-              onClick={() => handleDelete(record.serviceId)}
-            />
+          <Tooltip title="Add Answers">
+            <Button icon={<PlusOutlined />} onClick={() => handleAddAnswers(record.quizquestionId)} />
           </Tooltip>
         </Space>
       ),
     },
   ];
 
-  if (isLoadingQuizAnswer || isLoadingQuizQuestion) {
-    return <Skeleton />;
-  }
+  const answerColumns: ColumnsType<any> = [
+    {
+      title: "Answer",
+      dataIndex: "answer",
+      key: "answer",
+    },
+    {
+      title:"Edit",
+      dataIndex :"answer",
+      key:"answer",
+    },
+
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <Space>
+          <Tooltip title="Delete">
+            <Button icon={<DeleteOutlined />} danger onClick={() => handleDeleteAnswer(record.answerId)} />
+          </Tooltip>
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <div>
-      <Flex gap="middle" justify="space-between">
-        <div className="content-header">Danh sách quiz</div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-          Tạo quiz
-        </Button>
-      </Flex>
-      <hr style={{ opacity: 0.1 }} />
-      <Space direction="vertical" style={{ width: "100%" }}>
-        <AntInput
-          prefix={<SearchOutlined />}
-          placeholder="Nhập dịch vụ cần tìm"
-          style={{ border: "none", backgroundColor: "transparent" }}
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-        />
-      </Space>
-      <hr style={{ opacity: 0.1 }} />
       <Table
-        dataSource={filteredQuizQuestions || []}
-        columns={columns}
-        rowKey="quizquestionId"
-        pagination={{
-          ...pagination,
-          showSizeChanger: true,
-          pageSizeOptions: ["10", "20", "30"],
-        }}
-        onChange={handleTableChange}
-        locale={{
-          emptyText: isLoadingQuizQuestion ? (
-            <Skeleton active={true} />
-          ) : (
-            <Empty />
-          ),
-        }}
+            loading={isLoadingQuizQuestion || isLoadingQuizAnswer} // Add loading check
+            dataSource={quizQuestions || []} // Ensure it's never undefined
+            columns={quizColumns}
+            rowKey="answerId"
+            expandable={{
+    expandedRowRender: (quiz) => {
+      const relatedAnswers = (quizAnswers || []).filter(answer => answer.quizquestionId === quiz.quizquestionId);
+
+     
+      console.log("quiz.quizquestionId:", quiz.quizquestionId);
+      console.log("Rendering Table with dataSource:", relatedAnswers);
+      console.log("Type of relatedAnswers:", typeof relatedAnswers);
+      console.log("Length of relatedAnswers:", Array.isArray(relatedAnswers) ? relatedAnswers.length : "Not an array");
+      console.log("Table columns:", answerColumns);
+      console.log("First relatedAnswer object:", relatedAnswers[0]);
+
+      if (isLoadingQuizAnswer || !quizAnswers) return <p>Loading answers...</p>;
+
+      if (relatedAnswers.length === 0) {
+        return <p>No answers found</p>;
+      }
+
+      return (
+        <Table
+        dataSource={Array.isArray(relatedAnswers) ? relatedAnswers : []} 
+        columns={answerColumns}
+        rowKey="answerId"
+        pagination={false}
       />
+      );
+    }
+  }}
+/>
 
-      <Modal
-        title={editingService ? "Cập nhật dịch vụ" : "Tạo dịch vụ"}
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        onOk={editingService ? handleUpdate : handleCreateService}
-        width={600}
-        centered
-        cancelText="Hủy"
-        okText={editingService ? "Cập nhật" : "Tạo"}
-        footer={(_, { OkBtn, CancelBtn }) => (
-          <>
-            <CancelBtn />
-            <OkBtn />
-          </>
-        )}
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="name"
-            label="Name"
-            rules={[{ required: true, message: "Please enter the name!" }]}
-          >
-            <AntInput />
-          </Form.Item>
-          <Form.Item
-            name="description"
-            label="description"
-            rules={[
-              { required: true, message: "Please enter the description!" },
-            ]}
-          >
-            <AntInput />
-          </Form.Item>
-          <Form.Item
-            name="price"
-            label="price"
-            rules={[{ required: true, message: "Please enter the price!" }]}
-          >
-            <AntInput />
-          </Form.Item>
-          <Form.Item
-            name="duration"
-            label="duration"
-            rules={[{ required: true, message: "Please enter the duration!" }]}
-          >
-            <AntInput />
-          </Form.Item>
-          <Form.Item
-            name="image"
-            label="image"
-            rules={[{ required: true, message: "Please enter the image!" }]}
-          >
-            <AntInput />
-          </Form.Item>
-          <Form.Item
-            name="procedureDescription"
-            label="procedureDescription"
-            rules={[
-              {
-                required: true,
-                message: "Please enter the procedure description!",
-              },
-            ]}
-          >
-            <AntInput />
-          </Form.Item>
-        </Form>
-      </Modal>
+      {/* Modal for Adding Answers */}
+      <Modal title="Add Answers" open={isModalOpen} onOk={handleSubmitAnswers} onCancel={() => setIsModalOpen(false)}>
+  <Form form={form} layout="vertical">
+    <Form.List name="answers">
+      {(fields, { add, remove }) => (
+        <>
+          {fields.map(({ key, name, ...restField }) => (
+            <div key={key} style={{ marginBottom: 16, border: "1px solid #ddd", padding: 10, borderRadius: 5 }}>
+              <Form.Item
+                {...restField}
+                name={[name, "answer"]}
+                label="Answer"
+                rules={[{ required: true, message: "Answer is required" }]}
+              >
+                <AntInput placeholder="Enter an answer" />
+              </Form.Item>
 
-      <Modal
-        title="Confirm Deletion"
-        open={isDeleteModalOpen}
-        width={200}
-        onCancel={() => setDeleteModalOpen(false)}
-        footer={[
-          <Button key="back" onClick={() => setDeleteModalOpen(false)}>
-            Hủy
-          </Button>,
-          <Button key="delete" type="primary" danger onClick={confirmDelete}>
-            Xóa
-          </Button>,
-        ]}
-      >
-        <p>Bạn có chắc chắn muốn xóa quiz này không?</p>
-      </Modal>
+              <Form.Item
+                {...restField}
+                name={[name, "skintypeId"]}
+                label="Skin Type ID"
+                rules={[{ required: true, message: "Skin Type ID is required" }]}
+              >
+                <AntInput type="number" placeholder="Enter Skin Type ID" />
+              </Form.Item>
+
+              <Form.Item
+                {...restField}
+                name={[name, "serviceImpact"]}
+                label="Service Impact"
+                rules={[{ required: true, message: "Service Impact is required" }]}
+              >
+                <AntInput placeholder="Enter Service Impact" />
+              </Form.Item>
+
+              <Button onClick={() => remove(name)} danger>
+                Remove
+              </Button>
+            </div>
+          ))}
+          <Button type="dashed" onClick={() => add()} block>
+            Add Answer
+          </Button>
+        </>
+      )}
+    </Form.List>
+  </Form>
+</Modal>
+
     </div>
   );
 };
