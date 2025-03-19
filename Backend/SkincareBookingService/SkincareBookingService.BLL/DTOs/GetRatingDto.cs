@@ -1,6 +1,6 @@
 ﻿namespace SkincareBookingService.BLL.DTOs
 {
-    public class RatingDto
+    public class GetRatingDto
     {
         public int RatingId { get; set; }
         public int CustomerId { get; set; }
