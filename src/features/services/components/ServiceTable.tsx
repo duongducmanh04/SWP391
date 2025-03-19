@@ -30,7 +30,7 @@ import { ColumnsType } from "antd/es/table";
 import { ServiceDto } from "../dto/get-service.dto";
 
 const ServiceTable = () => {
-  const { data, isLoading, error } = useServices();
+  const { data, isLoading, error, refetch: refetchService } = useServices();
   const { mutate: createService } = useCreateService();
   const { mutate: updateService } = useUpdateService();
   const { mutate: deleteService } = useDeleteService();
@@ -63,6 +63,7 @@ const ServiceTable = () => {
             message.success("Tạo dịch vụ thành công");
             setIsModalOpen(false);
             form.resetFields();
+            refetchService();
           },
           onError: (err: { message: any }) => {
             message.error(`Lỗi tạo người dùng: ${err.message}`);
@@ -111,6 +112,7 @@ const ServiceTable = () => {
               message.success("Cập nhật dịch vụ thành công");
               setIsModalOpen(false);
               setEditingService(null);
+              refetchService();
             },
             onError: (err: { message: any }) => {
               message.error(`Lỗi cập nhật dịch vụ: ${err.message}`);
