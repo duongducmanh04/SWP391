@@ -150,6 +150,20 @@ public class BookingController : ControllerBase
         return Ok(bookings);
     }
 
+    [HttpPut("CancelBooking/{bookingId}")]
+    public async Task<IActionResult> CancelBookingById(int bookingId)
+    {
+        if (bookingId <= 0)
+        {
+            return BadRequest("Invalid booking id");
+        }
+        var result = await _bookingService.CancelBookingByBookingId(bookingId);
+        if (!result)
+        {
+            return BadRequest("Cancel fail");
+        }
+        return Ok("Cancel success");
+    }
 
     // ===================== UPDATE METHODS =====================
 
