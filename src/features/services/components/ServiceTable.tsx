@@ -11,6 +11,7 @@ import {
   Flex,
   Image,
   Skeleton,
+  InputNumber,
   Empty,
   Tooltip,
 } from "antd";
@@ -267,14 +268,14 @@ const ServiceTable = () => {
         <Form form={form} layout="vertical">
           <Form.Item
             name="name"
-            label="Name"
+            label="Tên dịch vụ"
             rules={[{ required: true, message: "Please enter the name!" }]}
           >
             <AntInput />
           </Form.Item>
           <Form.Item
             name="description"
-            label="description"
+            label="Mô tả"
             rules={[
               { required: true, message: "Please enter the description!" },
             ]}
@@ -283,28 +284,28 @@ const ServiceTable = () => {
           </Form.Item>
           <Form.Item
             name="price"
-            label="price"
+            label="Giá"
             rules={[{ required: true, message: "Please enter the price!" }]}
           >
-            <AntInput />
+            <InputNumber min={0} style={{ width: "-webkit-fill-available" }} />
           </Form.Item>
           <Form.Item
             name="duration"
-            label="duration"
+            label="Tổng thời gian làm"
             rules={[{ required: true, message: "Please enter the duration!" }]}
           >
-            <AntInput />
+            <InputNumber min={15} style={{ width: "-webkit-fill-available" }} />
           </Form.Item>
           <Form.Item
             name="image"
-            label="image"
+            label="Hình ảnh"
             rules={[{ required: true, message: "Please enter the image!" }]}
           >
             <AntInput />
           </Form.Item>
           <Form.Item
             name="procedureDescription"
-            label="procedureDescription"
+            label="Bước chăm sóc"
             rules={[
               {
                 required: true,
@@ -318,9 +319,9 @@ const ServiceTable = () => {
       </Modal>
 
       <Modal
-        title="Confirm Deletion"
+        title="Xác nhận xóa"
         open={isDeleteModalOpen}
-        width={200}
+        style={{ width: "max-content" }}
         onCancel={() => setDeleteModalOpen(false)}
         footer={[
           <Button key="back" onClick={() => setDeleteModalOpen(false)}>

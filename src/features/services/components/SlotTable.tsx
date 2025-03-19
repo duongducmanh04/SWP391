@@ -10,24 +10,19 @@ import {
   Button,
   Modal,
   Form,
-  Input,
   message,
   Flex,
   Tag,
   DatePicker,
   TimePicker,
+  Select,
 } from "antd";
 import { useSlots } from "../hooks/useGetSlot";
 import { useAvailableSlot } from "../hooks/useAvailableSlot";
 import { useBookedSlot } from "../hooks/useGetBookedSlot";
 import { useCreateSlot } from "../hooks/useCreateSlot";
-import { useDeleteSlot } from "../hooks/useDeleteSlot";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  SearchOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { useCreateSchedule } from "../../schedule/hooks/useCreateSchedule";
+import { EditOutlined, SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import type { DatePickerProps } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { SlotDto } from "../dto/slot.dto";
@@ -35,6 +30,8 @@ import dayjs from "dayjs";
 import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { RoleCode } from "../../../enums/role.enum";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
+import { TherapistDto } from "../../skin_therapist/dto/get-therapist.dto";
 
 dayjs.extend(customParseFormat);
 
@@ -44,8 +41,10 @@ const SlotTable = () => {
   const { data: availableSlots, isLoading: isLoadingAvailable } =
     useAvailableSlot();
   const { data: bookedSlots, isLoading: isLoadingBooked } = useBookedSlot();
-  const { mutate: createSlot } = useCreateSlot();
-  const { mutate: deleteSlot } = useDeleteSlot();
+  const { mutate: createSlot, isPending: isCreatingSlot } = useCreateSlot();
+  const { mutate: createSchedule, isPending: isCreatingSchedule } =
+    useCreateSchedule();
+  const { data: therapists } = useTherapists();
 
   const [searchText, setSearchText] = useState("");
   const [activeTab, setActiveTab] = useState("all");
@@ -62,17 +61,6 @@ const SlotTable = () => {
   const customFormat: DatePickerProps["format"] = (value) =>
     `${value.format(dateFormat)}`;
 
-  const handleDeleteSlot = (slotId: number) => {
-    deleteSlot(slotId, {
-      onSuccess: () => {
-        message.success("Xoá slot thành công");
-      },
-      onError: () => {
-        message.error("Xoá slot thất bại");
-      },
-    });
-  };
-
   const columns: ColumnsType<SlotDto> = [
     { title: "ID", dataIndex: "slotId", key: "slotId" },
     { title: "Time", dataIndex: "time", key: "time" },
@@ -81,6 +69,7 @@ const SlotTable = () => {
       dataIndex: "date",
       key: "date",
       render: (date: string) => <div>{dayjs(date).format("DD/MM/YYYY")}</div>,
+      sorter: (a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf(),
     },
     {
       title: "Status",
@@ -94,16 +83,11 @@ const SlotTable = () => {
       ? [
           {
             title: "Actions",
-            render: (_: unknown, record: SlotDto) => (
+            render: () => (
+              // _: unknown, record: SlotDto
               <Space>
                 <Tooltip title="Edit">
                   <Button icon={<EditOutlined />} />
-                </Tooltip>
-                <Tooltip title="Delete">
-                  <Button
-                    icon={<DeleteOutlined />}
-                    onClick={() => handleDeleteSlot(record.slotId)}
-                  />
                 </Tooltip>
               </Space>
             ),
@@ -123,18 +107,44 @@ const SlotTable = () => {
     form.resetFields();
   };
 
-  const handleCreateSlot = () => {
+  const handleCreateSlotAndSchedule = () => {
     form
       .validateFields()
       .then((values) => {
-        createSlot(values, {
-          onSuccess: () => {
-            message.success("Tạo slot thành công");
-            setIsModalOpen(false);
-            form.resetFields();
+        const { skinTherapistId, time, date } = values;
+
+        const slotData: SlotDto = {
+          slotId: 0,
+          time: dayjs(time).format("HH:mm A"),
+          date: date.format("YYYY-MM-DD"),
+          status: "Available",
+          bookingId: 0,
+        };
+
+        createSlot(slotData, {
+          onSuccess: (response) => {
+            const createdSlotId = response.slotId;
+
+            const scheduleData = {
+              scheduleId: 0,
+              skinTherapistId: skinTherapistId,
+              slotId: createdSlotId,
+              date: date.format("YYYY-MM-DD"),
+            };
+
+            createSchedule(scheduleData, {
+              onSuccess: () => {
+                message.success("Tạo slot và lịch thành công");
+                setIsModalOpen(false);
+                form.resetFields();
+              },
+              onError: (scheduleError: any) => {
+                message.error(`Tạo lịch thất bại: ${scheduleError.message}`);
+              },
+            });
           },
-          onError: (err: { message: any }) => {
-            message.error(`Lỗi tạo người dùng: ${err.message}`);
+          onError: (slotError: any) => {
+            message.error(`Tạo slot thất bại: ${slotError.message}`);
           },
         });
       })
@@ -143,8 +153,16 @@ const SlotTable = () => {
       });
   };
 
-  if (isLoadingAll || isLoadingAvailable || isLoadingBooked)
+  const isLoading =
+    isLoadingAll ||
+    isLoadingAvailable ||
+    isLoadingBooked ||
+    isCreatingSlot ||
+    isCreatingSchedule;
+
+  if (isLoading && !isCreatingSlot && !isCreatingSchedule) {
     return <Skeleton />;
+  }
 
   return (
     <div>
@@ -179,24 +197,50 @@ const SlotTable = () => {
       <Table dataSource={renderTable()} columns={columns} rowKey="slotId" />
 
       <Modal
-        title="Thêm Slot"
+        title="Thêm Slot và Lịch"
         open={isModalOpen}
-        onOk={handleCreateSlot}
+        onOk={handleCreateSlotAndSchedule}
         onCancel={() => setIsModalOpen(false)}
+        confirmLoading={isCreatingSlot || isCreatingSchedule}
       >
         <Form
           form={form}
           layout="vertical"
           initialValues={{ status: "Available" }}
         >
-          <Form.Item name="time" label="Time" rules={[{ required: true }]}>
-            <TimePicker format="HH:mm A" placeholder="Choose time" />
+          <Form.Item
+            name="skinTherapistId"
+            label="Chuyên viên"
+            rules={[{ required: true, message: "Vui lòng chọn chuyên viên" }]}
+          >
+            <Select style={{ width: "100%" }}>
+              {therapists?.map((therapist: TherapistDto) => (
+                <Select.Option
+                  key={therapist.skintherapistId}
+                  value={therapist.skintherapistId}
+                >
+                  {therapist.name}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
-          <Form.Item name="status" label="Status" rules={[{ required: true }]}>
-            <Input disabled />
+          <Form.Item
+            name="time"
+            label="Thời gian"
+            rules={[{ required: true, message: "Vui lòng chọn thời gian" }]}
+          >
+            <TimePicker
+              use12Hours
+              format="h:mm A"
+              placeholder="Chọn thời gian"
+            />
           </Form.Item>
-          <Form.Item name="date" label="Date" rules={[{ required: true }]}>
-            <DatePicker format={customFormat} />
+          <Form.Item
+            name="date"
+            label="Ngày"
+            rules={[{ required: true, message: "Vui lòng chọn ngày" }]}
+          >
+            <DatePicker format={customFormat} placeholder="Chọn ngày" />
           </Form.Item>
         </Form>
       </Modal>

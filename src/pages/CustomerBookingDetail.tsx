@@ -12,8 +12,6 @@ import { Status } from "../enums/status-booking";
 import { useSlots } from "../features/services/hooks/useGetSlot";
 import { SlotDto } from "../features/services/dto/slot.dto";
 
-const API_BASE_URL =
-  "http://skincare-sbs.southeastasia.azurecontainer.io:8080/api/Booking";
 const RATING_API_URL = "https://localhost:7071/api/Rating";
 
 const CustomerBookingDetail = () => {
@@ -47,7 +45,7 @@ const CustomerBookingDetail = () => {
         throw new Error("Booking ID không hợp lệ");
       }
 
-      const cancelUrl = `${API_BASE_URL}/cancelled/${validBookingId}`;
+      const cancelUrl = `https://localhost:7071/api/Booking/cancelled/${validBookingId}`;
 
       const response = await axios.put(cancelUrl);
       return response.data;

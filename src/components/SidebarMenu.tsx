@@ -3,7 +3,7 @@ import {
   HomeOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  BellFilled,
+  // BellFilled,
   UserOutlined,
   LogoutOutlined,
   CalendarOutlined,
@@ -11,6 +11,7 @@ import {
   CustomerServiceOutlined,
   HourglassOutlined,
   SkinOutlined,
+  QuestionOutlined,
 } from "@ant-design/icons";
 import {
   Breadcrumb,
@@ -19,7 +20,7 @@ import {
   Button,
   Dropdown,
   Modal,
-  Popover,
+  // Popover,
 } from "antd";
 import type { MenuProps } from "antd";
 import { Link, useLocation, Outlet } from "react-router-dom";
@@ -32,18 +33,18 @@ import { useGetTherapistProfile } from "../features/authentication/hooks/useGetT
 
 const { Header, Content, Sider } = Layout;
 
-const notificationContent = (
-  <div>
-    <p>Chưa có thông báo</p>
-    <BellFilled
-      style={{
-        fontSize: "25px",
-        display: "block",
-        cursor: "pointer",
-      }}
-    />
-  </div>
-);
+// const notificationContent = (
+//   <div>
+//     <p>Chưa có thông báo</p>
+//     <BellFilled
+//       style={{
+//         fontSize: "25px",
+//         display: "block",
+//         cursor: "pointer",
+//       }}
+//     />
+//   </div>
+// );
 
 const SidebarMenu = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -178,7 +179,7 @@ const SidebarMenu = () => {
       ? [
           {
             key: PagePath.QUIZ_MANAGEMENT,
-            icon: <HourglassOutlined />,
+            icon: <QuestionOutlined />,
             label: <Link to={PagePath.QUIZ_MANAGEMENT}>Quản lý quiz</Link>,
           },
         ]
@@ -293,7 +294,7 @@ const SidebarMenu = () => {
               marginRight: "20px",
             }}
           >
-            <Popover
+            {/* <Popover
               content={notificationContent}
               trigger="hover"
               placement="bottomRight"
@@ -305,7 +306,7 @@ const SidebarMenu = () => {
                   cursor: "pointer",
                 }}
               />
-            </Popover>
+            </Popover> */}
 
             <Dropdown menu={{ items, onClick: ({ key }) => handleMenu(key) }}>
               <span

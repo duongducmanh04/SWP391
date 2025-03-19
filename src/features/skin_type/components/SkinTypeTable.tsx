@@ -36,27 +36,30 @@ const SkinTypeTable = () => {
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSkin, setEditingSkin] = useState<any>(null);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [skintypeToDelete, setSkintypeToDelete] = useState<any>(null);
   const [form] = Form.useForm();
 
   const filterSkins = skinData?.filter((skin: any) =>
     skin.skintypeName.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  const handleDeleteSkin = (skintypeId: number) => {
-    deleteSkinType(skintypeId, {
-      onSuccess: () => {
-        message.success("Xóa loại da thành công");
-        refetch();
-      },
-      onError: () => {
-        message.error("Xóa loại da thất bại");
-      },
-    });
-  };
+  // const handleDeleteSkin = (skintypeId: number) => {
+  //   deleteSkinType(skintypeId, {
+  //     onSuccess: () => {
+  //       message.success("Xóa loại da thành công");
+  //       refetch();
+  //     },
+  //     onError: () => {
+  //       message.error("Xóa loại da thất bại");
+  //     },
+  //   });
+  // };
 
   const handleCreate = () => {
     setIsModalOpen(true);
     form.resetFields();
+    form.setFieldsValue({ status: "Active" });
   };
 
   const handleCreateSkin = () => {
@@ -79,6 +82,27 @@ const SkinTypeTable = () => {
     setEditingSkin(record);
     form.setFieldsValue(record);
     setIsModalOpen(true);
+  };
+
+  const handleDelete = (skintypeId: number) => {
+    setSkintypeToDelete(skintypeId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteSkin = () => {
+    if (skintypeToDelete) {
+      deleteSkinType(skintypeToDelete, {
+        onSuccess: () => {
+          message.success("Xóa loại da thành công");
+          setDeleteModalOpen(false);
+          setSkintypeToDelete(null);
+          refetch();
+        },
+        onError: (err: { message: any }) => {
+          message.error(`Lỗi xóa loại da: ${err.message}`);
+        },
+      });
+    }
   };
 
   const handleUpdate = () => {
@@ -155,7 +179,7 @@ const SkinTypeTable = () => {
           <Tooltip title="Delete">
             <Button
               icon={<DeleteOutlined />}
-              onClick={() => handleDeleteSkin(record.skintypeId)}
+              onClick={() => handleDelete(record.skintypeId)}
             />
           </Tooltip>
         </Space>
@@ -210,7 +234,11 @@ const SkinTypeTable = () => {
           </>
         )}
       >
-        <Form form={form} layout="vertical">
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{ status: "Active" }}
+        >
           <Form.Item
             name="skintypeName"
             label="Tên loại da"
@@ -231,6 +259,14 @@ const SkinTypeTable = () => {
             rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
           >
             <AntInput.TextArea rows={4} />
+          </Form.Item>
+          <Form.Item
+            name="status"
+            label="Hoạt động"
+            initialValue="Active"
+            rules={[{ required: true, message: "Vui lòng nhập tên loại da" }]}
+          >
+            <AntInput disabled />
           </Form.Item>
           <Form.Item
             name="pros"
@@ -266,6 +302,23 @@ const SkinTypeTable = () => {
             <AntInput />
           </Form.Item>
         </Form>
+      </Modal>
+
+      <Modal
+        title="Xác nhận xóa"
+        open={isDeleteModalOpen}
+        style={{ width: "max-content" }}
+        onCancel={() => setDeleteModalOpen(false)}
+        footer={[
+          <Button key="back" onClick={() => setDeleteModalOpen(false)}>
+            Hủy
+          </Button>,
+          <Button key="delete" type="primary" danger onClick={handleDeleteSkin}>
+            Xóa
+          </Button>,
+        ]}
+      >
+        <p>Bạn có chắc chắn muốn xóa loại da này không?</p>
       </Modal>
     </div>
   );
