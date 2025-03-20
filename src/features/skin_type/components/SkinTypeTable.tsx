@@ -11,12 +11,14 @@ import {
   Tooltip,
   Image,
   Flex,
+  Upload,
 } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
   SearchOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import { useSkinTypes } from "../hooks/useGetSkin";
 import { useDeleteSkin } from "../hooks/useDeleteSkin";
@@ -25,6 +27,8 @@ import { useUpdateSkin } from "../hooks/useUpdateSkin";
 import { TablePaginationConfig } from "antd/es/table";
 import { SkinDto } from "../dto/skin.dto";
 import { ColumnsType } from "antd/es/table";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "../../../firebase/firebase";
 
 const SkinTypeTable = () => {
   const { data: skinData, isLoading, refetch } = useSkinTypes();
@@ -38,11 +42,50 @@ const SkinTypeTable = () => {
   const [editingSkin, setEditingSkin] = useState<any>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [skintypeToDelete, setSkintypeToDelete] = useState<any>(null);
+  const [, setUploading] = useState(false);
+  const [, setImageAsFile] = useState<File | null>(null);
   const [form] = Form.useForm();
 
   const filterSkins = skinData?.filter((skin: any) =>
     skin.skintypeName.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  const handleFireBaseUpload = (file: File) => {
+    if (!file) {
+      message.error("Vui lòng chọn một hình ảnh!");
+      return;
+    }
+
+    setUploading(true);
+    const storageRef = ref(storage, `images/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(`Upload is ${progress}% done`);
+      },
+      (error) => {
+        setUploading(false);
+        message.error(`Lỗi khi upload hình ảnh: ${error.message}`);
+        console.error("Upload error:", error);
+      },
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          form.setFieldsValue({ image: downloadURL });
+          setUploading(false);
+          message.success("Upload hình ảnh thành công!");
+        } catch (error) {
+          setUploading(false);
+          message.error("Lỗi khi lấy URL hình ảnh!");
+          console.error("Error getting download URL:", error);
+        }
+      }
+    );
+  };
 
   // const handleDeleteSkin = (skintypeId: number) => {
   //   deleteSkinType(skintypeId, {
@@ -60,6 +103,7 @@ const SkinTypeTable = () => {
     setIsModalOpen(true);
     form.resetFields();
     form.setFieldsValue({ status: "Active" });
+    setImageAsFile(null);
   };
 
   const handleCreateSkin = () => {
@@ -82,6 +126,7 @@ const SkinTypeTable = () => {
     setEditingSkin(record);
     form.setFieldsValue(record);
     setIsModalOpen(true);
+    setImageAsFile(null);
   };
 
   const handleDelete = (skintypeId: number) => {
@@ -299,7 +344,29 @@ const SkinTypeTable = () => {
             label="Hình ảnh"
             rules={[{ required: true, message: "Vui lòng nhập hình ảnh" }]}
           >
-            <AntInput />
+            <Upload
+              listType="picture-card"
+              showUploadList={false}
+              beforeUpload={(file) => {
+                handleFireBaseUpload(file);
+                return false;
+              }}
+              accept="image/*"
+            >
+              {form.getFieldValue("image") ? (
+                <Image
+                  src={form.getFieldValue("image")}
+                  alt="skintype Image"
+                  style={{ width: "100%", height: "100%" }}
+                  preview={false}
+                />
+              ) : (
+                <div>
+                  <UploadOutlined />
+                  <div style={{ marginTop: 8 }}>Upload</div>
+                </div>
+              )}
+            </Upload>
           </Form.Item>
         </Form>
       </Modal>

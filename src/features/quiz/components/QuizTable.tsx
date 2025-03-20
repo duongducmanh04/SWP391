@@ -304,7 +304,7 @@ const QuizTable = () => {
       key: "actions",
       render: (_, record) => (
         <Space>
-          <Tooltip title="Add Answers">
+          <Tooltip title="Thêm câu trả lời">
             <Button
               icon={<PlusOutlined />}
               onClick={() => handleAddAnswers(record.quizquestionId)}

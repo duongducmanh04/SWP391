@@ -14,6 +14,7 @@ import {
   InputNumber,
   Empty,
   Tooltip,
+  Upload,
 } from "antd";
 import { useServices } from "../hooks/useGetService";
 import { useServiceStore } from "../hooks/useServiceStore";
@@ -22,12 +23,15 @@ import {
   EditOutlined,
   PlusOutlined,
   SearchOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import { useCreateService } from "../hooks/useCreateService";
 import { useUpdateService } from "../hooks/useUpdateService";
 import { useDeleteService } from "../hooks/useDeleteService";
 import { ColumnsType } from "antd/es/table";
 import { ServiceDto } from "../dto/get-service.dto";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "../../../firebase/firebase";
 
 const ServiceTable = () => {
   const { data, isLoading, error, refetch: refetchService } = useServices();
@@ -42,6 +46,8 @@ const ServiceTable = () => {
   const { services, setServices } = useServiceStore();
   const [searchText, setSearchText] = useState("");
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
+  const [, setUploading] = useState(false);
+  const [, setImageAsFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (data) {
@@ -49,9 +55,49 @@ const ServiceTable = () => {
     }
   }, [data, setServices]);
 
+  const handleFireBaseUpload = (file: File) => {
+    if (!file) {
+      message.error("Vui lòng chọn một hình ảnh!");
+      return;
+    }
+
+    setUploading(true);
+    const storageRef = ref(storage, `images/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(`Upload is ${progress}% done`);
+      },
+      (error) => {
+        setUploading(false);
+        message.error(`Lỗi khi upload hình ảnh: ${error.message}`);
+        console.error("Upload error:", error);
+      },
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          form.setFieldsValue({ image: downloadURL });
+          setUploading(false);
+          message.success("Upload hình ảnh thành công!");
+          // console.log("File available at", downloadURL);
+        } catch (error) {
+          setUploading(false);
+          message.error("Lỗi khi lấy URL hình ảnh!");
+          console.error("Error getting download URL:", error);
+        }
+      }
+    );
+  };
+
   const handleCreate = () => {
+    setEditingService(null);
     setIsModalOpen(true);
     form.resetFields();
+    setImageAsFile(null);
   };
 
   const handleCreateService = () => {
@@ -79,6 +125,7 @@ const ServiceTable = () => {
     setEditingService(record);
     form.setFieldsValue(record);
     setIsModalOpen(true);
+    setImageAsFile(null);
   };
 
   const handleDelete = (serviceId: string) => {
@@ -93,6 +140,7 @@ const ServiceTable = () => {
           message.success("Xóa dịch vụ thành công");
           setDeleteModalOpen(false);
           setServiceToDelete(null);
+          refetchService();
         },
         onError: (err: { message: any }) => {
           message.error(`Lỗi xóa dịch vụ: ${err.message}`);
@@ -303,7 +351,29 @@ const ServiceTable = () => {
             label="Hình ảnh"
             rules={[{ required: true, message: "Please enter the image!" }]}
           >
-            <AntInput />
+            <Upload
+              listType="picture-card"
+              showUploadList={false}
+              beforeUpload={(file) => {
+                handleFireBaseUpload(file);
+                return false;
+              }}
+              accept="image/*"
+            >
+              {form.getFieldValue("image") ? (
+                <Image
+                  src={form.getFieldValue("image")}
+                  alt="Service Image"
+                  style={{ width: "100%", height: "100%" }}
+                  preview={false}
+                />
+              ) : (
+                <div>
+                  <UploadOutlined />
+                  <div style={{ marginTop: 8 }}>Upload</div>
+                </div>
+              )}
+            </Upload>
           </Form.Item>
           <Form.Item
             name="procedureDescription"
