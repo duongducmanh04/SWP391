@@ -21,7 +21,7 @@ namespace SkincareBookingService.BLL.Services
            {
                Time = slotDto.Time,
                Status = slotDto.Status,
-               BookingId = slotDto.BookingId
+               BookingId = null
            };
             await _slotRepository.AddAsync(slot);
             await _slotRepository.SaveChangesAsync();
