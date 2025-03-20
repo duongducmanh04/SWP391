@@ -65,28 +65,24 @@ const CustomerBookingDetail = () => {
   });
 
   // ✅ Đánh giá dịch vụ (POST hoặc PUT)
+  const [rating, setRating] = useState<number>(
+    Number(localStorage.getItem(`rating_${validBookingId}`)) || 0
+  );
+
   const ratingMutation = useMutation({
     mutationFn: async (value: number) => {
-      if (existingRating) {
-        // Cập nhật đánh giá nếu đã tồn tại
-        return await axios.put(`${RATING_API_URL}/${existingRating.ratingId}`, {
-          customerId: validCustomerId,
-          stars: value,
-          serviceId: validServiceId,
-        });
-      } else {
-        // Tạo đánh giá mới
-        return await axios.post(RATING_API_URL, {
-          customerId: validCustomerId,
-          stars: value,
-          serviceId: validServiceId,
-        });
-      }
+      localStorage.setItem(`rating_${validBookingId}`, String(value));
+
+      return await axios.post(RATING_API_URL, {
+        customerId: validCustomerId,
+        stars: value,
+        serviceId: booking?.serviceId,
+      });
     },
     onSuccess: () => {
       message.success("✅ Cảm ơn bạn đã đánh giá!");
       queryClient.invalidateQueries({
-        queryKey: ["ratings", validServiceId],
+        queryKey: ["ratings", booking?.serviceId],
       });
     },
     onError: () => {
@@ -98,22 +94,6 @@ const CustomerBookingDetail = () => {
     setRating(value);
     ratingMutation.mutate(value);
   };
-
-  if (!validBookingId) {
-    return (
-      <div
-        style={{ padding: "24px", background: "#f5f1eb", minHeight: "100vh" }}
-      >
-        <Card
-          title="Chi tiết đặt lịch"
-          bordered={false}
-          style={{ maxWidth: 600, margin: "auto" }}
-        >
-          <Alert message="❌ Lỗi: Booking ID không hợp lệ!" type="error" />
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div style={{ padding: "24px", background: "#f5f1eb", minHeight: "100vh" }}>
@@ -139,10 +119,7 @@ const CustomerBookingDetail = () => {
             </p>
             <p>
               <strong>Ngày đặt làm:</strong>{" "}
-              {dayjs(booking.date).format("DD/MM/YYYY")}{" "}
-              {slotMap.get(booking.bookingId)?.time
-                ? ` - ${slotMap.get(booking.bookingId)?.time}`
-                : ""}
+              {dayjs(booking.date).format("DD/MM/YYYY")}
             </p>
             <p>
               <strong>Trạng thái:</strong> <StatusTag status={booking.status} />
@@ -180,11 +157,7 @@ const CustomerBookingDetail = () => {
                 <p>
                   <strong>Đánh giá dịch vụ:</strong>
                 </p>
-                {isRatingsLoading ? (
-                  <Spin tip="🔄 Đang tải đánh giá..." />
-                ) : (
-                  <Rate value={rating} onChange={handleRatingChange} />
-                )}
+                <Rate value={rating} onChange={handleRatingChange} />
               </div>
             )}
           </>

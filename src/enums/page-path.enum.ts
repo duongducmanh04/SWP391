@@ -41,7 +41,7 @@ export enum PagePath {
   SCHEDULE_FOR_THERAPIST = "/Home/TherepistSchedule",
   ROOT = "/",
   CUSTOMER_INFORMATION = "/CustomerInformation",
-
+  CREATE_BLOG = "/HomePage/Blog/CreateBlog",
   // TICKET_MANAGEMENT = "/ticket-management",
   // TIMEKEEPING_DETAIL = "/timekeeping/:code/detail",
   // TIMEKEEPING_MANAGEMENT = "/timekeeping",

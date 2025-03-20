@@ -200,7 +200,7 @@ const CustomerProfile = () => {
                     />
                   ) : bookings && bookings.length > 0 ? (
                     <List
-                      itemLayout="horizontal"
+                      itemLayout="vertical"
                       dataSource={bookings}
                       pagination={{
                         pageSize: 10,
@@ -209,32 +209,47 @@ const CustomerProfile = () => {
                       }}
                       renderItem={(booking: BookingDto) => (
                         <List.Item
-                          style={{ cursor: "pointer" }}
+                          style={{
+                            cursor: "pointer",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "flex-start",
+                          }}
                           onClick={() =>
                             handleNavigateToBookingDetail(booking.bookingId)
                           }
-                          actions={[
-                            <Button
-                              type="primary"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleNavigateToBookingDetail(
-                                  booking.bookingId
-                                );
-                              }}
-                            >
-                              Xem Chi Tiết
-                            </Button>,
-                          ]}
                         >
                           <List.Item.Meta
-                            title={`Dịch vụ: ${booking.serviceName}`}
-                            description={`Ngày: ${dayjs(booking.date).format(
-                              "DD-MM-YYYY"
-                            )} | Trạng thái: ${booking.status} | Địa điểm: ${
-                              booking.location
-                            }`}
+                            title={<strong>{booking.serviceName}</strong>}
                           />
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: "5px",
+                            }}
+                          >
+                            <p>
+                              <strong>Ngày:</strong>{" "}
+                              {dayjs(booking.date).format("DD-MM-YYYY")}
+                            </p>
+                            <p>
+                              <strong>Trạng thái:</strong> {booking.status}
+                            </p>
+                            <p>
+                              <strong>Địa điểm:</strong> {booking.location}
+                            </p>
+                          </div>
+                          <Button
+                            type="primary"
+                            style={{ marginTop: "10px" }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleNavigateToBookingDetail(booking.bookingId);
+                            }}
+                          >
+                            Xem Chi Tiết
+                          </Button>
                         </List.Item>
                       )}
                     />

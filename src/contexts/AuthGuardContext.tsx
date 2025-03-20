@@ -259,6 +259,7 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.BOOKING_INFO_CONFIRM,
         PagePath.COMPLETE_RESULT,
         PagePath.CUSTOMER_BOOKING_DETAIL,
+        PagePath.CREATE_BLOG,
       ],
       Manager: [],
     };

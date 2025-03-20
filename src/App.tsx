@@ -43,7 +43,7 @@ import SlotTable from "./features/services/components/SlotTable";
 import SkinTypeTable from "./features/skin_type/components/SkinTypeTable";
 import ResetPassword from "./features/authentication/components/ResetPassword";
 import QuizTable from "./features/quiz/components/QuizTable";
-
+import CreateBlog from "./features/blog/components/CreateBlog";
 const App = () => {
   return (
     <Router>
@@ -130,6 +130,7 @@ const App = () => {
               path={PagePath.CUSTOMER_BOOKING_DETAIL}
               element={<CustomerBookingDetail />}
             />
+            <Route path={PagePath.CREATE_BLOG} element={<CreateBlog />} />
           </Route>
         </Routes>
       </AuthGuardProvider>
