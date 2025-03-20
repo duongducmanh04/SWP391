@@ -27,7 +27,7 @@ interface LoginVariables {
 
 const login = async (credentials: LoginVariables) => {
   const response = await axios.post<LoginResponse>(
-    "http://skincare-sbs.southeastasia.azurecontainer.io:8080/api/auth/login",
+    "https://localhost:7071/api/auth/login",
     credentials,
     {
       headers: { "Content-Type": "application/json" },
