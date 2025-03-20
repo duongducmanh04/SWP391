@@ -1,94 +1,39 @@
-# Ignore build outputs
-bin/
-obj/
-out/
+# Ignore build outputs in all layers
+backend/SkincareBookingService/**/bin/
+backend/SkincareBookingService/**/obj/
 
-# Ignore Visual Studio related files
-.vs/
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
+# Ignore API (Presentation layer) files
+backend/SkincareBookingService/.vs/
+backend/SkincareBookingService/secrets.json
+backend/SkincareBookingService/appsettings.Development.json
+backend/SkincareBookingService/appsettings.Local.json
+backend/SkincareBookingService/*.log
 
-# Ignore logs
-*.log
-Logs/
+# Ignore Data Access Layer (DAL) files (if using EF Core)
+backend/SkincareBookingService.DAL/Migrations/
+backend/SkincareBookingService.DAL/*.dbmdl
 
-# Ignore NuGet packages and dependencies
-*.nupkg
-*.snupkg
-packages/
-project.lock.json
-project.assets.json
-PackageReference.cache/
+# Ignore frontend (React.js) files
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.cache/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.production.local
+frontend/coverage/
 
-# Ignore generated files
-*.g.i.cs
-*.g.cs
-*.Designer.cs
+# Ignore NuGet packages
+backend/SkincareBookingService/packages/
+backend/SkincareBookingService/*.nupkg
+backend/SkincareBookingService/*.snupkg
+backend/SkincareBookingService/project.lock.json
+backend/SkincareBookingService/project.assets.json
+backend/SkincareBookingService/PackageReference.cache/
 
-# Ignore user secrets & configuration files
-appsettings.Development.json
-secrets.json
-secrets/
-
-# Ignore database files & migrations (optional)
-Migrations/
-*.mdf
-*.ldf
-
-# Ignore Entity Framework cache files
-*.dbmdl
-*.jfm
-
-# Ignore Docker-related files (if using Docker)
-docker-compose.override.yml
-
-# Ignore coverage reports
-coverage/
-*.coverage
-*.coveragexml
-
-# Ignore Rider / JetBrains files
-.idea/
-*.sln.iml
-
-# Ignore temporary files
-temp/
-
-# Ignore dependencies
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# Ignore build output
-dist/
-build/
-
-# Ignore environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Ignore logs
-logs/
-*.log
-
-# Ignore editor settings
-.vscode/
-.idea/
-*.sublime-workspace
-
-# Ignore system files
+# Ignore system & temporary files
 .DS_Store
 Thumbs.db
-
-# Ignore testing coverage
-coverage/
-
-# Ignore temporary files
+logs/
 temp/
