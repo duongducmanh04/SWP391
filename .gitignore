@@ -1,0 +1,94 @@
+# Ignore build outputs
+bin/
+obj/
+out/
+
+# Ignore Visual Studio related files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Ignore logs
+*.log
+Logs/
+
+# Ignore NuGet packages and dependencies
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.assets.json
+PackageReference.cache/
+
+# Ignore generated files
+*.g.i.cs
+*.g.cs
+*.Designer.cs
+
+# Ignore user secrets & configuration files
+appsettings.Development.json
+secrets.json
+secrets/
+
+# Ignore database files & migrations (optional)
+Migrations/
+*.mdf
+*.ldf
+
+# Ignore Entity Framework cache files
+*.dbmdl
+*.jfm
+
+# Ignore Docker-related files (if using Docker)
+docker-compose.override.yml
+
+# Ignore coverage reports
+coverage/
+*.coverage
+*.coveragexml
+
+# Ignore Rider / JetBrains files
+.idea/
+*.sln.iml
+
+# Ignore temporary files
+temp/
+
+# Ignore dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Ignore build output
+dist/
+build/
+
+# Ignore environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore editor settings
+.vscode/
+.idea/
+*.sublime-workspace
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore testing coverage
+coverage/
+
+# Ignore temporary files
+temp/
