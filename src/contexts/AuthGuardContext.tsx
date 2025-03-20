@@ -228,6 +228,7 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.SKIN_TYPE_MANAGEMENT,
         PagePath.SLOT_MANAGEMENT,
         PagePath.SERVICE_MANAGEMENT,
+        PagePath.QUIZ_MANAGEMENT,
       ],
       Staff: [
         PagePath.HOME,

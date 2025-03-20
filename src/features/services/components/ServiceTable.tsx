@@ -11,8 +11,10 @@ import {
   Flex,
   Image,
   Skeleton,
+  InputNumber,
   Empty,
   Tooltip,
+  Upload,
 } from "antd";
 import { useServices } from "../hooks/useGetService";
 import { useServiceStore } from "../hooks/useServiceStore";
@@ -21,15 +23,18 @@ import {
   EditOutlined,
   PlusOutlined,
   SearchOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import { useCreateService } from "../hooks/useCreateService";
 import { useUpdateService } from "../hooks/useUpdateService";
 import { useDeleteService } from "../hooks/useDeleteService";
 import { ColumnsType } from "antd/es/table";
 import { ServiceDto } from "../dto/get-service.dto";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "../../../firebase/firebase";
 
 const ServiceTable = () => {
-  const { data, isLoading, error } = useServices();
+  const { data, isLoading, error, refetch: refetchService } = useServices();
   const { mutate: createService } = useCreateService();
   const { mutate: updateService } = useUpdateService();
   const { mutate: deleteService } = useDeleteService();
@@ -41,6 +46,8 @@ const ServiceTable = () => {
   const { services, setServices } = useServiceStore();
   const [searchText, setSearchText] = useState("");
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
+  const [, setUploading] = useState(false);
+  const [, setImageAsFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (data) {
@@ -48,9 +55,49 @@ const ServiceTable = () => {
     }
   }, [data, setServices]);
 
+  const handleFireBaseUpload = (file: File) => {
+    if (!file) {
+      message.error("Vui lòng chọn một hình ảnh!");
+      return;
+    }
+
+    setUploading(true);
+    const storageRef = ref(storage, `images/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(`Upload is ${progress}% done`);
+      },
+      (error) => {
+        setUploading(false);
+        message.error(`Lỗi khi upload hình ảnh: ${error.message}`);
+        console.error("Upload error:", error);
+      },
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          form.setFieldsValue({ image: downloadURL });
+          setUploading(false);
+          message.success("Upload hình ảnh thành công!");
+          // console.log("File available at", downloadURL);
+        } catch (error) {
+          setUploading(false);
+          message.error("Lỗi khi lấy URL hình ảnh!");
+          console.error("Error getting download URL:", error);
+        }
+      }
+    );
+  };
+
   const handleCreate = () => {
+    setEditingService(null);
     setIsModalOpen(true);
     form.resetFields();
+    setImageAsFile(null);
   };
 
   const handleCreateService = () => {
@@ -62,6 +109,7 @@ const ServiceTable = () => {
             message.success("Tạo dịch vụ thành công");
             setIsModalOpen(false);
             form.resetFields();
+            refetchService();
           },
           onError: (err: { message: any }) => {
             message.error(`Lỗi tạo người dùng: ${err.message}`);
@@ -77,6 +125,7 @@ const ServiceTable = () => {
     setEditingService(record);
     form.setFieldsValue(record);
     setIsModalOpen(true);
+    setImageAsFile(null);
   };
 
   const handleDelete = (serviceId: string) => {
@@ -91,6 +140,7 @@ const ServiceTable = () => {
           message.success("Xóa dịch vụ thành công");
           setDeleteModalOpen(false);
           setServiceToDelete(null);
+          refetchService();
         },
         onError: (err: { message: any }) => {
           message.error(`Lỗi xóa dịch vụ: ${err.message}`);
@@ -110,6 +160,7 @@ const ServiceTable = () => {
               message.success("Cập nhật dịch vụ thành công");
               setIsModalOpen(false);
               setEditingService(null);
+              refetchService();
             },
             onError: (err: { message: any }) => {
               message.error(`Lỗi cập nhật dịch vụ: ${err.message}`);
@@ -267,14 +318,14 @@ const ServiceTable = () => {
         <Form form={form} layout="vertical">
           <Form.Item
             name="name"
-            label="Name"
+            label="Tên dịch vụ"
             rules={[{ required: true, message: "Please enter the name!" }]}
           >
             <AntInput />
           </Form.Item>
           <Form.Item
             name="description"
-            label="description"
+            label="Mô tả"
             rules={[
               { required: true, message: "Please enter the description!" },
             ]}
@@ -283,28 +334,50 @@ const ServiceTable = () => {
           </Form.Item>
           <Form.Item
             name="price"
-            label="price"
+            label="Giá"
             rules={[{ required: true, message: "Please enter the price!" }]}
           >
-            <AntInput />
+            <InputNumber min={0} style={{ width: "-webkit-fill-available" }} />
           </Form.Item>
           <Form.Item
             name="duration"
-            label="duration"
+            label="Tổng thời gian làm"
             rules={[{ required: true, message: "Please enter the duration!" }]}
           >
-            <AntInput />
+            <InputNumber min={15} style={{ width: "-webkit-fill-available" }} />
           </Form.Item>
           <Form.Item
             name="image"
-            label="image"
+            label="Hình ảnh"
             rules={[{ required: true, message: "Please enter the image!" }]}
           >
-            <AntInput />
+            <Upload
+              listType="picture-card"
+              showUploadList={false}
+              beforeUpload={(file) => {
+                handleFireBaseUpload(file);
+                return false;
+              }}
+              accept="image/*"
+            >
+              {form.getFieldValue("image") ? (
+                <Image
+                  src={form.getFieldValue("image")}
+                  alt="Service Image"
+                  style={{ width: "100%", height: "100%" }}
+                  preview={false}
+                />
+              ) : (
+                <div>
+                  <UploadOutlined />
+                  <div style={{ marginTop: 8 }}>Upload</div>
+                </div>
+              )}
+            </Upload>
           </Form.Item>
           <Form.Item
             name="procedureDescription"
-            label="procedureDescription"
+            label="Bước chăm sóc"
             rules={[
               {
                 required: true,
@@ -318,9 +391,9 @@ const ServiceTable = () => {
       </Modal>
 
       <Modal
-        title="Confirm Deletion"
+        title="Xác nhận xóa"
         open={isDeleteModalOpen}
-        width={200}
+        style={{ width: "max-content" }}
         onCancel={() => setDeleteModalOpen(false)}
         footer={[
           <Button key="back" onClick={() => setDeleteModalOpen(false)}>

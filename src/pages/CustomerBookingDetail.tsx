@@ -10,15 +10,16 @@ import { useState, useEffect } from "react";
 import { useGetCustomerId } from "../features/user/hook/useGetCustomerId";
 import { useRatingsByService } from "../features/user/hook/useRatingsByServiceID";
 import { Status } from "../enums/status-booking";
+import { useSlots } from "../features/services/hooks/useGetSlot";
+import { SlotDto } from "../features/services/dto/slot.dto";
 
-const API_BASE_URL =
-  "http://skincare-sbs.southeastasia.azurecontainer.io:8080/api/Booking";
 const RATING_API_URL = "https://localhost:7071/api/Rating";
 
 const CustomerBookingDetail = () => {
   const location = useLocation();
   const { bookingId } = location.state || {};
   const queryClient = useQueryClient();
+  const { data: slots } = useSlots();
 
   const { customerId } = useGetCustomerId();
   const validBookingId = bookingId ? String(bookingId) : "";
@@ -30,31 +31,22 @@ const CustomerBookingDetail = () => {
     isError,
     error,
   } = useBookingById(validBookingId);
-  const validServiceId = booking?.serviceId ?? 0;
 
-  // 🔹 Lấy danh sách rating từ API
-  const { data: ratings, isLoading: isRatingsLoading } =
-    useRatingsByService(validServiceId);
+  const slotMap = new Map<number, SlotDto>();
+  if (slots) {
+    slots.forEach((slot) => {
+      slotMap.set(slot.bookingId, slot);
+    });
+  }
 
-  // 🔹 Tìm rating của khách hàng hiện tại
-  const existingRating = ratings?.find(
-    (rating) => rating.customerId === validCustomerId
-  );
-  const [rating, setRating] = useState<number>(existingRating?.stars ?? 0);
-
-  useEffect(() => {
-    if (existingRating?.stars !== undefined) {
-      setRating(existingRating.stars);
-    }
-  }, [existingRating]);
-
-  // ✅ Hủy đặt lịch
   const cancelBookingMutation = useMutation({
     mutationFn: async () => {
       if (!validBookingId) {
         throw new Error("Booking ID không hợp lệ");
       }
-      const cancelUrl = `${API_BASE_URL}/cancelled/${validBookingId}`;
+
+      const cancelUrl = `https://localhost:7071/api/Booking/cancelled/${validBookingId}`;
+
       const response = await axios.put(cancelUrl);
       return response.data;
     },
@@ -146,8 +138,11 @@ const CustomerBookingDetail = () => {
               <strong>Dịch vụ:</strong> {booking.serviceName}
             </p>
             <p>
-              <strong>Ngày đặt:</strong>{" "}
-              {dayjs(booking.date).format("DD/MM/YYYY HH:mm")}
+              <strong>Ngày đặt làm:</strong>{" "}
+              {dayjs(booking.date).format("DD/MM/YYYY")}{" "}
+              {slotMap.get(booking.bookingId)?.time
+                ? ` - ${slotMap.get(booking.bookingId)?.time}`
+                : ""}
             </p>
             <p>
               <strong>Trạng thái:</strong> <StatusTag status={booking.status} />

@@ -186,61 +186,70 @@ const CustomerProfile = () => {
                   )}
                 </div>
               )}
-              {activeTab === "schedule" &&
-                (isBookingLoading ? (
-                  <Spin tip="Đang tải lịch sử đặt lịch..." />
-                ) : isBookingError ? (
-                  <Alert
-                    message={
-                      bookingError?.message || "Lỗi tải lịch sử đặt lịch"
-                    }
-                    type="error"
-                  />
-                ) : bookings && bookings.length > 0 ? (
-                  <List
-                    itemLayout="vertical"
-                    dataSource={bookings}
-                    pagination={{
-                      pageSize: 10,
-                      showSizeChanger: true,
-                      pageSizeOptions: ["5", "10", "20"],
-                    }}
-                    renderItem={(booking) => (
-                      <List.Item
-                        style={{
-                          cursor: "pointer",
-                          padding: "16px",
-                          border: "1px solid #ddd",
-                          borderRadius: "8px",
-                          marginBottom: "12px",
-                        }}
-                        onClick={() =>
-                          handleNavigateToBookingDetail(booking.bookingId)
-                        }
-                      >
-                        <List.Item.Meta
-                          title={<strong>{booking.serviceName}</strong>}
-                          description={
-                            <>
-                              <p>
-                                <strong>Ngày:</strong>{" "}
-                                {dayjs(booking.date).format("DD-MM-YYYY")}
-                              </p>
-                              <p>
-                                <strong>Trạng thái:</strong> {booking.status}
-                              </p>
-                              <p>
-                                <strong>Địa điểm:</strong> {booking.location}
-                              </p>
-                            </>
+
+              {activeTab === "schedule" && (
+                <>
+                  {isBookingLoading ? (
+                    <Spin tip="Đang tải lịch sử đặt lịch..." />
+                  ) : isBookingError ? (
+                    <Alert
+                      message={
+                        bookingError?.message || "Lỗi tải lịch sử đặt lịch"
+                      }
+                      type="error"
+                    />
+                  ) : bookings && bookings.length > 0 ? (
+                    <List
+                      itemLayout="horizontal"
+                      dataSource={bookings}
+                      pagination={{
+                        pageSize: 10,
+                        showSizeChanger: true,
+                        pageSizeOptions: ["10", "20", "30", "40"],
+                      }}
+                      renderItem={(booking: BookingDto) => (
+                        <List.Item
+                          style={{ cursor: "pointer" }}
+                          onClick={() =>
+                            handleNavigateToBookingDetail(booking.bookingId)
                           }
-                        />
-                      </List.Item>
-                    )}
-                  />
-                ) : (
-                  <Alert message="Không có lịch sử đặt lịch." type="warning" />
-                ))}
+                          actions={[
+                            <Button
+                              type="primary"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleNavigateToBookingDetail(
+                                  booking.bookingId
+                                );
+                              }}
+                            >
+                              Xem Chi Tiết
+                            </Button>,
+                          ]}
+                        >
+                          <List.Item.Meta
+                            title={`Dịch vụ: ${booking.serviceName}`}
+                            description={`Ngày: ${dayjs(booking.date).format(
+                              "DD-MM-YYYY"
+                            )} | Trạng thái: ${booking.status} | Địa điểm: ${
+                              booking.location
+                            }`}
+                          />
+                        </List.Item>
+                      )}
+                    />
+                  ) : (
+                    <Alert
+                      message="Không có lịch sử đặt lịch."
+                      type="warning"
+                    />
+                  )}
+                </>
+              )}
+
+              {activeTab === "password" && (
+                <p>Thay đổi mật khẩu của khách hàng</p>
+              )}
             </Card>
           </Content>
         </Layout>

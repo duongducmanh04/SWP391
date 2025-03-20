@@ -28,6 +28,8 @@ import { TherapistDto } from "../../skin_therapist/dto/get-therapist.dto";
 import { useCustomers } from "../../user/hook/useGetCustomer";
 import { CustomerDto } from "../../user/dto/customer.dto";
 import { PagePath } from "../../../enums/page-path.enum";
+import { SlotDto } from "../../services/dto/slot.dto";
+import { useSlots } from "../../services/hooks/useGetSlot";
 
 const BookingListTable = () => {
   const {
@@ -81,6 +83,7 @@ const BookingListTable = () => {
   const navigate = useNavigate();
   const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
   const [activeTab, setActiveTab] = useState("all");
+  const { data: slots } = useSlots();
   const { user } = useAuthStore();
   const accountId = user?.accountId;
 
@@ -98,9 +101,7 @@ const BookingListTable = () => {
   const filteredBookings = useMemo(() => {
     if (!bookingData || !skintherapistId) return bookingData;
     return bookingData.filter(
-      (booking) =>
-        booking.skintherapistId === skintherapistId &&
-        booking.status === Status.CHECK_IN
+      (booking) => booking.skintherapistId === skintherapistId
     );
   }, [bookingData, skintherapistId]);
 
@@ -115,6 +116,13 @@ const BookingListTable = () => {
   if (customerData) {
     customerData.forEach((customer) => {
       customerMap.set(customer.customerId, customer);
+    });
+  }
+
+  const slotMap = new Map<number, SlotDto>();
+  if (slots) {
+    slots.forEach((slot: SlotDto) => {
+      slotMap.set(slot.bookingId, slot);
     });
   }
 
@@ -196,7 +204,11 @@ const BookingListTable = () => {
       title: "Ngày đặt làm",
       dataIndex: "date",
       key: "date",
-      render: (text: string) => dayjs(text).format("DD/MM/YYYY HH:mm:ss"),
+      render: (text: string, record: BookingDto) => {
+        const formattedDate = dayjs(text).format("DD/MM/YYYY");
+        const slotTime = slotMap.get(record.bookingId)?.time;
+        return `${formattedDate}${slotTime ? ` - ${slotTime}` : ""}`;
+      },
       sorter: (a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf(),
     },
     {

@@ -1,13 +1,57 @@
 import { useEffect, useState } from "react";
-import { Card, Button, Row, Col, Typography, Input } from "antd";
-import { HeartOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import {
+  Card,
+  Button,
+  Row,
+  Col,
+  Typography,
+  Input,
+  Select,
+  Modal,
+  Slider,
+} from "antd";
+import {
+  FilterOutlined,
+  HeartOutlined,
+  ShoppingCartOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useServices } from "../hooks/useGetService";
 import { useServiceStore } from "../hooks/useServiceStore";
 import { PagePath } from "../../../enums/page-path.enum";
 import { ServiceDto } from "../dto/get-service.dto";
+import axios from "axios";
+import { SkintypeServiceDto } from "../../services/dto/skintype-service.dto";
+import { useSkinTypes } from "../../skin_type/hooks/useGetSkin";
+import { useQuery } from "@tanstack/react-query";
+import { SkinDto } from "../../skin_type/dto/skin.dto";
+// import { useSkintypeServiceByServiceId } from "../hooks/useGetSkintypeServiceByServiceId";
 
 const { Title, Text } = Typography;
+const { Option } = Select;
+
+interface ServiceSkinType extends ServiceDto {
+  skinTypeIds?: number[];
+  skinTypeNames?: string;
+}
+
+const fetchSkinTypeByServiceId = async (
+  serviceId: number
+): Promise<number[]> => {
+  try {
+    console.log(`Fetching skin types for serviceId: ${serviceId}`);
+    const response = await axios.get<SkintypeServiceDto[]>(
+      `https://localhost:7071/getSkintypeServiceByServiceId/${serviceId}`
+    );
+    return response.data.map((item) => item.skintypeId) ?? [];
+  } catch (error: unknown) {
+    console.error(
+      `Lỗi khi tải loại da cho serviceId ${serviceId}:`,
+      error instanceof Error ? error.message : "Lỗi không xác định"
+    );
+    return [];
+  }
+};
 
 const SkincareServices = () => {
   const navigate = useNavigate();
@@ -19,10 +63,38 @@ const SkincareServices = () => {
 
   const { setServices } = useServiceStore();
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [filteredTherapists, setFilteredTherapists] = useState<ServiceDto[]>(
-    []
-  );
+  // const { data: skintypeServiceData = [] } = useSkintypeServiceByServiceId(
+  //   serviceId ? serviceId.toString() : ""
+  // );
 
+  const { data: skinTypes } = useSkinTypes();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [selectedSkinType, setSelectedSkinType] = useState<number | null>(null);
+  const [filteredData, setFilteredData] = useState<ServiceSkinType[]>([]);
+
+  const { data: serviceSkinTypes } = useQuery<ServiceSkinType[]>({
+    queryKey: ["serviceSkinTypes", serviceData],
+    queryFn: async () => {
+      if (!serviceData || !skinTypes) return [];
+      return await Promise.all(
+        serviceData.map(async (service) => {
+          const skinData = await fetchSkinTypeByServiceId(service.serviceId);
+          const matchedSkinTypes = skinTypes.filter((st) =>
+            skinData.includes(st.skintypeId)
+          );
+          return {
+            ...service,
+            skinTypeIds: skinData,
+            skinTypeNames: matchedSkinTypes.length
+              ? matchedSkinTypes.map((st) => st.skintypeName).join(", ")
+              : "Không xác định",
+          } as ServiceSkinType;
+        })
+      );
+    },
+    enabled: !!serviceData && !!skinTypes,
+  });
   // const handleNavigate = (serviceId: number) => {
   //   navigate(`/Homepage/Service/${serviceId}`);
   // };
@@ -35,14 +107,22 @@ const SkincareServices = () => {
   };
 
   useEffect(() => {
-    const filtered = serviceData?.filter((service: ServiceDto) => {
-      const matchesSearch = service.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      return matchesSearch;
-    });
-    setFilteredTherapists(filtered || []);
-  }, [searchTerm, serviceData]);
+    if (searchTerm && serviceSkinTypes) {
+      const filtered = serviceSkinTypes.filter((service) =>
+        service.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredData(filtered);
+    } else if (serviceSkinTypes) {
+      setFilteredData(serviceSkinTypes);
+    }
+  }, [searchTerm, serviceSkinTypes]);
+
+  useEffect(() => {
+    if (serviceSkinTypes) {
+      setServices(serviceSkinTypes);
+      setFilteredData(serviceSkinTypes);
+    }
+  }, [serviceSkinTypes, setServices]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -76,9 +156,18 @@ const SkincareServices = () => {
           onChange={handleSearchChange}
           style={{ width: 300 }}
         />
+        <div className="filter-container">
+          <Button
+            type="primary"
+            icon={<FilterOutlined />}
+            onClick={() => setIsModalOpen(true)}
+          >
+            Bộ lọc
+          </Button>
+        </div>
       </div>
       <Row gutter={[16, 16]} justify="start">
-        {filteredTherapists?.map((service) => (
+        {filteredData?.map((service) => (
           <Col
             key={service.serviceId}
             xs={24}
@@ -110,10 +199,13 @@ const SkincareServices = () => {
                   Chi tiết
                 </Button>,
               ]}
-              style={{ width: "-webkit-fill-available" }}
+              style={{
+                width: "-webkit-fill-available",
+              }}
             >
               <Title level={4}>{service.name}</Title>
-              <Text>{service.description}</Text>
+              <Text style={{ display: "block" }}>{service.description}</Text>
+              <Text>Loại da: {service.skinTypeNames}</Text>
               <div
                 style={{
                   marginTop: "10px",
@@ -127,6 +219,53 @@ const SkincareServices = () => {
           </Col>
         ))}
       </Row>
+
+      <Modal
+        title="Bộ lọc"
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        onOk={() => {
+          let filtered = serviceSkinTypes || [];
+          filtered = filtered.filter(
+            (service) =>
+              service.price >= priceRange[0] && service.price <= priceRange[1]
+          );
+          if (selectedSkinType !== null) {
+            filtered = filtered.filter((service) =>
+              service.skinTypeIds?.includes(selectedSkinType)
+            );
+          }
+          setFilteredData(filtered);
+          setIsModalOpen(false);
+        }}
+      >
+        <Title level={4}>Lọc theo giá</Title>
+        <Slider
+          range
+          min={0}
+          max={1000}
+          step={10}
+          value={priceRange}
+          onChange={(value) => setPriceRange(value as [number, number])}
+        />
+
+        <Title level={4} style={{ marginTop: "16px" }}>
+          Lọc theo loại da
+        </Title>
+        <Select
+          placeholder="Chọn loại da"
+          allowClear
+          style={{ width: "100%" }}
+          value={selectedSkinType}
+          onChange={(value) => setSelectedSkinType(value)}
+        >
+          {skinTypes?.map((skin: SkinDto) => (
+            <Option key={skin.skintypeId} value={skin.skintypeId}>
+              {skin.skintypeName ?? `Loại da ${skin.skintypeId}`}
+            </Option>
+          ))}
+        </Select>
+      </Modal>
     </div>
   );
 };
