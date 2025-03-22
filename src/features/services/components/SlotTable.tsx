@@ -65,6 +65,28 @@ const SlotTable = () => {
   const customFormat: DatePickerProps["format"] = (value) =>
     `${value.format(dateFormat)}`;
 
+  const disabledHours = () => {
+    const hours: number[] = [];
+    // Vô hiệu hóa từ 12:00 AM (0) đến 8:00 AM (8)
+    for (let i = 0; i <= 7; i++) {
+      hours.push(i);
+    }
+    // Vô hiệu hóa từ 6:00 PM (18) đến 11:59 PM (23)
+    for (let i = 19; i <= 23; i++) {
+      hours.push(i);
+    }
+    return hours;
+  };
+
+  // Hàm vô hiệu hóa phút (chỉ áp dụng cho 6:00 PM)
+  const disabledMinutes = (selectedHour: number) => {
+    if (selectedHour === 18) {
+      // Vô hiệu hóa phút từ 1 đến 59 tại 6:00 PM
+      return Array.from({ length: 59 }, (_, i) => i + 1);
+    }
+    return [];
+  };
+
   const columns: ColumnsType<SlotDto> = [
     { title: "ID", dataIndex: "slotId", key: "slotId" },
     { title: "Time", dataIndex: "time", key: "time" },
@@ -117,9 +139,32 @@ const SlotTable = () => {
       .then((values) => {
         const { skinTherapistId, time, date } = values;
 
+        const selectedHour = dayjs(time).hour(); // Lấy giờ (0-23)
+        const selectedMinute = dayjs(time).minute(); // Lấy phút
+
+        // Kiểm tra từ 6:01 PM đến 11:59 PM
+        if (selectedHour >= 18 && selectedHour <= 23) {
+          if (selectedHour === 18 && selectedMinute === 0) {
+            // 6:00 PM là hợp lệ
+          } else {
+            message.error(
+              "Thời gian từ 6:01 PM đến 8:00 AM không được phép chọn!"
+            );
+            return;
+          }
+        }
+
+        // Kiểm tra từ 12:00 AM đến 8:00 AM
+        if (selectedHour >= 0 && selectedHour <= 8) {
+          message.error(
+            "Thời gian từ 6:01 PM đến 8:00 AM không được phép chọn!"
+          );
+          return;
+        }
+
         const slotData: SlotDto = {
           slotId: 0,
-          time: dayjs(time).format("HH:mm A"),
+          time: dayjs(time).format("h:mm A"),
           date: date.format("YYYY-MM-DD"),
           status: "Available",
           bookingId: 0,
@@ -238,6 +283,8 @@ const SlotTable = () => {
               use12Hours
               format="h:mm A"
               placeholder="Chọn thời gian"
+              disabledHours={disabledHours}
+              disabledMinutes={disabledMinutes}
             />
           </Form.Item>
           <Form.Item
