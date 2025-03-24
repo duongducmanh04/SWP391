@@ -57,7 +57,7 @@ namespace SkincareBookingService
 
             builder.Services.AddDbContext<SkincareBookingSystemContext>(options =>
                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-           );
+                );
 
             /*====================================================*/
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

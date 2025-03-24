@@ -9,6 +9,15 @@ backend/SkincareBookingService/appsettings.Development.json
 backend/SkincareBookingService/appsettings.Local.json
 backend/SkincareBookingService/*.log
 
+# Ignore Visual Studio FileContentIndex (for extensions/search indexing)
+backend/SkincareBookingService/.vs/SkincareBookingService/FileContentIndex/
+
+# Ignore Visual Studio Extension files
+backend/SkincareBookingService/**/*.vsix
+
+# Ignore GitHub Copilot chat session data
+backend/SkincareBookingService/.vs/SkincareBookingService/copilot-chat/
+
 # Ignore Data Access Layer (DAL) files (if using EF Core)
 backend/SkincareBookingService.DAL/Migrations/
 backend/SkincareBookingService.DAL/*.dbmdl

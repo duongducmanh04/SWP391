@@ -141,5 +141,25 @@ namespace SkincareBookingService.BLL.Services
                 Date = (DateTime)schedule.Date
             };
         }
+
+        public async Task<List<ScheduleDTO>> GetAllScheduleAsync()
+        {
+            var schedules = await _scheduleRepository.GetAllAsync();
+
+            if (schedules == null || !schedules.Any())
+            {
+                return null;
+            }
+
+            return new List<ScheduleDTO>(schedules.Select(s => new ScheduleDTO
+            {
+                ScheduleId = s.ScheduleId,
+                SkinTherapistId = s.SkinTherapistId,
+                SlotId = s.SlotId,
+                Date = (DateTime)s.Date,
+                SkinTherapist = s.SkinTherapist,
+                Slot = s.Slot
+            }));
+        }
     }
 }

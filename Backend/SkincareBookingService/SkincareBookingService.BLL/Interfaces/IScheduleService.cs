@@ -6,6 +6,8 @@ namespace SkincareBookingService.BLL.Interfaces
     {
         Task<ScheduleInputDTO> CreateScheduleAsync(ScheduleInputDTO scheduleInputDTO);
 
+        Task<List<ScheduleDTO>> GetAllScheduleAsync();
+
         Task<List<ScheduleDTO>> GetAllBySkinTherapistId(int skinTherapistId);
         Task<List<List<ScheduleDTO>>> GetAllByServiceId(int serviceId);
         Task<ScheduleDTO> GetScheduleById(int id);
