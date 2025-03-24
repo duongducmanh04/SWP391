@@ -1,0 +1,48 @@
+# Ignore build outputs in all layers
+backend/SkincareBookingService/**/bin/
+backend/SkincareBookingService/**/obj/
+
+# Ignore API (Presentation layer) files
+backend/SkincareBookingService/.vs/
+backend/SkincareBookingService/secrets.json
+backend/SkincareBookingService/appsettings.Development.json
+backend/SkincareBookingService/appsettings.Local.json
+backend/SkincareBookingService/*.log
+
+# Ignore Visual Studio FileContentIndex (for extensions/search indexing)
+backend/SkincareBookingService/FileContentIndex/
+
+# Ignore Visual Studio Extension files
+backend/SkincareBookingService/**/*.vsix
+
+# Ignore GitHub Copilot chat session data
+backend/SkincareBookingService/copilot-chat/
+
+# Ignore Data Access Layer (DAL) files (if using EF Core)
+backend/SkincareBookingService.DAL/Migrations/
+backend/SkincareBookingService.DAL/*.dbmdl
+
+# Ignore frontend (React.js) files
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.cache/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.production.local
+frontend/coverage/
+
+# Ignore NuGet packages
+backend/SkincareBookingService/packages/
+backend/SkincareBookingService/*.nupkg
+backend/SkincareBookingService/*.snupkg
+backend/SkincareBookingService/project.lock.json
+backend/SkincareBookingService/project.assets.json
+backend/SkincareBookingService/PackageReference.cache/
+
+# Ignore system & temporary files
+.DS_Store
+Thumbs.db
+logs/
+temp/
