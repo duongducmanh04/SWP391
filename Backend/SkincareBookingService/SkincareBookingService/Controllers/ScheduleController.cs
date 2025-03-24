@@ -16,6 +16,13 @@ namespace SkincareBookingService.Controllers
             _scheduleService = scheduleService;
         }
 
+        [HttpGet("getAll")]
+        public async Task<IActionResult> GetAllSchedules()
+        {
+            var schedules = await _scheduleService.GetAllScheduleAsync();
+            return Ok(schedules);
+        }
+
         [HttpPost("createSchedule")]
         public async Task<IActionResult> CreateSchedule([FromBody] ScheduleInputDTO scheduleInputDTO)
         {
