@@ -27,6 +27,7 @@ namespace SkincareBookingService.BLL.Services
                 Description = s.Description,
                 Price = s.Price,
                 Duration = s.Duration,
+                AverageStars = s.AverageStars,
                 ProcedureDescription = s.ProcedureDescription,
                 Image = s.Image
             }).ToList();
@@ -44,6 +45,7 @@ namespace SkincareBookingService.BLL.Services
                 Description = service.Description,
                 Price = service.Price,
                 Duration = service.Duration,
+                AverageStars = service.AverageStars,
                 ProcedureDescription = service.ProcedureDescription,
                 Image = service.Image
             };
@@ -135,6 +137,7 @@ namespace SkincareBookingService.BLL.Services
                 Description = s.Description,
                 Price = s.Price,
                 Duration = s.Duration,
+                AverageStars = s.AverageStars,
                 ProcedureDescription = s.ProcedureDescription,
                 Image = s.Image
             }).ToList();
@@ -191,6 +194,7 @@ namespace SkincareBookingService.BLL.Services
             service.Description = serviceDTO.Description;
             service.Price = serviceDTO.Price;
             service.Duration = serviceDTO.Duration;
+            service.AverageStars = (double)serviceDTO.AverageStars;
             service.ProcedureDescription = serviceDTO.ProcedureDescription;
             service.Image = serviceDTO.Image;
 
