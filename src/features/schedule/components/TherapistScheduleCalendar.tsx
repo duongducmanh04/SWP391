@@ -1,4 +1,4 @@
-import { Calendar, Spin, Flex, Tooltip, Badge } from "antd";
+import { Calendar, Spin, Flex, Tooltip, Badge, Row } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { useGetScheduleByTherapistId } from "../hooks/useGetScheduleByTherapistId";
@@ -154,6 +154,10 @@ const TherapistScheduleView = () => {
         <div className="content-header">Lịch làm việc của chuyên viên</div>
       </Flex>
       <hr style={{ opacity: 0.1 }} />
+      <Row style={{ gap: 30 }}>
+        <Badge status="error" text="Đã đặt" />
+        <Badge status="success" text="Lịch trống" />
+      </Row>
 
       {loadingSchedule ||
       loadingSlots ||

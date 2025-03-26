@@ -111,7 +111,7 @@ const BlogPage = () => {
               {blogData?.[0].customerId !== undefined &&
                 getCustomerName(blogData[0].customerId)}{" "}
               &nbsp;|&nbsp; <CalendarOutlined />{" "}
-              {dayjs(blogData?.[0].createdAt).format("DD [tháng] MM, YYYY")}
+              {dayjs(blogData?.[0].createAt).format("DD [tháng] MM, YYYY")}
             </Text>
           </div>
         </Card>
@@ -154,7 +154,7 @@ const BlogPage = () => {
                 <Text>
                   {getCustomerName(blog.customerId)} &nbsp;|&nbsp;{" "}
                   <CalendarOutlined />{" "}
-                  {dayjs(blog.createdAt).format("DD [tháng] MM, YYYY")}
+                  {dayjs(blog.createAt).format("DD [tháng] MM, YYYY")}
                 </Text>
               </div>
             </Card>

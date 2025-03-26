@@ -5,7 +5,7 @@ import {
   Space,
   Input as AntInput,
   Skeleton,
-  Tooltip,
+  // Tooltip,
   Tabs,
   Button,
   Modal,
@@ -22,7 +22,7 @@ import { useAvailableSlot } from "../hooks/useAvailableSlot";
 import { useBookedSlot } from "../hooks/useGetBookedSlot";
 import { useCreateSlot } from "../hooks/useCreateSlot";
 import { useCreateSchedule } from "../../schedule/hooks/useCreateSchedule";
-import { EditOutlined, SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import type { DatePickerProps } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { SlotDto } from "../dto/slot.dto";
@@ -32,6 +32,9 @@ import { RoleCode } from "../../../enums/role.enum";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
 import { TherapistDto } from "../../skin_therapist/dto/get-therapist.dto";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSchedule } from "../../schedule/hooks/useGetSchedule";
+import { ScheduleDto } from "../../schedule/dto/schedule.dto";
 
 dayjs.extend(customParseFormat);
 
@@ -42,6 +45,7 @@ const SlotTable = () => {
     isLoading: isLoadingAll,
     refetch: refetchSlot,
   } = useSlots();
+  const { data: schedules } = useSchedule();
   const { data: availableSlots, isLoading: isLoadingAvailable } =
     useAvailableSlot();
   const { data: bookedSlots, isLoading: isLoadingBooked } = useBookedSlot();
@@ -54,6 +58,7 @@ const SlotTable = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
+  const queryClient = useQueryClient();
 
   const filterSlots = (slots: SlotDto[] | undefined) =>
     slots?.filter((slot) =>
@@ -86,6 +91,20 @@ const SlotTable = () => {
     }
     return [];
   };
+  
+  const scheduleMap = new Map<number, ScheduleDto>();
+  if (schedules) {
+    schedules.forEach((schedule) => {
+      scheduleMap.set(schedule.slotId, schedule);
+    });
+  }
+
+  const therapistMap = new Map<number, TherapistDto>();
+  if (therapists) {
+    therapists.forEach((therapist) => {
+      therapistMap.set(therapist.skintherapistId, therapist);
+    });
+  }
 
   const columns: ColumnsType<SlotDto> = [
     { title: "ID", dataIndex: "slotId", key: "slotId" },
@@ -98,6 +117,18 @@ const SlotTable = () => {
       sorter: (a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf(),
     },
     {
+      title: "Chuyên viên",
+      key: "skintherapistId",
+      render: (_: unknown, record: SlotDto) => {
+        const schedule = scheduleMap.get(record.slotId);
+        if (schedule) {
+          const therapist = therapistMap.get(schedule.skinTherapistId);
+          return therapist ? therapist.name : "N/A";
+        }
+        return "N/A";
+      },
+    },
+    {
       title: "Status",
       dataIndex: "status",
       key: "status",
@@ -105,21 +136,21 @@ const SlotTable = () => {
         <Tag color={status === "Available" ? "green" : "red"}>{status}</Tag>
       ),
     },
-    ...(user?.role === RoleCode.STAFF
-      ? [
-          {
-            title: "Actions",
-            render: () => (
-              // _: unknown, record: SlotDto
-              <Space>
-                <Tooltip title="Edit">
-                  <Button icon={<EditOutlined />} />
-                </Tooltip>
-              </Space>
-            ),
-          },
-        ]
-      : []),
+    // ...(user?.role === RoleCode.STAFF
+    //   ? [
+    //       {
+    //         title: "Actions",
+    //         render: () => (
+    //           // _: unknown, record: SlotDto
+    //           <Space>
+    //             <Tooltip title="Edit">
+    //               <Button icon={<EditOutlined />} />
+    //             </Tooltip>
+    //           </Space>
+    //         ),
+    //       },
+    //     ]
+    //   : []),
   ];
 
   const renderTable = () => {
@@ -187,6 +218,9 @@ const SlotTable = () => {
                 setIsModalOpen(false);
                 form.resetFields();
                 refetchSlot();
+
+                queryClient.invalidateQueries({ queryKey: ["slots"] });
+                queryClient.invalidateQueries({ queryKey: ["schedules"] });
               },
               onError: (scheduleError: any) => {
                 message.error(`Tạo lịch thất bại: ${scheduleError.message}`);

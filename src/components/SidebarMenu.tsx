@@ -178,6 +178,15 @@ const SidebarMenu = () => {
     ...(user?.role === RoleCode.ADMIN
       ? [
           {
+            key: PagePath.BLOG_MANAGEMENT,
+            icon: <QuestionOutlined />,
+            label: <Link to={PagePath.BLOG_MANAGEMENT}>Quản lý blog</Link>,
+          },
+        ]
+      : []),
+    ...(user?.role === RoleCode.ADMIN
+      ? [
+          {
             key: PagePath.QUIZ_MANAGEMENT,
             icon: <QuestionOutlined />,
             label: <Link to={PagePath.QUIZ_MANAGEMENT}>Quản lý quiz</Link>,

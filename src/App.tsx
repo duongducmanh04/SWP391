@@ -43,6 +43,7 @@ import SlotTable from "./features/services/components/SlotTable";
 import SkinTypeTable from "./features/skin_type/components/SkinTypeTable";
 import ResetPassword from "./features/authentication/components/ResetPassword";
 import QuizTable from "./features/quiz/components/QuizTable";
+import BlogTable from "./features/blog/components/BlogTable";
 
 const App = () => {
   return (
@@ -81,6 +82,7 @@ const App = () => {
               path={PagePath.SERVICE_MANAGEMENT}
               element={<ServiceTable />}
             />
+            <Route path={PagePath.BLOG_MANAGEMENT} element={<BlogTable />} />
             <Route path={PagePath.SLOT_MANAGEMENT} element={<SlotTable />} />
             <Route
               path={PagePath.SKIN_TYPE_MANAGEMENT}

@@ -4,5 +4,5 @@ export interface BlogDto {
   content: string;
   customerId: number;
   image: string;
-  createdAt: Date;
+  createAt: Date;
 }
