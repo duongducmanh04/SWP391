@@ -91,7 +91,7 @@ const SlotTable = () => {
     }
     return [];
   };
-
+  
   const scheduleMap = new Map<number, ScheduleDto>();
   if (schedules) {
     schedules.forEach((schedule) => {
