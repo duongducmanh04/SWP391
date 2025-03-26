@@ -440,26 +440,27 @@ const BookingDetail = () => {
               {booking.status}
             </p> */}
           </Card>
-          {user?.role == RoleCode.THERAPIST && (
-            <Card style={{ marginTop: "10px" }}>
-              <Title level={4}>Ghi chú</Title>
-              <TextArea
-                rows={4}
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-              >
-                {booking.note}
-              </TextArea>
-              <Button
-                type="primary"
-                onClick={handleUpdateNote}
-                loading={isUpdatingNote}
-                style={{ marginTop: "10px" }}
-              >
-                Lưu ghi chú
-              </Button>
-            </Card>
-          )}
+          {user?.role == RoleCode.THERAPIST &&
+            booking?.status === Status.CHECK_IN && (
+              <Card style={{ marginTop: "10px" }}>
+                <Title level={4}>Ghi chú</Title>
+                <TextArea
+                  rows={4}
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                >
+                  {booking.note}
+                </TextArea>
+                <Button
+                  type="primary"
+                  onClick={handleUpdateNote}
+                  loading={isUpdatingNote}
+                  style={{ marginTop: "10px" }}
+                >
+                  Lưu ghi chú
+                </Button>
+              </Card>
+            )}
         </Col>
       </Row>
       {booking?.status === Status.BOOKED && user?.role == RoleCode.STAFF && (

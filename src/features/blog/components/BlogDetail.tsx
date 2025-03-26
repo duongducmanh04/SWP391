@@ -72,7 +72,7 @@ const BlogDetail = () => {
             {blog?.customerId !== undefined
               ? getCustomerName(blog.customerId)
               : ""}{" "}
-            | {dayjs(blog?.createdAt).format("DD [tháng] MM, YYYY")}
+            | {dayjs(blog?.createAt).format("DD [tháng] MM, YYYY")}
           </Text>
         </div>
       </Card>

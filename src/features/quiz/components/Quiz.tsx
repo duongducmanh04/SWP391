@@ -175,11 +175,21 @@ const QuizTest = () => {
             {matchedSkinType.skintypeName}
           </Text>
           <Title level={5}>Ưu điểm:</Title>
-          <Paragraph>{matchedSkinType.pros}</Paragraph>
+          <Paragraph>
+            <div dangerouslySetInnerHTML={{ __html: matchedSkinType.pros }} />
+          </Paragraph>
           <Title level={5}>Nhược điểm:</Title>
-          <Paragraph>{matchedSkinType.cons}</Paragraph>
+          <Paragraph>
+            <div dangerouslySetInnerHTML={{ __html: matchedSkinType.cons }} />
+          </Paragraph>
           <Title level={5}>Hướng dẫn chăm sóc:</Title>
-          <Paragraph>{matchedSkinType.skincareGuide}</Paragraph>
+          <Paragraph>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: matchedSkinType.skincareGuide,
+              }}
+            />
+          </Paragraph>
         </Card>
       )}
 

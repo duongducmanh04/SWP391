@@ -525,88 +525,6 @@ const QuizTable = () => {
         onOk={handleSubmitAnswers}
         onCancel={() => setIsModalOpen(false)}
       >
-        {/* <Form form={answerForm} layout="vertical">
-          <Form.List name="answers">
-            {(fields, { add, remove }) => (
-              <>
-                {fields.map(({ key, name, ...restField }) => (
-                  <div
-                    key={key}
-                    style={{
-                      marginBottom: 16,
-                      border: "1px solid #ddd",
-                      padding: 10,
-                      borderRadius: 5,
-                      width: "-webkit-fill-available",
-                    }}
-                  >
-                    <Form.Item
-                      {...restField}
-                      name={[name, "answer"]}
-                      label="Nội dung câu trả lời"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Vui lòng nhập câu trả lời",
-                        },
-                      ]}
-                    >
-                      <AntInput placeholder="Enter an answer" />
-                    </Form.Item>
-
-                    <Form.Item
-                      {...restField}
-                      name={[name, "skintypeId"]}
-                      label="Loại da"
-                      rules={[
-                        { required: true, message: "Vui lòng chọn loại da" },
-                      ]}
-                    >
-                      <Select
-                        placeholder="Chọn loại da"
-                        allowClear
-                        style={{ width: "100%" }}
-                      >
-                        {skinTypes?.map((skin: SkinDto) => (
-                          <Option key={skin.skintypeId} value={skin.skintypeId}>
-                            {skin.skintypeName ?? `Loại da ${skin.skintypeId}`}
-                          </Option>
-                        ))}
-                      </Select>
-                    </Form.Item>
-
-                    <Form.Item
-                      {...restField}
-                      name={[name, "serviceImpact"]}
-                      label="Service Impact"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Service Impact is required",
-                        },
-                      ]}
-                    >
-                      <Select
-                        options={[
-                          { value: "High", label: "High" },
-                          { value: "Medium", label: "Medium" },
-                          { value: "Low", label: "Low" },
-                        ]}
-                      />
-                    </Form.Item>
-
-                    <Button onClick={() => remove(name)} danger>
-                      Hủy
-                    </Button>
-                  </div>
-                ))}
-                <Button type="dashed" onClick={() => add()} block>
-                  Thêm câu trả lời
-                </Button>
-              </>
-            )}
-          </Form.List>
-        </Form> */}
         <Form form={answerForm} layout="vertical">
           <Form.List name="answers">
             {(fields, { add, remove }) => {
@@ -746,14 +664,6 @@ const QuizTable = () => {
           initialValues={{ questionsId: 1 }}
         >
           <Form.Item
-            name="questionsId"
-            label="ID loại câu hỏi"
-            initialValue="1"
-            rules={[{ required: true }]}
-          >
-            <AntInput disabled />
-          </Form.Item>
-          <Form.Item
             name="content"
             label="Nội dung câu hỏi"
             rules={[{ required: true, message: "Vui lòng nhập câu hỏi" }]}
@@ -785,7 +695,7 @@ const QuizTable = () => {
           </Button>,
         ]}
       >
-        <p>Bạn có chắc chắn muốn xóa câu hỏi này không?</p>
+        <p>Bạn có chắc chắn muốn xóa câu trả lời này không?</p>
       </Modal>
 
       <Modal
@@ -807,7 +717,7 @@ const QuizTable = () => {
           </Button>,
         ]}
       >
-        <p>Bạn có chắc chắn muốn xóa câu trả lời này không?</p>
+        <p>Bạn có chắc chắn muốn xóa câu hỏi này không?</p>
       </Modal>
     </div>
   );
