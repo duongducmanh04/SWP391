@@ -12,6 +12,7 @@ import {
   Image,
   Flex,
   Upload,
+  Switch,
 } from "antd";
 import {
   DeleteOutlined,
@@ -197,6 +198,25 @@ const SkinTypeTable = () => {
       title: "Mô tả",
       dataIndex: "description",
       key: "description",
+      render: (description: string) => {
+        return <div dangerouslySetInnerHTML={{ __html: description }} />;
+      },
+    },
+    {
+      title: "Lợi ích",
+      dataIndex: "pros",
+      key: "pros",
+      render: (pros: string) => {
+        return <div dangerouslySetInnerHTML={{ __html: pros }} />;
+      },
+    },
+    {
+      title: "Bất lợi",
+      dataIndex: "cons",
+      key: "cons",
+      render: (cons: string) => {
+        return <div dangerouslySetInnerHTML={{ __html: cons }} />;
+      },
     },
     {
       title: "Image",
@@ -308,10 +328,16 @@ const SkinTypeTable = () => {
           <Form.Item
             name="status"
             label="Hoạt động"
-            initialValue="Active"
-            rules={[{ required: true, message: "Vui lòng nhập tên loại da" }]}
+            valuePropName="checked"
+            rules={[{ required: true, message: "Vui lòng chọn trạng thái" }]}
           >
-            <AntInput disabled />
+            <Switch
+              onChange={(checked) => {
+                form.setFieldsValue({
+                  status: checked ? "Active" : "Inactive",
+                });
+              }}
+            />
           </Form.Item>
           <Form.Item
             name="pros"

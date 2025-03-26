@@ -27,13 +27,59 @@ const BlogPage = () => {
 
   return (
     <div style={{ padding: "20px" }}>
-      <Button
-        type="primary"
-        style={{ marginBottom: "20px" }}
-        onClick={handleCreateBlog}
-      >
-        Tạo Blog
-      </Button>
+      <div style={{ marginBottom: "30px" }}>
+        <Card
+          hoverable
+          style={{
+            borderRadius: "10px",
+            overflow: "hidden",
+            position: "relative",
+          }}
+          className="blog"
+          cover={
+            <img
+              alt={blogData?.[0].title}
+              src={blogData?.[0].image}
+              style={{
+                width: "100%",
+                height: "400px",
+                objectFit: "cover",
+              }}
+            />
+          }
+          onClick={() =>
+            blogData?.[0]?.blogId !== undefined &&
+            handleNavigate(blogData[0].blogId)
+          }
+        >
+          {/* <Tag color="blue">{featuredPost.category}</Tag> */}
+          <Title
+            level={2}
+            style={{
+              marginTop: "20px",
+              marginBottom: "10px",
+              // textAlign: "center",
+            }}
+          >
+            {blogData?.[0].title}
+          </Title>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginTop: "10px",
+            }}
+          >
+            <Avatar icon={<UserOutlined />} style={{ marginRight: "10px" }} />
+            <Text>
+              {blogData?.[0].customerId !== undefined &&
+                getCustomerName(blogData[0].customerId)}{" "}
+              &nbsp;|&nbsp; <CalendarOutlined />{" "}
+              {dayjs(blogData?.[0].createAt).format("DD [tháng] MM, YYYY")}
+            </Text>
+          </div>
+        </Card>
+      </div>
 
       <Row gutter={[16, 16]}>
         {blogData?.map((blog) => (
@@ -75,7 +121,7 @@ const BlogPage = () => {
                 <Text>
                   {getCustomerName(blog.customerId)} &nbsp;|&nbsp;
                   <CalendarOutlined />{" "}
-                  {dayjs(blog.createdAt).format("DD [tháng] MM, YYYY")}
+                  {dayjs(blog.createAt).format("DD [tháng] MM, YYYY")}
                 </Text>
               </div>
             </Card>

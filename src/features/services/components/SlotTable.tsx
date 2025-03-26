@@ -5,7 +5,7 @@ import {
   Space,
   Input as AntInput,
   Skeleton,
-  Tooltip,
+  // Tooltip,
   Tabs,
   Button,
   Modal,
@@ -22,7 +22,7 @@ import { useAvailableSlot } from "../hooks/useAvailableSlot";
 import { useBookedSlot } from "../hooks/useGetBookedSlot";
 import { useCreateSlot } from "../hooks/useCreateSlot";
 import { useCreateSchedule } from "../../schedule/hooks/useCreateSchedule";
-import { EditOutlined, SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import type { DatePickerProps } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { SlotDto } from "../dto/slot.dto";
@@ -32,6 +32,9 @@ import { RoleCode } from "../../../enums/role.enum";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
 import { TherapistDto } from "../../skin_therapist/dto/get-therapist.dto";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSchedule } from "../../schedule/hooks/useGetSchedule";
+import { ScheduleDto } from "../../schedule/dto/schedule.dto";
 
 dayjs.extend(customParseFormat);
 
@@ -42,6 +45,7 @@ const SlotTable = () => {
     isLoading: isLoadingAll,
     refetch: refetchSlot,
   } = useSlots();
+  const { data: schedules } = useSchedule();
   const { data: availableSlots, isLoading: isLoadingAvailable } =
     useAvailableSlot();
   const { data: bookedSlots, isLoading: isLoadingBooked } = useBookedSlot();
@@ -54,6 +58,7 @@ const SlotTable = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
+  const queryClient = useQueryClient();
 
   const filterSlots = (slots: SlotDto[] | undefined) =>
     slots?.filter((slot) =>
@@ -64,6 +69,42 @@ const SlotTable = () => {
 
   const customFormat: DatePickerProps["format"] = (value) =>
     `${value.format(dateFormat)}`;
+
+  const disabledHours = () => {
+    const hours: number[] = [];
+    // Vô hiệu hóa từ 12:00 AM (0) đến 8:00 AM (8)
+    for (let i = 0; i <= 7; i++) {
+      hours.push(i);
+    }
+    // Vô hiệu hóa từ 6:00 PM (18) đến 11:59 PM (23)
+    for (let i = 19; i <= 23; i++) {
+      hours.push(i);
+    }
+    return hours;
+  };
+
+  // Hàm vô hiệu hóa phút (chỉ áp dụng cho 6:00 PM)
+  const disabledMinutes = (selectedHour: number) => {
+    if (selectedHour === 18) {
+      // Vô hiệu hóa phút từ 1 đến 59 tại 6:00 PM
+      return Array.from({ length: 59 }, (_, i) => i + 1);
+    }
+    return [];
+  };
+  
+  const scheduleMap = new Map<number, ScheduleDto>();
+  if (schedules) {
+    schedules.forEach((schedule) => {
+      scheduleMap.set(schedule.slotId, schedule);
+    });
+  }
+
+  const therapistMap = new Map<number, TherapistDto>();
+  if (therapists) {
+    therapists.forEach((therapist) => {
+      therapistMap.set(therapist.skintherapistId, therapist);
+    });
+  }
 
   const columns: ColumnsType<SlotDto> = [
     { title: "ID", dataIndex: "slotId", key: "slotId" },
@@ -76,6 +117,18 @@ const SlotTable = () => {
       sorter: (a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf(),
     },
     {
+      title: "Chuyên viên",
+      key: "skintherapistId",
+      render: (_: unknown, record: SlotDto) => {
+        const schedule = scheduleMap.get(record.slotId);
+        if (schedule) {
+          const therapist = therapistMap.get(schedule.skinTherapistId);
+          return therapist ? therapist.name : "N/A";
+        }
+        return "N/A";
+      },
+    },
+    {
       title: "Status",
       dataIndex: "status",
       key: "status",
@@ -83,21 +136,21 @@ const SlotTable = () => {
         <Tag color={status === "Available" ? "green" : "red"}>{status}</Tag>
       ),
     },
-    ...(user?.role === RoleCode.STAFF
-      ? [
-          {
-            title: "Actions",
-            render: () => (
-              // _: unknown, record: SlotDto
-              <Space>
-                <Tooltip title="Edit">
-                  <Button icon={<EditOutlined />} />
-                </Tooltip>
-              </Space>
-            ),
-          },
-        ]
-      : []),
+    // ...(user?.role === RoleCode.STAFF
+    //   ? [
+    //       {
+    //         title: "Actions",
+    //         render: () => (
+    //           // _: unknown, record: SlotDto
+    //           <Space>
+    //             <Tooltip title="Edit">
+    //               <Button icon={<EditOutlined />} />
+    //             </Tooltip>
+    //           </Space>
+    //         ),
+    //       },
+    //     ]
+    //   : []),
   ];
 
   const renderTable = () => {
@@ -117,9 +170,32 @@ const SlotTable = () => {
       .then((values) => {
         const { skinTherapistId, time, date } = values;
 
+        const selectedHour = dayjs(time).hour(); // Lấy giờ (0-23)
+        const selectedMinute = dayjs(time).minute(); // Lấy phút
+
+        // Kiểm tra từ 6:01 PM đến 11:59 PM
+        if (selectedHour >= 18 && selectedHour <= 23) {
+          if (selectedHour === 18 && selectedMinute === 0) {
+            // 6:00 PM là hợp lệ
+          } else {
+            message.error(
+              "Thời gian từ 6:01 PM đến 8:00 AM không được phép chọn!"
+            );
+            return;
+          }
+        }
+
+        // Kiểm tra từ 12:00 AM đến 8:00 AM
+        if (selectedHour >= 0 && selectedHour <= 8) {
+          message.error(
+            "Thời gian từ 6:01 PM đến 8:00 AM không được phép chọn!"
+          );
+          return;
+        }
+
         const slotData: SlotDto = {
           slotId: 0,
-          time: dayjs(time).format("HH:mm A"),
+          time: dayjs(time).format("h:mm A"),
           date: date.format("YYYY-MM-DD"),
           status: "Available",
           bookingId: 0,
@@ -142,6 +218,9 @@ const SlotTable = () => {
                 setIsModalOpen(false);
                 form.resetFields();
                 refetchSlot();
+
+                queryClient.invalidateQueries({ queryKey: ["slots"] });
+                queryClient.invalidateQueries({ queryKey: ["schedules"] });
               },
               onError: (scheduleError: any) => {
                 message.error(`Tạo lịch thất bại: ${scheduleError.message}`);
@@ -238,6 +317,8 @@ const SlotTable = () => {
               use12Hours
               format="h:mm A"
               placeholder="Chọn thời gian"
+              disabledHours={disabledHours}
+              disabledMinutes={disabledMinutes}
             />
           </Form.Item>
           <Form.Item

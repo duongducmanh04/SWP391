@@ -84,23 +84,25 @@ const ActionButtons = ({
   switch (status) {
     case Status.BOOKED:
       return (
-        <>
-          <Button
-            type="primary"
-            icon={<CheckCircleOutlined />}
-            style={{ marginRight: 10 }}
-            onClick={handleCheckIn}
-          >
-            Check-in
-          </Button>
-          <Button
-            danger
-            icon={<CloseCircleOutlined />}
-            onClick={handleCancelled}
-          >
-            Hủy lịch đặt
-          </Button>
-        </>
+        user?.role === RoleCode.STAFF && (
+          <>
+            <Button
+              type="primary"
+              icon={<CheckCircleOutlined />}
+              style={{ marginRight: 10 }}
+              onClick={handleCheckIn}
+            >
+              Check-in
+            </Button>
+            <Button
+              danger
+              icon={<CloseCircleOutlined />}
+              onClick={handleCancelled}
+            >
+              Hủy lịch đặt
+            </Button>
+          </>
+        )
       );
 
     case Status.CHECK_IN:
@@ -118,18 +120,24 @@ const ActionButtons = ({
 
     case Status.FINISHED:
       return (
-        <>
-          <Button
-            style={{ marginRight: 10 }}
-            icon={<PayCircleOutlined />}
-            onClick={handleCompleted}
-          >
-            Xác nhận thanh toán
-          </Button>
-          <Button danger icon={<CloseCircleOutlined />} onClick={handleDenied}>
-            Hủy thanh toán
-          </Button>
-        </>
+        user?.role === RoleCode.STAFF && (
+          <>
+            <Button
+              style={{ marginRight: 10 }}
+              icon={<PayCircleOutlined />}
+              onClick={handleCompleted}
+            >
+              Xác nhận thanh toán
+            </Button>
+            <Button
+              danger
+              icon={<CloseCircleOutlined />}
+              onClick={handleDenied}
+            >
+              Hủy thanh toán
+            </Button>
+          </>
+        )
       );
 
     case "COMPLETED":

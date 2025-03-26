@@ -12,6 +12,8 @@ import { useRatingsByService } from "../features/user/hook/useRatingsByServiceID
 import { Status } from "../enums/status-booking";
 import { useSlots } from "../features/services/hooks/useGetSlot";
 import { SlotDto } from "../features/services/dto/slot.dto";
+import { useTherapists } from "../features/skin_therapist/hooks/useGetTherapist";
+import { TherapistDto } from "../features/skin_therapist/dto/get-therapist.dto";
 
 const RATING_API_URL = "https://localhost:7071/api/Rating";
 
@@ -20,6 +22,7 @@ const CustomerBookingDetail = () => {
   const { bookingId } = location.state || {};
   const queryClient = useQueryClient();
   const { data: slots } = useSlots();
+  const { data: therapists } = useTherapists();
 
   const { customerId } = useGetCustomerId();
   const validBookingId = bookingId ? String(bookingId) : "";
@@ -36,6 +39,13 @@ const CustomerBookingDetail = () => {
   if (slots) {
     slots.forEach((slot) => {
       slotMap.set(slot.bookingId, slot);
+    });
+  }
+
+  const therapistMap = new Map<number, TherapistDto>();
+  if (therapists) {
+    therapists.forEach((therapist) => {
+      therapistMap.set(therapist.skintherapistId, therapist);
     });
   }
 
@@ -128,7 +138,8 @@ const CustomerBookingDetail = () => {
               <strong>Địa điểm:</strong> {booking.location}
             </p>
             <p>
-              <strong>Nhân viên:</strong> {booking.skintherapistName}
+              <strong>Nhân viên:</strong>{" "}
+              {therapistMap.get(booking.skintherapistId)?.name}
             </p>
             <p>
               <strong>Giá tiền:</strong> {booking.amount.toLocaleString()} VND

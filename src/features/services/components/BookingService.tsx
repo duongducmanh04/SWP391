@@ -25,7 +25,7 @@ import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { useAvailableSlot } from "../hooks/useAvailableSlot";
 import utc from "dayjs/plugin/utc";
 import { useCustomers } from "../../user/hook/useGetCustomer";
-import { useGetSchedule } from "../../schedule/hooks/useGetSchedule";
+import { useGetScheduleByServiceId } from "../../schedule/hooks/useGetScheduleByServiceId";
 import { useNavigate } from "react-router-dom";
 import { PagePath } from "../../../enums/page-path.enum";
 
@@ -45,7 +45,7 @@ const SkincareBooking = () => {
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
   const { data: customers, isLoading, error } = useCustomers();
   const { amount, serviceId, serviceName } = location.state || {};
-  const { data: schedules } = useGetSchedule(serviceId);
+  const { data: schedules } = useGetScheduleByServiceId(serviceId);
   const navigate = useNavigate();
   const [therapistModalVisible, setTherapistModalVisible] = useState(false);
   const [selectedTherapist, setSelectedTherapist] = useState<any>(null);
@@ -68,19 +68,8 @@ const SkincareBooking = () => {
 
     const flatSchedules = schedules.flat();
 
-    console.log(
-      "📡 Debugging: Full Flattened Schedules Data:",
-      JSON.stringify(flatSchedules, null, 2)
-    );
-    console.log("📡 Debugging: Raw Available Slots:", availableSlots);
-
-    const scheduleSlotIds = flatSchedules.map(
-      (schedule) => schedule.slotId || "MISSING_SLOT_ID"
-    );
-    const availableSlotIds = availableSlots.map((slot) => slot.slotId);
-
-    console.log("🔍 All Schedule Slot IDs:", scheduleSlotIds);
-    console.log("🔍 All Available Slot IDs:", availableSlotIds);
+    const now = dayjs();
+    const today = now.format("YYYY-MM-DD");
 
     return flatSchedules
       .filter((schedule) => {
@@ -98,11 +87,17 @@ const SkincareBooking = () => {
             slot.slotId === schedule.slotId && slot.status === "Available"
         );
 
-        console.log(
-          `🧐 Checking Schedule - Date: ${scheduleDate}, Therapist ID: ${
-            schedule.skinTherapistId
-          }, Slot ID: ${schedule.slotId}, Match: ${!!matchingSlot}`
-        );
+        if (!matchingSlot) return false;
+
+        if (scheduleDate === today) {
+          const slotTime = dayjs(matchingSlot.time, ["h:mm A", "HH:mm"]);
+          if (slotTime.isBefore(now)) {
+            console.log(
+              `⏳ Removing past slot ${matchingSlot.time} (ID: ${matchingSlot.slotId}) as it is before the current time.`
+            );
+            return false;
+          }
+        }
 
         return isDateMatch && isTherapistMatch && matchingSlot;
       })
@@ -110,11 +105,6 @@ const SkincareBooking = () => {
         const matchingSlot = availableSlots.find(
           (slot) =>
             slot.slotId === schedule.slotId && slot.status === "Available"
-        );
-
-        console.log(
-          `🔗 Matched Slot for Schedule Slot ID ${schedule.slotId}:`,
-          matchingSlot
         );
 
         return matchingSlot
