@@ -10,6 +10,7 @@ import {
   Button,
   Input,
   message,
+  Alert,
 } from "antd";
 import {
   UserOutlined,
@@ -21,10 +22,10 @@ import { PagePath } from "../enums/page-path.enum";
 import useAuthStore from "../features/authentication/hooks/useAuthStore";
 import { useGetCustomerById } from "../features/user/hook/useGetCustomerById";
 import { useUpdateCustomerById } from "../features/user/hook/useUpdateCustomerById";
-import { CustomerDto } from "../features/user/hook/useGetCustomerById";
+import dayjs from "dayjs";
+import axios from "axios";
 
 const { Sider, Content } = Layout;
-
 type TabKey = "personal" | "schedule" | "password";
 
 const CustomerProfile = () => {
@@ -36,11 +37,10 @@ const CustomerProfile = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
-  const customerId = user?.accountId ?? 0; // Lấy ID khách hàng từ user
+  const customerId = user?.accountId ?? 0;
   const { data: customer, isPending, error, refetch } = useGetCustomerById();
-
   const updateCustomer = useUpdateCustomerById();
-  const { data: bookings } = useBookingHistory();
+  const { data: bookings, isLoading: isBookingLoading } = useBookingHistory();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -48,23 +48,21 @@ const CustomerProfile = () => {
     phoneNumber: "",
   });
 
-  // 🛠 Kiểm tra và gọi lại API khi user?.accountId thay đổi
+  // Lấy dữ liệu khi user?.accountId thay đổi
   useEffect(() => {
     if (user?.accountId) {
       refetch();
     }
   }, [user?.accountId, refetch]);
 
-  // 🚀 Cập nhật formData ngay khi API trả về dữ liệu
+  // Cập nhật formData ngay khi API trả về dữ liệu
   useEffect(() => {
     if (customer) {
-      console.log("🆕 Cập nhật dữ liệu từ API:", customer);
-      setFormData((prev) => ({
-        ...prev, // Giữ lại giá trị cũ nếu API không trả về đủ dữ liệu
-        name: customer.name || prev.name || "",
-        email: customer.email || prev.email || "",
-        phoneNumber: customer.phoneNumber?.toString() || prev.phoneNumber || "",
-      }));
+      setFormData({
+        name: customer.name || "",
+        email: customer.email || "",
+        phoneNumber: customer.phoneNumber?.toString() || "",
+      });
     }
   }, [customer]);
 
@@ -73,13 +71,16 @@ const CustomerProfile = () => {
     navigate(`?tab=${key}`);
   };
 
-  const handleEditClick = () => {
-    setIsEditing(true);
+  const handleEditClick = () => setIsEditing(true);
+  const handleCancelClick = () => setIsEditing(false);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleUpdateClick = async () => {
     try {
-      const updatedData: CustomerDto = {
+      const updatedData = {
         customerId: customer?.customerId ?? 0,
         name: formData.name.trim(),
         email: formData.email.trim(),
@@ -89,16 +90,19 @@ const CustomerProfile = () => {
         image: customer?.image || "",
       };
 
-      console.log("📤 Dữ liệu gửi API:", updatedData);
-
       await updateCustomer.mutateAsync(updatedData);
       message.success("Cập nhật thông tin thành công!");
       setIsEditing(false);
       refetch();
     } catch (error) {
-      console.error("❌ Lỗi cập nhật:", error);
       message.error("Cập nhật thông tin thất bại!");
     }
+  };
+
+  const handleNavigateToBookingDetail = (bookingId: number) => {
+    navigate(`${PagePath.CUSTOMER_BOOKING_DETAIL}?tab=schedule`, {
+      state: { bookingId },
+    });
   };
 
   if (isPending)
@@ -130,6 +134,7 @@ const CustomerProfile = () => {
             </Menu.Item>
           </Menu>
         </Sider>
+
         <Layout style={{ padding: "24px", background: "#f5f1eb" }}>
           <Content
             style={{ padding: "24px", background: "#fff", borderRadius: "8px" }}
@@ -143,28 +148,19 @@ const CustomerProfile = () => {
                       <Input
                         name="name"
                         value={formData.name}
-                        onChange={(e) =>
-                          setFormData({ ...formData, name: e.target.value })
-                        }
+                        onChange={handleInputChange}
                         style={{ marginBottom: 10 }}
                       />
                       <Input
                         name="email"
                         value={formData.email}
-                        onChange={(e) =>
-                          setFormData({ ...formData, email: e.target.value })
-                        }
+                        onChange={handleInputChange}
                         style={{ marginBottom: 10 }}
                       />
                       <Input
                         name="phoneNumber"
                         value={formData.phoneNumber}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            phoneNumber: e.target.value,
-                          })
-                        }
+                        onChange={handleInputChange}
                         style={{ marginBottom: 10 }}
                       />
                       <Button type="primary" onClick={handleUpdateClick}>
@@ -172,7 +168,7 @@ const CustomerProfile = () => {
                       </Button>
                       <Button
                         style={{ marginLeft: 10 }}
-                        onClick={() => setIsEditing(false)}
+                        onClick={handleCancelClick}
                       >
                         Hủy
                       </Button>
@@ -193,29 +189,54 @@ const CustomerProfile = () => {
                   )}
                 </div>
               )}
+
               {activeTab === "schedule" && (
-                <List
-                  dataSource={bookings || []}
-                  renderItem={(booking) => (
-                    <List.Item>
-                      <List.Item.Meta
-                        title={`Lịch đặt #${booking.bookingId}`}
-                        description={`Ngày: ${booking.date}`}
-                      />
-                      <Button
-                        onClick={() =>
-                          navigate(
-                            `${PagePath.CUSTOMER_BOOKING_DETAIL}?tab=schedule`,
-                            { state: { bookingId: booking.bookingId } }
-                          )
-                        }
-                      >
-                        Xem chi tiết
-                      </Button>
-                    </List.Item>
+                <>
+                  {isBookingLoading ? (
+                    <Spin tip="Đang tải lịch sử đặt lịch..." />
+                  ) : bookings?.length > 0 ? (
+                    <List
+                      itemLayout="vertical"
+                      dataSource={bookings}
+                      pagination={{
+                        pageSize: 5, // Số lượng booking hiển thị trên mỗi trang
+                      }}
+                      renderItem={(booking) => (
+                        <List.Item
+                          onClick={() =>
+                            handleNavigateToBookingDetail(booking.bookingId)
+                          }
+                          style={{ cursor: "pointer" }}
+                        >
+                          <List.Item.Meta
+                            title={<strong>{booking.serviceName}</strong>}
+                          />
+                          <p>
+                            <strong>Ngày:</strong>{" "}
+                            {dayjs(booking.date).format("DD-MM-YYYY")}
+                          </p>
+                          <p>
+                            <strong>Trạng thái:</strong> {booking.status}
+                          </p>
+                          <Button
+                            onClick={() =>
+                              handleNavigateToBookingDetail(booking.bookingId)
+                            }
+                          >
+                            Xem chi tiết
+                          </Button>
+                        </List.Item>
+                      )}
+                    />
+                  ) : (
+                    <Alert
+                      message="Không có lịch sử đặt lịch."
+                      type="warning"
+                    />
                   )}
-                />
+                </>
               )}
+
               {activeTab === "password" && (
                 <p>Chức năng đổi mật khẩu sẽ được cập nhật sau!</p>
               )}
