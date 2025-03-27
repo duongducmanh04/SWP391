@@ -44,11 +44,13 @@ namespace SkincareBookingService
             {
                 options.AddPolicy("AllowReactApp", policy =>
                 {
-                    policy.WithOrigins("http://localhost:5173")
+                    policy.WithOrigins("http://localhost:5173", "https://skincare-booking-system-eight.vercel.app")
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .AllowCredentials(); // if need cookies or authentication
                 });
             });
+
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

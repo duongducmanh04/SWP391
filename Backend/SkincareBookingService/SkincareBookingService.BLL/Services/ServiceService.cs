@@ -194,7 +194,6 @@ namespace SkincareBookingService.BLL.Services
             service.Description = serviceDTO.Description;
             service.Price = serviceDTO.Price;
             service.Duration = serviceDTO.Duration;
-            service.AverageStars = (double)serviceDTO.AverageStars;
             service.ProcedureDescription = serviceDTO.ProcedureDescription;
             service.Image = serviceDTO.Image;
 
