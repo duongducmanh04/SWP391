@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Layout,
   Menu,
   Card,
   Spin,
-  Alert,
   Avatar,
   List,
   Button,
@@ -17,77 +16,87 @@ import {
   ClockCircleOutlined,
   LockOutlined,
 } from "@ant-design/icons";
-import { useGetCustomerProfile } from "../features/authentication/hooks/useGetCustomerProfile";
 import { useBookingHistory } from "../features/user/hook/useBookingHistory";
-import { BookingDto } from "../features/booking/dto/booking.dto";
 import { PagePath } from "../enums/page-path.enum";
 import useAuthStore from "../features/authentication/hooks/useAuthStore";
-import dayjs from "dayjs";
-import axios from "axios";
+import { useGetCustomerById } from "../features/user/hook/useGetCustomerById";
+import { useUpdateCustomerById } from "../features/user/hook/useUpdateCustomerById";
+import { CustomerDto } from "../features/user/hook/useGetCustomerById";
 
 const { Sider, Content } = Layout;
+
+type TabKey = "personal" | "schedule" | "password";
 
 const CustomerProfile = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const initialTab = searchParams.get("tab") || "personal";
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const initialTab = (searchParams.get("tab") as TabKey) || "personal";
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const [isEditing, setIsEditing] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
+
+  const customerId = user?.accountId ?? 0; // Lấy ID khách hàng từ user
+  const { data: customer, isPending, error, refetch } = useGetCustomerById();
+
+  const updateCustomer = useUpdateCustomerById();
+  const { data: bookings } = useBookingHistory();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phoneNumber: "",
   });
-  const navigate = useNavigate();
-  const { user } = useAuthStore();
 
-  const {
-    data: profileData,
-    isPending,
-    error,
-  } = useGetCustomerProfile(user?.accountId, user?.role);
-  const profile = Array.isArray(profileData) ? profileData[0] : undefined;
-  const customers = profile?.customer?.[0] ?? null;
+  // 🛠 Kiểm tra và gọi lại API khi user?.accountId thay đổi
+  useEffect(() => {
+    if (user?.accountId) {
+      refetch();
+    }
+  }, [user?.accountId, refetch]);
 
-  const {
-    data: bookings,
-    isLoading: isBookingLoading,
-    isError: isBookingError,
-    error: bookingError,
-  } = useBookingHistory();
+  // 🚀 Cập nhật formData ngay khi API trả về dữ liệu
+  useEffect(() => {
+    if (customer) {
+      console.log("🆕 Cập nhật dữ liệu từ API:", customer);
+      setFormData((prev) => ({
+        ...prev, // Giữ lại giá trị cũ nếu API không trả về đủ dữ liệu
+        name: customer.name || prev.name || "",
+        email: customer.email || prev.email || "",
+        phoneNumber: customer.phoneNumber?.toString() || prev.phoneNumber || "",
+      }));
+    }
+  }, [customer]);
 
-  const handleNavigateToBookingDetail = (bookingId: string | number) => {
-    navigate(`${PagePath.CUSTOMER_BOOKING_DETAIL}?tab=schedule`, {
-      state: { bookingId },
-    });
+  const handleTabChange = (key: string) => {
+    setActiveTab(key as TabKey);
+    navigate(`?tab=${key}`);
   };
 
   const handleEditClick = () => {
     setIsEditing(true);
-    setFormData({
-      name: customers?.name || "",
-      email: customers?.email || "",
-      phoneNumber: customers?.phoneNumber || "",
-    });
-  };
-
-  const handleCancelClick = () => setIsEditing(false);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const handleUpdateClick = async () => {
     try {
-      await axios.put(
-        `https://localhost:7071/updateCustomer/${customers?.customerId}`,
-        formData
-      );
+      const updatedData: CustomerDto = {
+        customerId: customer?.customerId ?? 0,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phoneNumber: formData.phoneNumber.trim(),
+        skintypeId: customer?.skintypeId ?? 0,
+        accountId: customer?.accountId ?? 0,
+        image: customer?.image || "",
+      };
+
+      console.log("📤 Dữ liệu gửi API:", updatedData);
+
+      await updateCustomer.mutateAsync(updatedData);
       message.success("Cập nhật thông tin thành công!");
       setIsEditing(false);
-    } catch (err) {
-      console.error(err); // In lỗi ra console (hoặc có thể xóa đi)
+      refetch();
+    } catch (error) {
+      console.error("❌ Lỗi cập nhật:", error);
       message.error("Cập nhật thông tin thất bại!");
     }
   };
@@ -108,11 +117,7 @@ const CustomerProfile = () => {
           <Menu
             mode="inline"
             selectedKeys={[activeTab]}
-            onClick={(e) => {
-              setActiveTab(e.key);
-              navigate(`?tab=${e.key}`);
-            }}
-            style={{ borderRight: 0 }}
+            onClick={(e) => handleTabChange(e.key)}
           >
             <Menu.Item key="personal" icon={<UserOutlined />}>
               Thông tin cá nhân
@@ -125,7 +130,6 @@ const CustomerProfile = () => {
             </Menu.Item>
           </Menu>
         </Sider>
-
         <Layout style={{ padding: "24px", background: "#f5f1eb" }}>
           <Content
             style={{ padding: "24px", background: "#fff", borderRadius: "8px" }}
@@ -133,28 +137,34 @@ const CustomerProfile = () => {
             <Card title="Hồ sơ khách hàng" bordered={false}>
               {activeTab === "personal" && (
                 <div style={{ textAlign: "center" }}>
-                  <Avatar size={100} src={customers?.image} />
+                  <Avatar size={100} src={customer?.image} />
                   {isEditing ? (
                     <div>
                       <Input
-                        placeholder="Tên"
                         name="name"
                         value={formData.name}
-                        onChange={handleInputChange}
+                        onChange={(e) =>
+                          setFormData({ ...formData, name: e.target.value })
+                        }
                         style={{ marginBottom: 10 }}
                       />
                       <Input
-                        placeholder="Email"
                         name="email"
                         value={formData.email}
-                        onChange={handleInputChange}
+                        onChange={(e) =>
+                          setFormData({ ...formData, email: e.target.value })
+                        }
                         style={{ marginBottom: 10 }}
                       />
                       <Input
-                        placeholder="Số điện thoại"
                         name="phoneNumber"
                         value={formData.phoneNumber}
-                        onChange={handleInputChange}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            phoneNumber: e.target.value,
+                          })
+                        }
                         style={{ marginBottom: 10 }}
                       />
                       <Button type="primary" onClick={handleUpdateClick}>
@@ -162,22 +172,19 @@ const CustomerProfile = () => {
                       </Button>
                       <Button
                         style={{ marginLeft: 10 }}
-                        onClick={handleCancelClick}
+                        onClick={() => setIsEditing(false)}
                       >
                         Hủy
                       </Button>
                     </div>
                   ) : (
                     <>
-                      <h3 style={{ marginTop: 10 }}>{customers?.name}</h3>
+                      <h3>{formData.name}</h3>
                       <p>
-                        <strong>Email:</strong> {customers?.email}
+                        <strong>Email:</strong> {formData.email}
                       </p>
                       <p>
-                        <strong>Số điện thoại:</strong> {customers?.phoneNumber}
-                      </p>
-                      <p>
-                        <strong>Tên tài khoản:</strong> {profile?.accountName}
+                        <strong>Số điện thoại:</strong> {formData.phoneNumber}
                       </p>
                       <Button type="primary" onClick={handleEditClick}>
                         Sửa thông tin
@@ -186,84 +193,31 @@ const CustomerProfile = () => {
                   )}
                 </div>
               )}
-
               {activeTab === "schedule" && (
-                <>
-                  {isBookingLoading ? (
-                    <Spin tip="Đang tải lịch sử đặt lịch..." />
-                  ) : isBookingError ? (
-                    <Alert
-                      message={
-                        bookingError?.message || "Lỗi tải lịch sử đặt lịch"
-                      }
-                      type="error"
-                    />
-                  ) : bookings && bookings.length > 0 ? (
-                    <List
-                      itemLayout="vertical"
-                      dataSource={bookings}
-                      pagination={{
-                        pageSize: 10,
-                        showSizeChanger: true,
-                        pageSizeOptions: ["10", "20", "30", "40"],
-                      }}
-                      renderItem={(booking: BookingDto) => (
-                        <List.Item
-                          style={{
-                            cursor: "pointer",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "flex-start",
-                          }}
-                          onClick={() =>
-                            handleNavigateToBookingDetail(booking.bookingId)
-                          }
-                        >
-                          <List.Item.Meta
-                            title={<strong>{booking.serviceName}</strong>}
-                          />
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: "5px",
-                            }}
-                          >
-                            <p>
-                              <strong>Ngày:</strong>{" "}
-                              {dayjs(booking.date).format("DD-MM-YYYY")}
-                            </p>
-                            <p>
-                              <strong>Trạng thái:</strong> {booking.status}
-                            </p>
-                            <p>
-                              <strong>Địa điểm:</strong> {booking.location}
-                            </p>
-                          </div>
-                          <Button
-                            type="primary"
-                            style={{ marginTop: "10px" }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleNavigateToBookingDetail(booking.bookingId);
-                            }}
-                          >
-                            Xem Chi Tiết
-                          </Button>
-                        </List.Item>
-                      )}
-                    />
-                  ) : (
-                    <Alert
-                      message="Không có lịch sử đặt lịch."
-                      type="warning"
-                    />
+                <List
+                  dataSource={bookings || []}
+                  renderItem={(booking) => (
+                    <List.Item>
+                      <List.Item.Meta
+                        title={`Lịch đặt #${booking.bookingId}`}
+                        description={`Ngày: ${booking.date}`}
+                      />
+                      <Button
+                        onClick={() =>
+                          navigate(
+                            `${PagePath.CUSTOMER_BOOKING_DETAIL}?tab=schedule`,
+                            { state: { bookingId: booking.bookingId } }
+                          )
+                        }
+                      >
+                        Xem chi tiết
+                      </Button>
+                    </List.Item>
                   )}
-                </>
+                />
               )}
-
               {activeTab === "password" && (
-                <p>Thay đổi mật khẩu của khách hàng</p>
+                <p>Chức năng đổi mật khẩu sẽ được cập nhật sau!</p>
               )}
             </Card>
           </Content>

@@ -132,7 +132,6 @@ const App = () => {
               path={PagePath.CUSTOMER_BOOKING_DETAIL}
               element={<CustomerBookingDetail />}
             />
-            <Route path={PagePath.CREATE_BLOG} element={<CreateBlog />} />
           </Route>
         </Routes>
       </AuthGuardProvider>

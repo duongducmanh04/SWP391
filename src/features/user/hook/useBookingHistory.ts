@@ -12,10 +12,16 @@ const fetchBookingHistory = async (
   if (!customerId || customerId <= 0) {
     throw new Error("Customer ID không hợp lệ");
   }
-  const response = await axios.get<BookingDto[]>(
-    `${API_BASE_URL}/previousBooking/${customerId}`
-  );
-  return response.data;
+
+  try {
+    const response = await axios.get<BookingDto[]>(
+      `${API_BASE_URL}/previousBooking/${customerId}`
+    );
+    return response.data;
+  } catch (error: unknown) {
+    console.error("❌ Lỗi khi fetch booking history:", error);
+    throw error;
+  }
 };
 
 // Hook lấy lịch sử đặt lịch
@@ -26,31 +32,28 @@ export const useBookingHistory = () => {
     error: customerError,
   } = useGetCustomerId();
 
-  console.log("customerId lấy được:", customerId);
+  console.log("🔍 Customer ID lấy được:", customerId);
 
+  // Kiểm tra `customerId` hợp lệ
   const isCustomerIdValid = typeof customerId === "number" && customerId > 0;
 
+  // Nếu `customerId` chưa sẵn sàng, không gọi API
   const bookingQuery = useQuery<BookingDto[], Error>({
     queryKey: ["getBookingHistory", customerId],
-    queryFn: () => {
-      if (!isCustomerIdValid) {
-        return Promise.reject(new Error("Customer ID không hợp lệ"));
-      }
-      return fetchBookingHistory(customerId);
-    },
+    queryFn: () => fetchBookingHistory(customerId!),
     enabled: isCustomerIdValid,
-    select: (data) => {
-      return data.sort((a, b) => {
-        // Ưu tiên các lịch có trạng thái "Booked"
+    select: (data) =>
+      data.sort((a, b) => {
         if (a.status === "Booked" && b.status !== "Booked") return -1;
         if (a.status !== "Booked" && b.status === "Booked") return 1;
-        // Sau đó sắp xếp theo ngày đặt lịch mới nhất (date) lên đầu
-        const dateA = new Date(a.date).getTime();
-        const dateB = new Date(b.date).getTime();
-        return dateB - dateA;
-      });
-    },
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      }),
   });
+
+  // Xử lý lỗi trong hook thay vì `onError`
+  if (bookingQuery.error) {
+    console.error("🚨 Lỗi khi tải lịch sử đặt lịch:", bookingQuery.error);
+  }
 
   return {
     ...bookingQuery,
