@@ -95,6 +95,7 @@ namespace SkincareBookingService.BLL.Services
             var rating = await _ratingRepository.GetByIdAsync(id);
             if (rating == null) return false;
             rating.Stars = dto.Stars;
+            rating.Feedback = dto.Feedback;
             await _ratingRepository.UpdateAsync(rating);
             return true;
         }
@@ -120,6 +121,7 @@ namespace SkincareBookingService.BLL.Services
                 CreateAt = rating.CreateAt,
                 Stars = rating.Stars,
                 ServiceId = rating.ServiceId,
+                Feedback = rating.Feedback,
                 CustomerName = customer?.Name,
                 ServiceName = service?.Name
             };
