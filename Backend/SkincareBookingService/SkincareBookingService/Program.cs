@@ -53,8 +53,8 @@ namespace SkincareBookingService
                         ValidateIssuer = false,
                         ValidateAudience = false
                     };
-                })
-                .AddGoogle(options =>
+                });
+                /*.AddGoogle(options =>
                 {
                     options.ClientId = builder.Configuration["GoogleAuth:ClientId"];
                     options.ClientSecret = builder.Configuration["GoogleAuth:ClientSecret"];
@@ -94,7 +94,7 @@ namespace SkincareBookingService
                             return Task.CompletedTask;
                         }
                     };
-                });
+                });*/
 
             // Add CORS service
             builder.Services.AddCors(options =>
