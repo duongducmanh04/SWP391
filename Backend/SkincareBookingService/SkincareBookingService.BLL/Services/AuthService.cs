@@ -134,5 +134,24 @@ namespace SkincareBookingService.BLL.Services
 
             return !accountExists && !emailExists;
         }
+
+        public async Task<Account> GetOrCreateGoogleUserAsync(string email, string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Account> GetGoogleUserAsync(string email)
+        {
+            try
+            {
+                return await _accountRepository.FirstOrDefaultAsync(a =>
+                    a.Customers.Any(c => c.Email == email));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error in GetGoogleUserAsync: " + ex.Message + "\nStackTrace: " + ex.StackTrace);
+                throw; // Re-throw to be caught by GoogleCallback
+            }
+        }
     }
 }
