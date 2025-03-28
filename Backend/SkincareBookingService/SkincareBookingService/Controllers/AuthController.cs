@@ -119,6 +119,7 @@ namespace SkincareBookingService.Controllers
             return BadRequest(new { message = "OTP is incorrect or expired!" });
         }
 
+        /*
         // GET: api/auth/getGoogleUser
         [HttpGet("google-login")]
         public IActionResult GoogleLogin()
@@ -212,6 +213,6 @@ namespace SkincareBookingService.Controllers
                     error = ex.Message
                 });
             }
-        }
+        }*/
     }
 }

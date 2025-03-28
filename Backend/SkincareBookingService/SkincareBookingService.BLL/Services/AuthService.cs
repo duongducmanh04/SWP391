@@ -140,7 +140,7 @@ namespace SkincareBookingService.BLL.Services
             throw new NotImplementedException();
         }
 
-        public async Task<Account> GetGoogleUserAsync(string email)
+        /*public async Task<Account> GetGoogleUserAsync(string email)
         {
             try
             {
@@ -152,6 +152,6 @@ namespace SkincareBookingService.BLL.Services
                 Console.WriteLine("Error in GetGoogleUserAsync: " + ex.Message + "\nStackTrace: " + ex.StackTrace);
                 throw; // Re-throw to be caught by GoogleCallback
             }
-        }
+        } */
     }
 }
