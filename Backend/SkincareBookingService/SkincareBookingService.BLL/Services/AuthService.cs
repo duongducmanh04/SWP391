@@ -1,4 +1,6 @@
-﻿using SkincareBookingService.BLL.Interfaces;
+﻿using SkincareBookingService.BLL.DTOs;
+using SkincareBookingService.BLL.DTOs.AccountDTOs;
+using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
 using System.Collections.Concurrent;
@@ -9,12 +11,18 @@ namespace SkincareBookingService.BLL.Services
     {
         private readonly IGenericRepository<Account> _accountRepository;
         private readonly IEmailService _emailService;
+        private readonly IAccountService _accountService;
+        private readonly IGenericRepository<Customer> _customerRepository;
+
         private static readonly ConcurrentDictionary<string, (string Otp, DateTime Expires)> OtpStore = new();
 
-        public AuthService(IGenericRepository<Account> accountRepository, IEmailService emailService)
+        public AuthService(IGenericRepository<Account> accountRepository, IEmailService emailService,
+            IAccountService accountService, IGenericRepository<Customer> customerRepository )
         {
             _accountRepository = accountRepository;
             _emailService = emailService;
+            _accountService = accountService;
+            _customerRepository = customerRepository;
         }
 
         public async Task<Account> AuthenticateAsync(string accountName, string password)
@@ -36,7 +44,7 @@ namespace SkincareBookingService.BLL.Services
             return true;
         }
 
-        public async Task<Account> RegisterAsync(string accountName, string password)
+        public async Task<AccountDTO> RegisterAsync(string accountName, string email, string password)
         {
             var account = new Account
             {
@@ -46,9 +54,41 @@ namespace SkincareBookingService.BLL.Services
                 Active = true
             };
 
+            var customer = new Customer
+            {
+                Name = accountName,
+                Email = email,
+                SkintypeId = null,
+                AccountId = account.AccountId,
+                PhoneNumber = null,
+                Image = null
+            };
+
+            account.Customers = new List<Customer> { customer };
+
             await _accountRepository.AddAsync(account);
             await _accountRepository.SaveChangesAsync();
-            return account;
+
+            return new AccountDTO
+            {
+                AccountId = account.AccountId,
+                AccountName = account.AccountName,
+                Password = account.Password,
+                Role = account.Role,
+                Active = account.Active,
+                Customer = new List<CustomerDTO>
+                {
+                    new CustomerDTO
+                    {
+                        Name = customer.Name,
+                        Email = customer.Email,
+                        SkintypeId = customer.SkintypeId,
+                        AccountId = customer.AccountId,
+                        PhoneNumber = customer.PhoneNumber,
+                        Image = customer.Image
+                    }
+                }
+            };
         }
 
         public async Task<bool> ResetPasswordAsync(string email, string otp, string newPassword)
@@ -85,6 +125,14 @@ namespace SkincareBookingService.BLL.Services
         {
             var random = new Random();
             return random.Next(100000, 999999).ToString();
+        }
+
+        public async Task<bool> CanRegisterCustomerAsync(string accountName, string email)
+        {
+            var accountExists = await _accountRepository.FirstOrDefaultAsync(a => a.AccountName == accountName) != null;
+            var emailExists = await _customerRepository.FirstOrDefaultAsync(c => c.Email == email) != null;
+
+            return !accountExists && !emailExists;
         }
     }
 }

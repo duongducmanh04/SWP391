@@ -76,10 +76,10 @@ namespace SkincareBookingService.Controllers
             return Ok(accounts);
         }
 
-        [HttpPut("updateAccount")]
-        public async Task<IActionResult> UpdateAccount([FromBody] AccountDTO account)
+        [HttpPut("updateAccount/{accountId}")]
+        public async Task<IActionResult> UpdateAccount(int accountId, [FromBody] AccountDTO account)
         {
-            var result = await _accountService.UpdateAccountAsync(account);
+            var result = await _accountService.UpdateAccountAsync(accountId, account);
             if (result)
             {
                 return Ok("Account updated successfully");

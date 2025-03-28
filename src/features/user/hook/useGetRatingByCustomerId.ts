@@ -7,10 +7,21 @@ export const useGetRatingByCustomerId = (customerId?: number) => {
     queryKey: ["ratings", customerId],
     queryFn: async () => {
       if (!customerId) return [];
+
       const response = await axios.get(
-        `https://localhost:7071/api/Rating/customer/${customerId}`
+        `https://skincareservicebooking.onrender.com/api/Rating/customer/${customerId}`,
+        {
+          headers: { Accept: "application/json" }, // Đảm bảo API trả JSON
+        }
       );
-      return response.data;
+
+      console.log("📥 Nhận dữ liệu rating từ API:", response.data); // Debug log
+
+      // Đảm bảo luôn có feedback, nếu null thì trả về chuỗi rỗng
+      return response.data.map((rating: RatingDto) => ({
+        ...rating,
+        feedback: rating.feedback ?? "",
+      }));
     },
     enabled: !!customerId, // Chỉ gọi API khi có customerId
   });

@@ -317,6 +317,7 @@ public partial class SkincareBookingSystemContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("createAt");
             entity.Property(e => e.CustomerId).HasColumnName("customerId");
+            entity.Property(e => e.Feedback).HasMaxLength(500);
             entity.Property(e => e.ServiceId).HasColumnName("serviceId");
             entity.Property(e => e.Stars).HasColumnName("stars");
 

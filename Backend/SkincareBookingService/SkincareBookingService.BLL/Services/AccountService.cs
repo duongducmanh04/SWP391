@@ -9,10 +9,12 @@ namespace SkincareBookingService.BLL.Services
     public class AccountService : IAccountService
     {
         private readonly IGenericRepository<Account> _accountRepository;
+        private readonly IGenericRepository<Customer> _customerRepository;
 
-        public AccountService(IGenericRepository<Account> accountRepository)
+        public AccountService(IGenericRepository<Account> accountRepository, IGenericRepository<Customer> customerRepository)
         {
             _accountRepository = accountRepository;
+            _customerRepository = customerRepository;
         }
 
         public async Task<CreateAccountDTO> CreateAccountAsync(CreateAccountDTO account)
@@ -131,7 +133,7 @@ namespace SkincareBookingService.BLL.Services
             }).ToList();
         }
 
-        public async Task<bool> UpdateAccountAsync(AccountDTO accountDto)
+        public async Task<bool> UpdateAccountAsync(int accountId, AccountDTO accountDto)
         {
             var account = await _accountRepository.FirstOrDefaultAsync(a => a.AccountId == accountDto.AccountId);
             if (account == null)

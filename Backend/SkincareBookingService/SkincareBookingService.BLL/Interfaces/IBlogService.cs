@@ -10,7 +10,7 @@ namespace SkincareBookingService.BLL.Interfaces
     public interface IBlogService
     {
         Task<BlogDTO> CreateBlogAsync(BlogDTO blogDTO);
-        Task<bool> UpdateBlogAsync(BlogDTO blogDTO);
+        Task<bool> UpdateBlogAsync(int blogId, BlogDTO blogDTO);
         Task<BlogDTO> GetBlogByIdAsync(int blogId);
         Task<List<BlogDTO>> GetAllBlogsAsync();
         Task<bool> DeleteBlogAsync(int blogId);

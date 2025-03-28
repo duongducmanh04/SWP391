@@ -50,18 +50,26 @@ namespace SkincareBookingService.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
         {
-            if (string.IsNullOrEmpty(registerDTO.AccountName) || string.IsNullOrEmpty(registerDTO.Password))
+            if (string.IsNullOrEmpty(registerDTO.AccountName) || string.IsNullOrEmpty(registerDTO.Email) || string.IsNullOrEmpty(registerDTO.Password))
             {
-                return BadRequest(new { message = "Please enter account and password!" });
+                return BadRequest(new { message = "Please enter account, email and password!" });
             }
-            var account = await _authService.RegisterAsync(registerDTO.AccountName, registerDTO.Password);
-            return Ok(new
+
+            var canRegister = await _authService.CanRegisterCustomerAsync(registerDTO.AccountName, registerDTO.Email);
+
+            if (!canRegister)
             {
-                message = "Register Successfully!",
-                accountId = account.AccountId,
-                role = account.Role
-            });
+                return BadRequest(new { message = "Account name or email already exists!" });
+            }
+
+            var account = await _authService.RegisterAsync(registerDTO.AccountName, registerDTO.Email, registerDTO.Password);
+            if (account == null)
+            {
+                return BadRequest(new { message = "Failed to register account!" });
+            }
+            return Ok(new { message = "Account registered successfully!" });
         }
+
 
         [HttpPost("forgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO forgotPasswordDTO)

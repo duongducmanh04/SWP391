@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { Card, Spin, Alert, Button, message, Modal, Rate } from "antd";
+import { Card, Spin, Alert, Button, message, Modal, Rate, Input } from "antd";
 import { useBookingById } from "../features/booking/hooks/useGetBookingId";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
@@ -7,20 +7,14 @@ import StatusTag from "../components/TagStatus";
 import { useState, useEffect } from "react";
 import { useGetCustomerId } from "../features/user/hook/useGetCustomerId";
 import { Status } from "../enums/status-booking";
-import { useSlots } from "../features/services/hooks/useGetSlot";
-import { SlotDto } from "../features/services/dto/slot.dto";
-import { useTherapists } from "../features/skin_therapist/hooks/useGetTherapist";
-import { TherapistDto } from "../features/skin_therapist/dto/get-therapist.dto";
 import { useCancelledBooking } from "../features/booking/hooks/useCancelledBooking";
 import { useCreateRating } from "../features/services/hooks/useCreateRating";
-import { useGetRatingByCustomerId } from "../features/user/hook/useGetRatingByCustomerId"; // ✅ Import hook
+import { useGetRatingByCustomerId } from "../features/user/hook/useGetRatingByCustomerId";
 
 const CustomerBookingDetail = () => {
   const location = useLocation();
   const { bookingId } = location.state || {};
   const queryClient = useQueryClient();
-  const { data: slots } = useSlots();
-  const { data: therapists } = useTherapists();
   const { customerId } = useGetCustomerId();
 
   const validBookingId = bookingId ? Number(bookingId) : 0;
@@ -34,55 +28,37 @@ const CustomerBookingDetail = () => {
   } = useBookingById(String(validBookingId));
 
   const { data: ratings, isLoading: isLoadingRating } =
-    useGetRatingByCustomerId(validCustomerId); // ✅ Lấy rating theo customerId
+    useGetRatingByCustomerId(validCustomerId);
+
   const existingRating = ratings?.find(
     (r) => r.serviceId === booking?.serviceId
   );
 
-  const [rating, setRating] = useState<number>(
-    existingRating?.stars ??
-      (Number(localStorage.getItem(`rating_${validBookingId}`)) || 0)
-  );
+  const [rating, setRating] = useState<number>(0);
+  const [feedback, setFeedback] = useState<string>("");
 
   useEffect(() => {
     if (existingRating) {
       setRating(existingRating.stars);
-      localStorage.setItem(
-        `rating_${validBookingId}`,
-        String(existingRating.stars)
-      );
+      setFeedback(existingRating.feedback || "");
     }
   }, [existingRating]);
-
-  const slotMap = new Map<number, SlotDto>();
-  if (slots) {
-    slots.forEach((slot) => slotMap.set(slot.bookingId, slot));
-  }
-
-  const therapistMap = new Map<number, TherapistDto>();
-  if (therapists) {
-    therapists.forEach((therapist) =>
-      therapistMap.set(therapist.skintherapistId, therapist)
-    );
-  }
 
   const { mutate: cancelBooking } = useCancelledBooking();
   const { mutate: createRating } = useCreateRating();
 
-  const handleRatingChange = (value: number) => {
+  const handleRatingSubmit = () => {
     if (!booking?.serviceId) {
       message.error("❌ Không thể gửi đánh giá vì thiếu serviceId!");
       return;
     }
 
-    setRating(value);
-    localStorage.setItem(`rating_${validBookingId}`, String(value));
-
     createRating(
       {
-        ratingId: 0,
+        ratingId: undefined,
         customerId: validCustomerId,
-        stars: value,
+        stars: rating,
+        feedback: feedback.trim(),
         serviceId: booking.serviceId,
         createAt: new Date(),
         customerName: "Unknown",
@@ -90,13 +66,13 @@ const CustomerBookingDetail = () => {
       },
       {
         onSuccess: () => {
-          message.success("Cảm ơn bạn đã đánh giá!");
+          message.success("✅ Đánh giá đã được gửi!");
           queryClient.invalidateQueries({
-            queryKey: ["ratings", booking?.serviceId],
+            queryKey: ["ratings", validCustomerId],
           });
         },
         onError: () => {
-          message.error("❌ Lỗi khi gửi đánh giá, vui lòng thử lại!");
+          message.error("❌ Lỗi khi gửi đánh giá!");
         },
       }
     );
@@ -135,10 +111,6 @@ const CustomerBookingDetail = () => {
               <strong>Địa điểm:</strong> {booking.location}
             </p>
             <p>
-              <strong>Nhân viên:</strong>{" "}
-              {therapistMap.get(booking.skintherapistId)?.name}
-            </p>
-            <p>
               <strong>Giá tiền:</strong> {booking.amount.toLocaleString()} VND
             </p>
 
@@ -167,8 +139,36 @@ const CustomerBookingDetail = () => {
                 </p>
                 {isLoadingRating ? (
                   <Spin tip="🔄 Đang tải đánh giá..." />
+                ) : existingRating ? (
+                  // 🔥 Nếu đã có đánh giá, chỉ hiển thị ở chế độ readonly
+                  <>
+                    <Rate value={rating} disabled />
+                    <Input.TextArea
+                      value={feedback}
+                      rows={4}
+                      style={{ marginTop: 10 }}
+                      readOnly
+                    />
+                  </>
                 ) : (
-                  <Rate value={rating} onChange={handleRatingChange} />
+                  // 🔥 Nếu chưa có đánh giá, cho phép tạo mới
+                  <>
+                    <Rate value={rating} onChange={setRating} />
+                    <Input.TextArea
+                      value={feedback}
+                      onChange={(e) => setFeedback(e.target.value)}
+                      placeholder="Nhập đánh giá của bạn..."
+                      rows={4}
+                      style={{ marginTop: 10 }}
+                    />
+                    <Button
+                      type="primary"
+                      onClick={handleRatingSubmit}
+                      style={{ marginTop: 10 }}
+                    >
+                      Gửi đánh giá
+                    </Button>
+                  </>
                 )}
               </div>
             )}

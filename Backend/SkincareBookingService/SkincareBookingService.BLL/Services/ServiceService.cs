@@ -9,10 +9,12 @@ namespace SkincareBookingService.BLL.Services
     public class ServiceService : IServiceService
     {
         private readonly IGenericRepository<Service> _serviceRepository;
+        private readonly IGenericRepository<Rating> _ratingRepository;
 
-        public ServiceService(IGenericRepository<Service> serviceRepository)
+        public ServiceService(IGenericRepository<Service> serviceRepository, IGenericRepository<Rating> ratingRepository)
         {
             _serviceRepository = serviceRepository;
+            _ratingRepository = ratingRepository;
         }
 
         public async Task<List<ServiceDTO>> GetServicesAsync()
@@ -25,6 +27,7 @@ namespace SkincareBookingService.BLL.Services
                 Description = s.Description,
                 Price = s.Price,
                 Duration = s.Duration,
+                AverageStars = s.AverageStars,
                 ProcedureDescription = s.ProcedureDescription,
                 Image = s.Image
             }).ToList();
@@ -42,6 +45,7 @@ namespace SkincareBookingService.BLL.Services
                 Description = service.Description,
                 Price = service.Price,
                 Duration = service.Duration,
+                AverageStars = service.AverageStars,
                 ProcedureDescription = service.ProcedureDescription,
                 Image = service.Image
             };
@@ -133,6 +137,7 @@ namespace SkincareBookingService.BLL.Services
                 Description = s.Description,
                 Price = s.Price,
                 Duration = s.Duration,
+                AverageStars = s.AverageStars,
                 ProcedureDescription = s.ProcedureDescription,
                 Image = s.Image
             }).ToList();
@@ -147,7 +152,8 @@ namespace SkincareBookingService.BLL.Services
                 Price = serviceDTO.Price,
                 Duration = serviceDTO.Duration,
                 ProcedureDescription = serviceDTO.ProcedureDescription,
-                Image = serviceDTO.Image
+                Image = serviceDTO.Image,
+                AverageStars = 0
             };
 
             await _serviceRepository.AddAsync(service);
@@ -161,7 +167,8 @@ namespace SkincareBookingService.BLL.Services
                 Price = service.Price,
                 Duration = service.Duration,
                 ProcedureDescription = service.ProcedureDescription,
-                Image = service.Image
+                Image = service.Image,
+                AverageStars = service.AverageStars
             };
         }
 
@@ -194,6 +201,34 @@ namespace SkincareBookingService.BLL.Services
             await _serviceRepository.SaveChangesAsync();
 
             return true;
+        }
+
+        private async Task<ServiceDTO> MapToDto(Service service)
+        {
+            return new ServiceDTO
+            {
+                ServiceId = service.ServiceId,
+                Name = service.Name,
+                Description = service.Description,
+                Price = service.Price,
+                Duration = service.Duration,
+                ProcedureDescription = service.ProcedureDescription,
+                Image = service.Image,
+                AverageStars = service.AverageStars
+            };
+        }
+        public async Task<IEnumerable<ServiceDTO>> GetTopRatingService()
+        {
+            var services = await _serviceRepository.Query()
+                .OrderByDescending(s => s.AverageStars)
+                .ToListAsync();
+            IEnumerable<ServiceDTO> result = new List<ServiceDTO>();
+            foreach (var service in services)
+            {
+                result = result.Append(await MapToDto(service));
+            }
+
+            return result;
         }
     }
 }

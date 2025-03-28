@@ -140,5 +140,15 @@ namespace SkincareBookingService.Controllers
             }
             return BadRequest(new { message = "Failed to delete service." });
         }
+        [HttpGet("getTopRatingService")]
+        public async Task<IActionResult> GetTopRatingService()
+        {
+            var services = await _serviceService.GetTopRatingService();
+            if (services == null || services.Count() == 0)
+            {
+                return NotFound("No services found");
+            }
+            return Ok(services);
+        }
     }
 }

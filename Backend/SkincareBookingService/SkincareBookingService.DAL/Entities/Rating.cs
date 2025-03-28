@@ -13,9 +13,11 @@ public partial class Rating
 
     public DateTime? CreateAt { get; set; }
 
-    public int? Stars { get; set; }
+    public int Stars { get; set; }
 
     public int ServiceId { get; set; }
+
+    public string? Feedback { get; set; }
 
     public virtual Customer Customer { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.DTOs.BookingDTOss;
 using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.Core.Constants;
@@ -54,7 +55,27 @@ namespace SkincareBookingService.BLL.Services
 
         public async Task<bool> UpdateStatusToCancelledAsync(int bookingId)
         {
-            return await UpdateBookingStatusAsync(bookingId, BookingStatus.Cancelled.ToString());
+            var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            if (booking == null) return false;
+
+            booking.Status = BookingStatus.Cancelled.ToString();
+            await _bookingRepository.UpdateAsync(booking);
+
+            var slot = await _slotRepository.Query()
+                .Where(s => s.BookingId == bookingId)
+                .FirstOrDefaultAsync();
+
+            if (slot != null)
+            {
+                slot.BookingId = null;
+                slot.Status = SlotStatus.Available.ToString();
+                await _slotRepository.UpdateAsync(slot);
+            }
+
+            await _bookingRepository.SaveChangesAsync();
+            await _slotRepository.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<bool> UpdateStatusToFinishedAsync(int bookingId)
@@ -281,6 +302,38 @@ namespace SkincareBookingService.BLL.Services
                 return new List<Booking>();
             }
             return bookings;
+        }
+
+        public async Task<bool> CancelBookingByBookingId(int bookingId)
+        {
+            if (bookingId <= 0) return false;
+
+            var booking = await _bookingRepository
+                .Query()
+                .Where(b => b.BookingId == bookingId)
+                .FirstOrDefaultAsync();
+
+            if(booking == null) return false;
+
+            booking.Status = BookingStatus.Cancelled.ToString();
+            await _bookingRepository.UpdateAsync(booking);
+            await _bookingRepository.SaveChangesAsync();
+
+            var slots = await _slotRepository
+                .Query()
+                .Where(s => s.BookingId == bookingId)
+                .ToListAsync();
+
+            foreach(var slot in slots)
+            {
+                slot.Status = SlotStatus.Available.ToString();
+                slot.BookingId = null;
+                slot.Booking = null;
+                await _slotRepository.UpdateAsync(slot);
+            }
+
+            await _slotRepository.SaveChangesAsync();
+            return true;
         }
     }
 }

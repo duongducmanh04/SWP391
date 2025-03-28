@@ -4,12 +4,14 @@ namespace SkincareBookingService.BLL.Interfaces
 {
     public interface IRatingService
     {
-        Task<IEnumerable<RatingDto>> GetRatingsAsync();
-        Task<RatingDto> GetRatingByIdAsync(int id);
-        Task<IEnumerable<RatingDto>> GetRatingsByServiceIdAsync(int serviceId);
-        Task<IEnumerable<RatingDto>> GetRatingsByCustomerIdAsync(int customerId);
-        Task<RatingDto> CreateRatingAsync(PostRatingDto dto);
+        Task<IEnumerable<GetRatingDto>> GetRatingsAsync();
+        Task<GetRatingDto> GetRatingByIdAsync(int id);
+        Task<IEnumerable<GetRatingDto>> GetRatingsByServiceIdAsync(int serviceId);
+        Task<IEnumerable<GetRatingDto>> GetRatingsByCustomerIdAsync(int customerId);
+        Task<GetRatingDto> CreateRatingAsync(PostRatingDto dto);
         Task<bool> UpdateRatingAsync(int id, PutRatingDto dto);
         Task<bool> DeleteRatingAsync(int id);
+        Task<bool> SumRatingByServiceId(int serviceId);
+        Task<bool> SumAllServiceAverageStar();
     }
 }

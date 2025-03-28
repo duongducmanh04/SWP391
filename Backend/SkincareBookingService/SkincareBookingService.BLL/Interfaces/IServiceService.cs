@@ -26,5 +26,6 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<bool> DeleteServiceAsync(int serviceId);
 
+        Task<IEnumerable<ServiceDTO>> GetTopRatingService();
     }
 }

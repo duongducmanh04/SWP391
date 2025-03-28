@@ -146,25 +146,43 @@ const CustomerProfile = () => {
                 <div style={{ textAlign: "center" }}>
                   <Avatar size={100} src={customer?.image} />
                   {isEditing ? (
-                    <div>
+                    <div
+                      style={{
+                        textAlign: "left",
+                        maxWidth: 400,
+                        margin: "0 auto",
+                      }}
+                    >
+                      <label>
+                        <strong>Họ và tên</strong>
+                      </label>
                       <Input
                         name="name"
                         value={formData.name}
                         onChange={handleInputChange}
                         style={{ marginBottom: 10 }}
                       />
+
+                      <label>
+                        <strong>Email</strong>
+                      </label>
                       <Input
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
                         style={{ marginBottom: 10 }}
                       />
+
+                      <label>
+                        <strong>Số điện thoại</strong>
+                      </label>
                       <Input
                         name="phoneNumber"
                         value={formData.phoneNumber}
                         onChange={handleInputChange}
                         style={{ marginBottom: 10 }}
                       />
+
                       <Button type="primary" onClick={handleUpdateClick}>
                         Cập nhật
                       </Button>

@@ -97,7 +97,7 @@ namespace SkincareBookingService.Controllers
         [HttpPut("updateCustomer/{customerId}")]
         public async Task<IActionResult> UpdateCustomer(int customerId, [FromBody] CustomerDTO customer)
         {
-            var result = await _customerService.UpdateCustomerAsync(customerId, customer.Name, customer.Email, customer.PhoneNumber, (int)customer.SkintypeId);
+            var result = await _customerService.UpdateCustomerAsync(customerId, customer);
             if (result)
             {
                 return Ok(new { message = "Customer updated successfully." });

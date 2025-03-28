@@ -150,6 +150,7 @@ public class BookingController : ControllerBase
         return Ok(bookings);
     }
 
+    
 
     // ===================== UPDATE METHODS =====================
 

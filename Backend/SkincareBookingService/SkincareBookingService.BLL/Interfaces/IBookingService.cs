@@ -42,5 +42,6 @@ namespace SkincareBookingService.BLL.Interfaces
         Task<bool> CreateBooking(PostBookingDTO booking, int slotId);
 
         Task<List<BookingDTO>> GetBookingsByCustomerId(int customerId);
+        Task<bool> CancelBookingByBookingId(int bookingId);
     }
 }
