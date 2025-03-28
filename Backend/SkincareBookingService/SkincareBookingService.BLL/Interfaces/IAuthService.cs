@@ -19,5 +19,6 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<bool> ResetPasswordAsync(string email, string otp, string newPassword);
 
+        //Task<Account> GetGoogleUserAsync(string email);
     }
 }
