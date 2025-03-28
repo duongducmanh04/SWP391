@@ -24,15 +24,18 @@ const fetchBookingHistory = async (
   }
 };
 
-// Hook lấy lịch sử đặt lịch
-export const useBookingHistory = () => {
+// Hook lấy lịch sử đặt lịch, hỗ trợ truyền `customerId` từ ngoài vào
+export const useBookingHistory = (overrideCustomerId?: number) => {
   const {
-    customerId,
+    customerId: defaultCustomerId,
     isLoading: isCustomerLoading,
     error: customerError,
   } = useGetCustomerId();
 
-  console.log("🔍 Customer ID lấy được:", customerId);
+  // Nếu `overrideCustomerId` có giá trị, ưu tiên sử dụng nó
+  const customerId = overrideCustomerId ?? defaultCustomerId;
+
+  console.log("🔍 Customer ID được sử dụng:", customerId);
 
   // Kiểm tra `customerId` hợp lệ
   const isCustomerIdValid = typeof customerId === "number" && customerId > 0;

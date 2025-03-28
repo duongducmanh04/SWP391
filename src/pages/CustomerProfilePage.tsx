@@ -40,7 +40,9 @@ const CustomerProfile = () => {
   const customerId = user?.accountId ?? 0;
   const { data: customer, isPending, error, refetch } = useGetCustomerById();
   const updateCustomer = useUpdateCustomerById();
-  const { data: bookings, isLoading: isBookingLoading } = useBookingHistory();
+  const { data: bookings, isLoading: isBookingLoading } = useBookingHistory(
+    customer?.customerId
+  );
 
   const [formData, setFormData] = useState({
     name: "",
@@ -194,7 +196,7 @@ const CustomerProfile = () => {
                 <>
                   {isBookingLoading ? (
                     <Spin tip="Đang tải lịch sử đặt lịch..." />
-                  ) : bookings?.length > 0 ? (
+                  ) : bookings && bookings.length > 0 ? (
                     <List
                       itemLayout="vertical"
                       dataSource={bookings}

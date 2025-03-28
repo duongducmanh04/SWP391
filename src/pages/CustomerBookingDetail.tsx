@@ -1,21 +1,19 @@
 import { useLocation } from "react-router-dom";
 import { Card, Spin, Alert, Button, message, Modal, Rate } from "antd";
 import { useBookingById } from "../features/booking/hooks/useGetBookingId";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
+import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import StatusTag from "../components/TagStatus";
-
 import { useState, useEffect } from "react";
 import { useGetCustomerId } from "../features/user/hook/useGetCustomerId";
-import { useRatingsByService } from "../features/user/hook/useRatingsByServiceID";
 import { Status } from "../enums/status-booking";
 import { useSlots } from "../features/services/hooks/useGetSlot";
 import { SlotDto } from "../features/services/dto/slot.dto";
 import { useTherapists } from "../features/skin_therapist/hooks/useGetTherapist";
 import { TherapistDto } from "../features/skin_therapist/dto/get-therapist.dto";
-
-const RATING_API_URL = "https://localhost:7071/api/Rating";
+import { useCancelledBooking } from "../features/booking/hooks/useCancelledBooking";
+import { useCreateRating } from "../features/services/hooks/useCreateRating";
+import { useGetRatingByCustomerId } from "../features/user/hook/useGetRatingByCustomerId"; // ✅ Import hook
 
 const CustomerBookingDetail = () => {
   const location = useLocation();
@@ -23,9 +21,9 @@ const CustomerBookingDetail = () => {
   const queryClient = useQueryClient();
   const { data: slots } = useSlots();
   const { data: therapists } = useTherapists();
-
   const { customerId } = useGetCustomerId();
-  const validBookingId = bookingId ? String(bookingId) : "";
+
+  const validBookingId = bookingId ? Number(bookingId) : 0;
   const validCustomerId = customerId ?? 0;
 
   const {
@@ -33,76 +31,75 @@ const CustomerBookingDetail = () => {
     isLoading,
     isError,
     error,
-  } = useBookingById(validBookingId);
+  } = useBookingById(String(validBookingId));
+
+  const { data: ratings, isLoading: isLoadingRating } =
+    useGetRatingByCustomerId(validCustomerId); // ✅ Lấy rating theo customerId
+  const existingRating = ratings?.find(
+    (r) => r.serviceId === booking?.serviceId
+  );
+
+  const [rating, setRating] = useState<number>(
+    existingRating?.stars ??
+      (Number(localStorage.getItem(`rating_${validBookingId}`)) || 0)
+  );
+
+  useEffect(() => {
+    if (existingRating) {
+      setRating(existingRating.stars);
+      localStorage.setItem(
+        `rating_${validBookingId}`,
+        String(existingRating.stars)
+      );
+    }
+  }, [existingRating]);
 
   const slotMap = new Map<number, SlotDto>();
   if (slots) {
-    slots.forEach((slot) => {
-      slotMap.set(slot.bookingId, slot);
-    });
+    slots.forEach((slot) => slotMap.set(slot.bookingId, slot));
   }
 
   const therapistMap = new Map<number, TherapistDto>();
   if (therapists) {
-    therapists.forEach((therapist) => {
-      therapistMap.set(therapist.skintherapistId, therapist);
-    });
+    therapists.forEach((therapist) =>
+      therapistMap.set(therapist.skintherapistId, therapist)
+    );
   }
 
-  const cancelBookingMutation = useMutation({
-    mutationFn: async () => {
-      if (!validBookingId) {
-        throw new Error("Booking ID không hợp lệ");
-      }
-
-      const cancelUrl = `https://localhost:7071/api/Booking/cancelled/${validBookingId}`;
-
-      const response = await axios.put(cancelUrl);
-      return response.data;
-    },
-    onSuccess: () => {
-      message.success("✅ Đã hủy đặt lịch thành công!");
-      queryClient.invalidateQueries({
-        queryKey: ["getBookingById", validBookingId],
-      });
-    },
-    onError: (error) => {
-      const axiosError = error as AxiosError;
-      message.error(
-        `❌ Hủy thất bại: ${axiosError.response?.data || axiosError.message}`
-      );
-    },
-  });
-
-  // ✅ Đánh giá dịch vụ (POST hoặc PUT)
-  const [rating, setRating] = useState<number>(
-    Number(localStorage.getItem(`rating_${validBookingId}`)) || 0
-  );
-
-  const ratingMutation = useMutation({
-    mutationFn: async (value: number) => {
-      localStorage.setItem(`rating_${validBookingId}`, String(value));
-
-      return await axios.post(RATING_API_URL, {
-        customerId: validCustomerId,
-        stars: value,
-        serviceId: booking?.serviceId,
-      });
-    },
-    onSuccess: () => {
-      message.success("✅ Cảm ơn bạn đã đánh giá!");
-      queryClient.invalidateQueries({
-        queryKey: ["ratings", booking?.serviceId],
-      });
-    },
-    onError: () => {
-      message.error("❌ Lỗi khi gửi đánh giá, vui lòng thử lại!");
-    },
-  });
+  const { mutate: cancelBooking } = useCancelledBooking();
+  const { mutate: createRating } = useCreateRating();
 
   const handleRatingChange = (value: number) => {
+    if (!booking?.serviceId) {
+      message.error("❌ Không thể gửi đánh giá vì thiếu serviceId!");
+      return;
+    }
+
     setRating(value);
-    ratingMutation.mutate(value);
+    localStorage.setItem(`rating_${validBookingId}`, String(value));
+
+    createRating(
+      {
+        ratingId: 0,
+        customerId: validCustomerId,
+        stars: value,
+        serviceId: booking.serviceId,
+        createAt: new Date(),
+        customerName: "Unknown",
+        serviceName: booking.serviceName || "Unknown",
+      },
+      {
+        onSuccess: () => {
+          message.success("Cảm ơn bạn đã đánh giá!");
+          queryClient.invalidateQueries({
+            queryKey: ["ratings", booking?.serviceId],
+          });
+        },
+        onError: () => {
+          message.error("❌ Lỗi khi gửi đánh giá, vui lòng thử lại!");
+        },
+      }
+    );
   };
 
   return (
@@ -155,7 +152,7 @@ const CustomerBookingDetail = () => {
                     content: "Hành động này không thể hoàn tác!",
                     okText: "Hủy lịch",
                     cancelText: "Đóng",
-                    onOk: () => cancelBookingMutation.mutate(),
+                    onOk: () => cancelBooking({ BookingId: validBookingId }),
                   });
                 }}
               >
@@ -168,7 +165,11 @@ const CustomerBookingDetail = () => {
                 <p>
                   <strong>Đánh giá dịch vụ:</strong>
                 </p>
-                <Rate value={rating} onChange={handleRatingChange} />
+                {isLoadingRating ? (
+                  <Spin tip="🔄 Đang tải đánh giá..." />
+                ) : (
+                  <Rate value={rating} onChange={handleRatingChange} />
+                )}
               </div>
             )}
           </>
