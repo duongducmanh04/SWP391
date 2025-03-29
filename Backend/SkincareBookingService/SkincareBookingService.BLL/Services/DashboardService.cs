@@ -2,6 +2,7 @@
 using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.DTOs.DashboardDTOs;
 using SkincareBookingService.BLL.Interfaces;
+using SkincareBookingService.Core.Constants;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
 
@@ -50,7 +51,7 @@ namespace SkincareBookingService.BLL.Services
         public async Task<List<MonthlyBookingRevenueDTO>> GetMonthlyBookingRevenueAsync(int year)
         {
             var monthlyData = await _bookingRepository.Query()
-                .Where(b => b.Date.HasValue && b.Date.Value.Year == year)
+                .Where(b => b.Date.HasValue && b.Date.Value.Year == year && b.Status == BookingStatus.Completed.ToString())
                 .GroupBy(b => b.Date.Value.Month)
                 .Select(g => new MonthlyBookingRevenueDTO
                 {
@@ -115,7 +116,8 @@ namespace SkincareBookingService.BLL.Services
         public async Task<decimal> GetTotalRevenueInMonthAsync(int year, int month)
         {
             var totalRevenue = await _bookingRepository.Query()
-                .Where(b => b.Date.HasValue && b.Date.Value.Year == year && b.Date.Value.Month == month)
+                .Where(b => b.Date.HasValue && b.Date.Value.Year == year && b.Date.Value.Month == month 
+                                            && b.Status == BookingStatus.Completed.ToString())
                 .SumAsync(b => b.Amount);
 
             return (decimal)totalRevenue;
