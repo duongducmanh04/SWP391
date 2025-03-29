@@ -25,6 +25,8 @@ public partial class Service
 
     public double AverageStars { get; set; }
 
+    public string Status { get; set; }
+
     public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
 
     public virtual ICollection<SkinTherapistService> SkinTherapistServices { get; set; } = new List<SkinTherapistService>();

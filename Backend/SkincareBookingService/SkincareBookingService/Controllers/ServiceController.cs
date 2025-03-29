@@ -53,6 +53,17 @@ namespace SkincareBookingService.Controllers
             return Ok(service);
         }
 
+        [HttpGet("getActiveServices")]
+        public async Task<IActionResult> GetActiveServices()
+        {
+            var services = await _serviceService.GetActiveServicesAsync();
+            if (services == null || services.Count() == 0)
+            {
+                return NotFound("No services found");
+            }
+            return Ok(services);
+        }
+
         [HttpPut("updateServiceName/{serviceId}")]
         public async Task<IActionResult> UpdateServiceName(int serviceId, [FromBody] string name)
         {
@@ -117,6 +128,17 @@ namespace SkincareBookingService.Controllers
                 return Ok(new { message = "Service procedure description updated successfully." });
             }
             return BadRequest(new { message = "Failed to update service procedure description." });
+        }
+
+        [HttpPut("updateServiceStatus/{serviceId}")]
+        public async Task<IActionResult> UpdateServiceStatus(int serviceId)
+        {
+            var result = await _serviceService.UpdateServiceStatusAsync(serviceId);
+            if (result)
+            {
+                return Ok(new { message = "Service status updated successfully." });
+            }
+            return BadRequest(new { message = "Failed to update service status." });
         }
 
         [HttpPut("updateService/{serviceId}")]

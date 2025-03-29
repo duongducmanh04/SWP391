@@ -29,7 +29,8 @@ namespace SkincareBookingService.BLL.Services
                 Duration = s.Duration,
                 AverageStars = s.AverageStars,
                 ProcedureDescription = s.ProcedureDescription,
-                Image = s.Image
+                Image = s.Image,
+                Status = s.Status,
             }).ToList();
         }
 
@@ -47,7 +48,8 @@ namespace SkincareBookingService.BLL.Services
                 Duration = service.Duration,
                 AverageStars = service.AverageStars,
                 ProcedureDescription = service.ProcedureDescription,
-                Image = service.Image
+                Image = service.Image,
+                Status = service.Status
             };
         }
 
@@ -139,7 +141,8 @@ namespace SkincareBookingService.BLL.Services
                 Duration = s.Duration,
                 AverageStars = s.AverageStars,
                 ProcedureDescription = s.ProcedureDescription,
-                Image = s.Image
+                Image = s.Image,
+                Status = s.Status
             }).ToList();
         }
 
@@ -153,7 +156,8 @@ namespace SkincareBookingService.BLL.Services
                 Duration = serviceDTO.Duration,
                 ProcedureDescription = serviceDTO.ProcedureDescription,
                 Image = serviceDTO.Image,
-                AverageStars = 0
+                AverageStars = 0,
+                Status = "Active"
             };
 
             await _serviceRepository.AddAsync(service);
@@ -168,7 +172,8 @@ namespace SkincareBookingService.BLL.Services
                 Duration = service.Duration,
                 ProcedureDescription = service.ProcedureDescription,
                 Image = service.Image,
-                AverageStars = service.AverageStars
+                AverageStars = service.AverageStars,
+                Status = service.Status
             };
         }
 
@@ -196,6 +201,7 @@ namespace SkincareBookingService.BLL.Services
             service.Duration = serviceDTO.Duration;
             service.ProcedureDescription = serviceDTO.ProcedureDescription;
             service.Image = serviceDTO.Image;
+            service.Status = serviceDTO.Status;
 
             await _serviceRepository.UpdateAsync(service);
             await _serviceRepository.SaveChangesAsync();
@@ -214,7 +220,8 @@ namespace SkincareBookingService.BLL.Services
                 Duration = service.Duration,
                 ProcedureDescription = service.ProcedureDescription,
                 Image = service.Image,
-                AverageStars = service.AverageStars
+                AverageStars = service.AverageStars,
+                Status = service.Status
             };
         }
         public async Task<IEnumerable<ServiceDTO>> GetTopRatingService()
@@ -229,6 +236,38 @@ namespace SkincareBookingService.BLL.Services
             }
 
             return result;
+        }
+
+        public async Task<bool> UpdateServiceStatusAsync(int serviceId)
+        {
+            var service = await _serviceRepository.GetByIdAsync(serviceId);
+            if (service == null) return false;
+
+            service.Status = service.Status == "Active" ? "Inactive" : "Active";
+            await _serviceRepository.UpdateAsync(service);
+            await _serviceRepository.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<List<ServiceDTO>> GetActiveServicesAsync()
+        {
+            var service = await _serviceRepository.Query()
+                .Where(s => s.Status == "Active")
+                .ToListAsync();
+
+            return service.Select(s => new ServiceDTO
+            {
+                ServiceId = s.ServiceId,
+                Name = s.Name,
+                Description = s.Description,
+                Price = s.Price,
+                Duration = s.Duration,
+                AverageStars = s.AverageStars,
+                ProcedureDescription = s.ProcedureDescription,
+                Image = s.Image,
+                Status = s.Status
+            }).ToList();
         }
     }
 }

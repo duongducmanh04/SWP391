@@ -17,7 +17,7 @@ public partial class Rating
 
     public int ServiceId { get; set; }
 
-    public string? Feedback { get; set; }
+    public string Feedback { get; set; }
 
     public virtual Customer Customer { get; set; }
 

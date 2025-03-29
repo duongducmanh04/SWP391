@@ -8,6 +8,8 @@ namespace SkincareBookingService.BLL.Interfaces
         Task<List<ServiceDTO>> GetServicesAsync();
         Task<ServiceDTO> GetServiceByIdAsync(int serviceId);
 
+        Task<List<ServiceDTO>> GetActiveServicesAsync();
+
         Task<List<ServiceDTO>> GetServiceBySkintherapistIdAsync(int skintherapistId);
 
         Task<bool> UpdateServiceNameAsync(int serviceId, string name);
@@ -21,6 +23,8 @@ namespace SkincareBookingService.BLL.Interfaces
         Task<bool> UpdateServiceDurationAsync(int serviceId, int duration);
 
         Task<bool> UpdateServiceProcedureDescriptionAsync(int serviceId, string procedureDescription);
+
+        Task<bool> UpdateServiceStatusAsync(int serviceId);
 
         Task<bool> UpdateServiceAsync(int serviceId, ServiceDTO serviceDTO);
 

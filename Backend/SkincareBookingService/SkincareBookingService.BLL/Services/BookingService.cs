@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.DTOs.BookingDTOss;
 using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.Core.Constants;
@@ -45,12 +44,52 @@ namespace SkincareBookingService.BLL.Services
 
         public async Task<bool> UpdateStatusToCompletedAsync(int bookingId)
         {
-            return await UpdateBookingStatusAsync(bookingId, BookingStatus.Completed.ToString());
+            var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            if (booking == null) return false;
+
+            booking.Status = BookingStatus.Completed.ToString();
+            await _bookingRepository.UpdateAsync(booking);
+
+            var slot = await _slotRepository.Query()
+                .Where(s => s.BookingId == bookingId)
+                .FirstOrDefaultAsync();
+
+            if (slot != null)
+            {
+                slot.BookingId = null;
+                slot.Status = SlotStatus.Available.ToString();
+                await _slotRepository.UpdateAsync(slot);
+            }
+
+            await _bookingRepository.SaveChangesAsync();
+            await _slotRepository.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<bool> UpdateStatusToDeniedAsync(int bookingId)
         {
-            return await UpdateBookingStatusAsync(bookingId, BookingStatus.Denied.ToString());
+            var booking = await _bookingRepository.GetByIdAsync(bookingId);
+            if (booking == null) return false;
+
+            booking.Status = BookingStatus.Denied.ToString();
+            await _bookingRepository.UpdateAsync(booking);
+
+            var slot = await _slotRepository.Query()
+                .Where(s => s.BookingId == bookingId)
+                .FirstOrDefaultAsync();
+
+            if (slot != null)
+            {
+                slot.BookingId = null;
+                slot.Status = SlotStatus.Available.ToString();
+                await _slotRepository.UpdateAsync(slot);
+            }
+
+            await _bookingRepository.SaveChangesAsync();
+            await _slotRepository.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<bool> UpdateStatusToCancelledAsync(int bookingId)

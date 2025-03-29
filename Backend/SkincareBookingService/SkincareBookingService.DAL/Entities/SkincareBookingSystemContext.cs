@@ -311,6 +311,8 @@ public partial class SkincareBookingSystemContext : DbContext
 
             entity.HasIndex(e => e.CustomerId, "IX_Rating_customerId");
 
+            entity.HasIndex(e => e.ServiceId, "IX_Rating_serviceId");
+
             entity.Property(e => e.RatingId).HasColumnName("ratingId");
             entity.Property(e => e.CreateAt)
                 .HasDefaultValueSql("(getdate())")
@@ -380,6 +382,10 @@ public partial class SkincareBookingSystemContext : DbContext
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("price");
             entity.Property(e => e.ProcedureDescription).HasColumnName("procedureDescription");
+            entity.Property(e => e.Status)
+                .IsRequired()
+                .HasMaxLength(50)
+                .HasDefaultValueSql("('Active')");
         });
 
         modelBuilder.Entity<SkinTherapist>(entity =>
