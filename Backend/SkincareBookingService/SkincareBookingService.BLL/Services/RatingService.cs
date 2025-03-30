@@ -73,6 +73,7 @@ namespace SkincareBookingService.BLL.Services
             {
                 existingRating.Stars = dto.Stars;
                 existingRating.CreateAt = DateTime.UtcNow;
+                existingRating.Feedback = dto.Feedback;
                 await _ratingRepository.UpdateAsync(existingRating);
                 return await MapToGetDto(existingRating);
             }
@@ -82,7 +83,8 @@ namespace SkincareBookingService.BLL.Services
                 CustomerId = dto.CustomerId,
                 Stars = dto.Stars,
                 ServiceId = dto.ServiceId,
-                CreateAt = DateTime.UtcNow
+                CreateAt = DateTime.UtcNow,
+                Feedback = dto.Feedback
             };
 
             await _ratingRepository.AddAsync(rating);
