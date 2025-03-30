@@ -54,47 +54,7 @@ namespace SkincareBookingService
                         ValidateAudience = false
                     };
                 });
-                /*.AddGoogle(options =>
-                {
-                    options.ClientId = builder.Configuration["GoogleAuth:ClientId"];
-                    options.ClientSecret = builder.Configuration["GoogleAuth:ClientSecret"];
-
-                    // Explicit callback path
-                    options.CallbackPath = "/api/auth/google-callback";
-
-                    options.SaveTokens = true;
-
-                    // More robust state handling
-                    options.CorrelationCookie.Name = ".AspNetCore.GoogleOAuth.Correlation";
-                    options.CorrelationCookie.HttpOnly = true;
-                    options.CorrelationCookie.SameSite = SameSiteMode.Lax;
-                    options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-
-                    options.Events = new OAuthEvents
-                    {
-                        OnRemoteFailure = context =>
-                        {
-                            // Detailed logging
-                            Console.WriteLine($"OAuth Remote Failure: {context.Failure?.Message}");
-                            Console.WriteLine($"Failure Details: {context.Failure}");
-
-                            context.Response.StatusCode = 500;
-                            context.Response.ContentType = "application/json";
-                            context.HandleResponse();
-                            return context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new
-                            {
-                                message = "Google OAuth failed",
-                                error = context.Failure?.Message,
-                                details = context.Failure?.ToString()
-                            }));
-                        },
-                        OnTicketReceived = context =>
-                        {
-                            Console.WriteLine("OAuth Ticket Received");
-                            return Task.CompletedTask;
-                        }
-                    };
-                });*/
+               
 
             // Add CORS service
             builder.Services.AddCors(options =>
@@ -137,6 +97,7 @@ namespace SkincareBookingService
             builder.Services.AddScoped<ICustomerSurveyService, CustomerSurveyService>();
             builder.Services.AddScoped<ICustomerSurveyAnswerService, CustomerSurveyAnswerService>();
             builder.Services.AddScoped<ISkintypeServiceService, SkintypeServiceService>();
+            builder.Services.AddScoped<ISkintherapistServiceService, SkintherapistServiceService>();
             builder.Services.AddScoped<IDashboardService, DashboardService>();
             builder.Services.AddScoped<IRatingService, RatingService>();
             builder.Services.AddScoped<IBlogService, BlogService>();
