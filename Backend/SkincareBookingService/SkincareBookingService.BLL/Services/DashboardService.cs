@@ -35,7 +35,7 @@ namespace SkincareBookingService.BLL.Services
             var totalBookings = await _bookingRepository.Query().CountAsync();
             var totalCustomers = await _customerRepository.Query().CountAsync();
             var totalSkintherapists = await _skinTherapistRepository.Query().CountAsync();
-            var totalRevenue = await _bookingRepository.Query().SumAsync(b => b.Amount);
+            var totalRevenue = await _bookingRepository.Query().SumAsync(b => b.Status == BookingStatus.Completed.ToString() ? b.Amount : 0);
 
             var dashboardSummary = new DashboardSummaryDTO
             {

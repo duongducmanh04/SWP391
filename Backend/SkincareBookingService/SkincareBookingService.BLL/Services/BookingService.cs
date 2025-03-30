@@ -15,7 +15,10 @@ namespace SkincareBookingService.BLL.Services
         private readonly IGenericRepository<Schedule> _scheduleRepository;
         private readonly IGenericRepository<SkinTherapist> _skinTherapistRepository;
         private readonly IGenericRepository<Customer> _customerRepository;
-        public BookingService(IGenericRepository<Booking> bookingRepository, IGenericRepository<Slot> genericRepository, IGenericRepository<Service> serviceRepository, IGenericRepository<Schedule> scheduleRepository, IGenericRepository<SkinTherapist> skinTherapistRepository, IGenericRepository<Customer> customerRepository)
+        private readonly IGenericRepository<SkinTherapistService> _skinTherapistServiceRepository;
+        public BookingService(IGenericRepository<Booking> bookingRepository, IGenericRepository<Slot> genericRepository, IGenericRepository<Service> serviceRepository,
+            IGenericRepository<Schedule> scheduleRepository, IGenericRepository<SkinTherapist> skinTherapistRepository,
+            IGenericRepository<Customer> customerRepository, IGenericRepository<SkinTherapistService> skintherapistServiceRepository)
         {
             _bookingRepository = bookingRepository;
             _slotRepository = genericRepository;
@@ -23,6 +26,7 @@ namespace SkincareBookingService.BLL.Services
             _scheduleRepository = scheduleRepository;
             _skinTherapistRepository = skinTherapistRepository;
             _customerRepository = customerRepository;
+            _skinTherapistServiceRepository = skintherapistServiceRepository;
         }
 
         public async Task<List<Booking>> GetBookingsAsync()
@@ -161,7 +165,7 @@ namespace SkincareBookingService.BLL.Services
             newBooking.CreateAt = DateTime.Now;
             newBooking.Status = BookingStatus.Booked.ToString();
             newBooking.Amount = booking.Amount;
-            newBooking.SkintherapistId = booking.SkintherapistId;
+
             //Add date from slot
             newBooking.Date = await _scheduleRepository.Query()
                 .Where(s => s.SlotId == slotId)
@@ -186,17 +190,32 @@ namespace SkincareBookingService.BLL.Services
             return true;
         }
 
-        public async Task<bool> UpdateBookingServiceAsync(int bookingId, string serviceName)
+        public async Task<(bool isSuccess, string message)> UpdateBookingServiceAsync(int bookingId, int serviceId)
         {
             var booking = await _bookingRepository.GetByIdAsync(bookingId);
-            if (booking == null) return false;
+            if (booking == null) return (false, "Booking not found");
 
-            booking.ServiceName = serviceName;
+            var service = await _serviceRepository.GetByIdAsync(serviceId);
+            if (service == null) return (false, "Service not found");
+
+            var skinTherapistService = await _skinTherapistServiceRepository.Query()
+                .Where(sts => sts.ServiceId == serviceId && sts.SkintherapistId == booking.SkintherapistId)
+                .FirstOrDefaultAsync();
+
+            if (skinTherapistService == null)
+            {
+                return (false, "The specified service is not associated with the skin therapist");
+            }
+
+            booking.ServiceId = serviceId;
+            booking.ServiceName = service.Name;
+
             await _bookingRepository.UpdateAsync(booking);
             await _bookingRepository.SaveChangesAsync();
 
-            return true;
+            return (true, "Booking service updated successfully");
         }
+
 
         public async Task<bool> UpdateBookingAmountAsync(int bookingId, float amount)
         {

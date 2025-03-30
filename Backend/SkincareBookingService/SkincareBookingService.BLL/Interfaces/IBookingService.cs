@@ -29,7 +29,7 @@ namespace SkincareBookingService.BLL.Interfaces
 
         Task<bool > UpdateBookingAmountAsync(int bookingId, float amount);
 
-        Task<bool> UpdateBookingServiceAsync(int bookingId, string serviceName); 
+        Task<(bool isSuccess, string message)> UpdateBookingServiceAsync(int bookingId, int serviceId);
 
         Task<bool> UpdateBookingNoteAsync(int bookingId, string note);
 
