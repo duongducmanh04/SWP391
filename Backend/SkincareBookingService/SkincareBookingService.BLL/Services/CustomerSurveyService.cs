@@ -2,6 +2,7 @@
 using SkincareBookingService.BLL.Interfaces;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
+using System.Security.Claims;
 
 namespace SkincareBookingService.BLL.Services
 {
@@ -11,14 +12,16 @@ namespace SkincareBookingService.BLL.Services
         private readonly IGenericRepository<CustomerSurveyAnswer> _customerSurveyAnswerRepository;
         private readonly IGenericRepository<QuizAnswer> _quizAnswerRepository; 
         private readonly IGenericRepository<SkinType> _skinTypeRepository;
+        private readonly IGenericRepository<Customer> _customerRepository;
 
         public CustomerSurveyService(IGenericRepository<CustomerSurvey> customerSurveyRepository, IGenericRepository<CustomerSurveyAnswer> customerSurveyAnswerRepository, 
-            IGenericRepository<QuizAnswer> quizAnswerRepository, IGenericRepository<SkinType> skinTypeRepository) 
+            IGenericRepository<QuizAnswer> quizAnswerRepository, IGenericRepository<SkinType> skinTypeRepository, IGenericRepository<Customer> customerRepository) 
         {
             _customerSurveyRepository = customerSurveyRepository;
             _customerSurveyAnswerRepository = customerSurveyAnswerRepository;
             _quizAnswerRepository = quizAnswerRepository;
             _skinTypeRepository = skinTypeRepository;
+            _customerRepository = customerRepository;
         }
 
         public async Task<List<CustomerSurveyDTO>> GetAllCustomerSurveysAsync()
@@ -96,7 +99,6 @@ namespace SkincareBookingService.BLL.Services
 
         public async Task<int> SubmitSurveyAsync(SubmitSurveyDTO request)
         {
-            
             var customerSurvey = new CustomerSurvey
             {
                 CustomerId = request.CustomerId,
@@ -107,7 +109,7 @@ namespace SkincareBookingService.BLL.Services
             await _customerSurveyRepository.AddAsync(customerSurvey);
             await _customerSurveyRepository.SaveChangesAsync();
 
-            //save answer into customer survey answer
+            // Save answers into customer survey answer
             foreach (var answer in request.Answers)
             {
                 var surveyAnswer = new CustomerSurveyAnswer
@@ -122,12 +124,20 @@ namespace SkincareBookingService.BLL.Services
 
             var recommendedSkinType = await RecommendSkintypeAsync(customerSurvey.CustomersurveyId);
 
-            //find most choosen skin type
+            // Find most chosen skin type
             var skinTypeEntity = await _skinTypeRepository.FindAsync(st => st.SkintypeName == recommendedSkinType);
             if (skinTypeEntity != null)
             {
                 customerSurvey.SkintypeId = skinTypeEntity.FirstOrDefault()?.SkintypeId;
                 await _customerSurveyRepository.SaveChangesAsync();
+            }
+
+            // Update skintypeId to customer
+            var customer = await _customerRepository.GetByIdAsync(request.CustomerId);
+            if (customer != null)
+            {
+                customer.SkintypeId = customerSurvey.SkintypeId;
+                await _customerRepository.SaveChangesAsync();
             }
 
             return customerSurvey.CustomersurveyId;
