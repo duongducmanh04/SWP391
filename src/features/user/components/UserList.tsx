@@ -16,7 +16,12 @@ import {
 } from "antd";
 import { useUsers } from "../hook/useGetUser";
 import { useUserStore } from "../hook/useUserStore";
-import { EditOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  
+  PlusOutlined,
+  SearchOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 import { useCreateUser } from "../hook/useCreateUser";
 import { useUpdateUser } from "../hook/useUpdateUser";
 import { ColumnsType } from "antd/es/table";
@@ -28,6 +33,7 @@ const UserTable = () => {
   const { mutate: updateUser } = useUpdateUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
+  const [isViewOnly, setIsViewOnly] = useState(false);
   const [form] = Form.useForm();
   const { users, setUsers } = useUserStore();
   const [searchText, setSearchText] = useState("");
@@ -41,6 +47,8 @@ const UserTable = () => {
 
   const handleCreate = () => {
     setIsModalOpen(true);
+    setIsViewOnly(false);
+    setEditingUser(null);
     form.resetFields();
   };
 
@@ -64,8 +72,10 @@ const UserTable = () => {
       });
   };
 
-  const handleEdit = (record: any) => {
+
+  const handleViewDetails = (record: any) => {
     setEditingUser(record);
+    setIsViewOnly(true);
     form.setFieldsValue(record);
     setIsModalOpen(true);
   };
@@ -132,12 +142,14 @@ const UserTable = () => {
       key: "actions",
       render: (_: unknown, record: any) => (
         <Space>
-          <Tooltip title="Chi tiết">
-            <Button
-              icon={<EditOutlined />}
-              onClick={() => handleEdit(record)}
-            />
-          </Tooltip>
+        
+            <Tooltip title="Chi tiết">
+              <Button
+                icon={<EyeOutlined />}
+                onClick={() => handleViewDetails(record)}
+              />
+            </Tooltip>
+        
         </Space>
       ),
     },
@@ -150,6 +162,8 @@ const UserTable = () => {
   if (error) {
     return <div>Error loading users</div>;
   }
+
+  const isCreating = !editingUser && !isViewOnly;
 
   return (
     <div>
@@ -186,39 +200,57 @@ const UserTable = () => {
       />
 
       <Modal
-        title={editingUser ? "Cập nhật người dùng" : "Tạo người dùng"}
+        title={
+          isViewOnly
+            ? "Chi tiết người dùng"
+            : "Tạo người dùng"
+        }
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
-        onOk={editingUser ? handleUpdate : handleCreateUser}
+        onOk={editingUser && !isViewOnly ? handleUpdate : handleCreateUser}
         width={600}
         cancelText="Hủy"
-        okText={editingUser ? "Cập nhật" : "Tạo"}
+        okText={editingUser ? (isViewOnly ? "Đóng" : "Cập nhật") : "Tạo"}
         footer={(_, { OkBtn, CancelBtn }) => (
           <>
-            <CancelBtn />
-            <OkBtn />
+            {isViewOnly ? (     
+                
+              <Button onClick={() => setIsModalOpen(false)}>Đóng</Button>
+            ) : (
+              <>
+                <CancelBtn />
+                <OkBtn />
+              </>
+            )}
           </>
         )}
       >
+
         <Form form={form} layout="vertical">
-          <Form.Item
-            name="accountName"
-            label="Account Name"
-            rules={[
-              { required: true, message: "Please enter the account name!" },
-            ]}
-          >
-            <AntInput />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[{ message: "Please enter the password!" }]}
-          >
-            <AntInput />
-          </Form.Item>
+          {isCreating && (
+            <Form.Item
+              name="accountName"
+              label="Account Name"
+              rules={[
+                { required: true, message: "Please enter the account name!" },
+              ]}
+            >
+              <AntInput disabled={isViewOnly } />
+            </Form.Item>
+          )}
+          {isCreating && (
+            <Form.Item
+              name="password"
+              label="Password"
+              rules={[{ message: "Please enter the password!" }]}
+            >
+              <AntInput disabled={isViewOnly } />
+            </Form.Item>
+          )}
+          {isCreating &&(
           <Form.Item name="role" label="Role">
             <Select
+              disabled={isViewOnly}
               showSearch
               placeholder="Select role"
               filterOption={(input, option) =>
@@ -231,8 +263,32 @@ const UserTable = () => {
                 { value: "Staff", label: "Staff" },
                 { value: "Skintherapist", label: "Skintherapist" },
               ]}
+              
             />
           </Form.Item>
+          )}
+
+          <Form.Item label="Account Name" name="accountName">
+             <AntInput 
+               disabled={isViewOnly || !isCreating} 
+               style={{ fontSize: '16px', fontWeight: '500', color: '#000' }} 
+            />
+          </Form.Item>
+
+          <Form.Item label="ID" name="accountId">
+            <AntInput 
+             disabled={isViewOnly || !isCreating} 
+             style={{ fontSize: '16px', fontWeight: '500', color: '#000' }} 
+           />
+          </Form.Item>
+
+          <Form.Item label="Role" name="role">
+            <AntInput 
+             disabled={isViewOnly || !isCreating} 
+              style={{ fontSize: '16px', fontWeight: '500', color: '#000' }} 
+           />
+          </Form.Item>
+
         </Form>
       </Modal>
     </div>
