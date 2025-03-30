@@ -14,7 +14,7 @@ export const useCreateRating = () => {
       console.log("📤 Gửi request lên API:", payload); // Debug log
 
       const response = await axios.post(
-        `https://localhost:7071/api/Rating`,
+        `https://skincareservicebooking.onrender.com/api/Rating`,
         payload,
         {
           headers: { "Content-Type": "application/json" }, // Đảm bảo gửi đúng JSON

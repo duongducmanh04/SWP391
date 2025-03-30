@@ -6,7 +6,7 @@ export const useCreateSkin = () => {
   return useMutation({
     mutationFn: async (newSkin: SkinDto) => {
       const response = await axios.post(
-        `https://localhost:7071/api/skintype/createSkintype`,
+        `https://skincareservicebooking.onrender.com/api/skintype/createSkintype`,
         newSkin
       );
       return response.data;

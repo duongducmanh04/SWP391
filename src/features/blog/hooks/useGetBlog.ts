@@ -4,7 +4,7 @@ import { BlogDto } from "../dto/blog.dto";
 
 const fetchBlogs = async (): Promise<BlogDto[]> => {
   const response = await axios.get<BlogDto[]>(
-    "https://localhost:7071/getAllBlogs"
+    "https://skincareservicebooking.onrender.com/getAllBlogs"
   );
   return response.data;
 };

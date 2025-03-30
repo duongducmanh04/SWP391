@@ -30,19 +30,27 @@ const CustomerBookingDetail = () => {
   const { data: ratings, isLoading: isLoadingRating } =
     useGetRatingByCustomerId(validCustomerId);
 
-  const existingRating = ratings?.find(
-    (r) => r.serviceId === booking?.serviceId
-  );
-
   const [rating, setRating] = useState<number>(0);
   const [feedback, setFeedback] = useState<string>("");
 
   useEffect(() => {
-    if (existingRating) {
-      setRating(existingRating.stars);
-      setFeedback(existingRating.feedback || "");
+    if (booking?.status === Status.COMPLETED) {
+      queryClient.prefetchQuery({ queryKey: ["ratings", validCustomerId] });
     }
-  }, [existingRating]);
+  }, [booking?.status, queryClient, validCustomerId]);
+
+  const latestRating = ratings
+    ?.filter((r) => r.serviceId === booking?.serviceId)
+    ?.sort(
+      (a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime()
+    )[0];
+
+  useEffect(() => {
+    if (latestRating) {
+      setRating(latestRating.stars);
+      setFeedback(latestRating.feedback || "");
+    }
+  }, [latestRating]);
 
   const { mutate: cancelBooking } = useCancelledBooking();
   const { mutate: createRating } = useCreateRating();
@@ -55,7 +63,7 @@ const CustomerBookingDetail = () => {
 
     createRating(
       {
-        ratingId: undefined,
+        ratingId: 0,
         customerId: validCustomerId,
         stars: rating,
         feedback: feedback.trim(),
@@ -139,8 +147,7 @@ const CustomerBookingDetail = () => {
                 </p>
                 {isLoadingRating ? (
                   <Spin tip="🔄 Đang tải đánh giá..." />
-                ) : existingRating ? (
-                  // 🔥 Nếu đã có đánh giá, chỉ hiển thị ở chế độ readonly
+                ) : latestRating ? (
                   <>
                     <Rate value={rating} disabled />
                     <Input.TextArea
@@ -151,7 +158,6 @@ const CustomerBookingDetail = () => {
                     />
                   </>
                 ) : (
-                  // 🔥 Nếu chưa có đánh giá, cho phép tạo mới
                   <>
                     <Rate value={rating} onChange={setRating} />
                     <Input.TextArea

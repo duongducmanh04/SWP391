@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
-const RATING_API_URL = "https://localhost:7071/api/Rating";
+const RATING_API_URL = "https://skincareservicebooking.onrender.com/api/Rating";
 
 interface Rating {
   ratingId: number;

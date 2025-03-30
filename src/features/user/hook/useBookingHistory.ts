@@ -3,7 +3,7 @@ import axios from "axios";
 import { BookingDto } from "../../booking/dto/booking.dto";
 import { useGetCustomerId } from "../../user/hook/useGetCustomerId";
 
-const API_BASE_URL = "https://localhost:7071/api/Booking";
+const API_BASE_URL = "https://skincareservicebooking.onrender.com/api/Booking";
 
 // Hàm fetch dữ liệu booking history
 const fetchBookingHistory = async (

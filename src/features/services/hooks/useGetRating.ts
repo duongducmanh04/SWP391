@@ -24,7 +24,7 @@ const fetchRatingById = async (
       `Fetching rating from: https://localhost:7071/api/Rating/${customerId}/${serviceId}`
     );
     const response = await axios.get<RatingDto>(
-      `https://localhost:7071/api/Rating/${customerId}/${serviceId}`
+      `https://skincareservicebooking.onrender.com/api/Rating/${customerId}/${serviceId}`
     );
     return response.data?.stars || 0;
   } catch (error) {

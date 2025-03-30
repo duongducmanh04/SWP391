@@ -8,7 +8,7 @@ export const useSkintypeServiceByServiceId = (serviceId: string) => {
     queryKey: ["getSkintypeServiceByServiceId", serviceId],
     queryFn: async () => {
       const response = await axios.get<SkintypeServiceDto[]>( // 🛠 Đổi kiểu dữ liệu trả về thành array
-        `https://localhost:7071/getSkintypeServiceByServiceId/${serviceId}`
+        `https://skincareservicebooking.onrender.com/getSkintypeServiceByServiceId/${serviceId}`
       );
       return response.data;
     },

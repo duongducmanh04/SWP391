@@ -25,7 +25,7 @@ export const useUpdateCustomerById = () => {
 
       try {
         const response = await axios.put<CustomerDto>(
-          `https://localhost:7071/updateCustomer/${customer.customerId}`,
+          `https://skincareservicebooking.onrender.com/updateCustomer/${customer.customerId}`,
           customer,
           { headers: { "Content-Type": "application/json" } }
         );

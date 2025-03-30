@@ -15,7 +15,7 @@ const updateCustomer = async ({
   updateData,
 }: UpdateCustomerParams): Promise<CustomerDto | null> => {
   const response = await axios.put(
-    `https://localhost:7071/updateCustomer/${accountId}/${role}`,
+    `https://skincareservicebooking.onrender.com/updateCustomer/${accountId}/${role}`,
     updateData
   );
 

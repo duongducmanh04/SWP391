@@ -4,7 +4,7 @@ import { CustomerDto } from "../dto/customer.dto";
 
 const fetchCustomers = async (): Promise<CustomerDto[]> => {
   const response = await axios.get<CustomerDto[]>(
-    "https://localhost:7071/getAllCustomers"
+    "https://skincareservicebooking.onrender.com/getAllCustomers"
   );
   return response.data;
 };

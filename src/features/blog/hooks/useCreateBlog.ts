@@ -12,7 +12,7 @@ interface CreateBlogDto {
 
 const createBlog = async (newBlog: CreateBlogDto): Promise<BlogDto> => {
   const response = await axios.post<BlogDto>(
-    "https://localhost:7071/createBlog",
+    "https://skincareservicebooking.onrender.com/createBlog",
     newBlog,
     {
       headers: {

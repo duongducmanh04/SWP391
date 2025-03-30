@@ -18,7 +18,7 @@ const createSkinType = async (
   skinType: CreateSkinTypeInput
 ): Promise<SkinDto> => {
   const response = await axios.post<SkinDto>(
-    "https://localhost:7071/api/skintype/createSkintype",
+    "https://skincareservicebooking.onrender.com/api/skintype/createSkintype",
     skinType
   );
   return response.data;
