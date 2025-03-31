@@ -19,7 +19,7 @@ const fetchCustomerById = async (
 
   try {
     const response = await axios.get<CustomerDto>(
-      `https://skincareservicebooking.onrender.com/getCustomerById/${customerId}`
+      `https://localhost:7071/getCustomerById/${customerId}`
     );
 
     console.log("✅ API trả về dữ liệu khách hàng:", response.data);

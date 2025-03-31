@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { Card, Spin, Alert, Button, message, Modal, Rate, Input } from "antd";
 import { useBookingById } from "../features/booking/hooks/useGetBookingId";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import StatusTag from "../components/TagStatus";
 import { useState, useEffect } from "react";
@@ -9,7 +9,8 @@ import { useGetCustomerId } from "../features/user/hook/useGetCustomerId";
 import { Status } from "../enums/status-booking";
 import { useCancelledBooking } from "../features/booking/hooks/useCancelledBooking";
 import { useCreateRating } from "../features/services/hooks/useCreateRating";
-import { useGetRatingByCustomerId } from "../features/user/hook/useGetRatingByCustomerId";
+import axios from "axios";
+import { RatingDto } from "../features/services/dto/rating.dto";
 
 const CustomerBookingDetail = () => {
   const location = useLocation();
@@ -27,28 +28,53 @@ const CustomerBookingDetail = () => {
     error,
   } = useBookingById(String(validBookingId));
 
-  const { data: ratings, isLoading: isLoadingRating } =
-    useGetRatingByCustomerId(validCustomerId);
+  // 📥 API lấy rating mới nhất dựa trên customerId và serviceId
+  const {
+    data: latestRating,
+    isLoading: isLoadingRating,
+    refetch: refetchRating,
+  } = useQuery<RatingDto | null>({
+    queryKey: ["latestRating", validCustomerId, booking?.serviceId],
+    queryFn: async () => {
+      if (!validCustomerId || !booking?.serviceId) return null;
+
+      const response = await axios.get<RatingDto[]>(
+        `https://skincareservicebooking.onrender.com/api/Rating/customer/${validCustomerId}`,
+        { headers: { Accept: "application/json" } }
+      );
+
+      console.log("📥 Nhận dữ liệu rating từ API:", response.data);
+
+      // 🎯 Lọc rating theo `customerId`, `serviceId`
+      const ratingsForService = response.data.filter(
+        (r) =>
+          r.serviceId === booking.serviceId && r.customerId === validCustomerId
+      );
+
+      if (ratingsForService.length === 0) return null;
+
+      // 🏆 Lấy rating mới nhất dựa trên `createAt`
+      return ratingsForService.sort(
+        (a, b) =>
+          new Date(b.createAt).getTime() - new Date(a.createAt).getTime()
+      )[0];
+    },
+    enabled: !!validCustomerId && !!booking?.serviceId,
+  });
 
   const [rating, setRating] = useState<number>(0);
   const [feedback, setFeedback] = useState<string>("");
-
-  useEffect(() => {
-    if (booking?.status === Status.COMPLETED) {
-      queryClient.prefetchQuery({ queryKey: ["ratings", validCustomerId] });
-    }
-  }, [booking?.status, queryClient, validCustomerId]);
-
-  const latestRating = ratings
-    ?.filter((r) => r.serviceId === booking?.serviceId)
-    ?.sort(
-      (a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime()
-    )[0];
+  const [hasRated, setHasRated] = useState<boolean>(false);
 
   useEffect(() => {
     if (latestRating) {
       setRating(latestRating.stars);
       setFeedback(latestRating.feedback || "");
+      setHasRated(true);
+    } else {
+      setRating(0);
+      setFeedback("");
+      setHasRated(false);
     }
   }, [latestRating]);
 
@@ -61,29 +87,36 @@ const CustomerBookingDetail = () => {
       return;
     }
 
-    createRating(
-      {
-        ratingId: 0,
-        customerId: validCustomerId,
-        stars: rating,
-        feedback: feedback.trim(),
-        serviceId: booking.serviceId,
-        createAt: new Date(),
-        customerName: "Unknown",
-        serviceName: booking.serviceName || "Unknown",
+    const newRating: RatingDto = {
+      ratingId: Math.random(), // 🆕 Tạo ID tạm thời
+      customerId: validCustomerId,
+      stars: rating,
+      feedback: feedback.trim(),
+      serviceId: booking.serviceId,
+      bookingId: validBookingId, // ✅ Lưu vào cache dù API chưa hỗ trợ
+      createAt: new Date(),
+      customerName: "Unknown",
+      serviceName: booking.serviceName || "Unknown",
+    };
+
+    createRating(newRating, {
+      onSuccess: () => {
+        message.success("✅ Đánh giá đã được gửi!");
+
+        // 🆕 Lưu ngay vào cache để hiển thị tức thì
+        queryClient.setQueryData(
+          ["latestRating", validCustomerId, booking.serviceId],
+          newRating
+        );
+
+        // 🚀 Refetch API để đảm bảo dữ liệu chính xác
+        refetchRating();
+        setHasRated(true);
       },
-      {
-        onSuccess: () => {
-          message.success("✅ Đánh giá đã được gửi!");
-          queryClient.invalidateQueries({
-            queryKey: ["ratings", validCustomerId],
-          });
-        },
-        onError: () => {
-          message.error("❌ Lỗi khi gửi đánh giá!");
-        },
-      }
-    );
+      onError: () => {
+        message.error("❌ Lỗi khi gửi đánh giá!");
+      },
+    });
   };
 
   return (
@@ -147,7 +180,7 @@ const CustomerBookingDetail = () => {
                 </p>
                 {isLoadingRating ? (
                   <Spin tip="🔄 Đang tải đánh giá..." />
-                ) : latestRating ? (
+                ) : hasRated ? (
                   <>
                     <Rate value={rating} disabled />
                     <Input.TextArea

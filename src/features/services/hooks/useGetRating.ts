@@ -1,52 +1,50 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { RatingDto } from "../dto/rating.dto";
 
-const fetchAllRatings = async (): Promise<RatingDto[]> => {
-  const response = await axios.get<RatingDto[]>(
-    "https://localhost:7071/api/Rating/all"
-  );
-  return response.data;
-};
+export const useCreateRating = () => {
+  const queryClient = useQueryClient();
 
-// 🔍 Lấy rating theo customerId và serviceId
-const fetchRatingById = async (
-  customerId?: number,
-  serviceId?: number
-): Promise<number> => {
-  if (!customerId || !serviceId) {
-    console.warn("❌ Thiếu customerId hoặc serviceId khi fetch rating!");
-    return 0;
-  }
+  return useMutation({
+    mutationFn: async (newRating: RatingDto) => {
+      // ✅ Chuẩn hóa dữ liệu trước khi gửi
+      const payload: Partial<RatingDto> = {
+        ...newRating,
+        feedback: newRating.feedback?.trim() || "",
+        bookingId: newRating.bookingId, // 🔥 Đảm bảo gửi bookingId
+      };
 
-  try {
-    console.log(
-      `Fetching rating from: https://localhost:7071/api/Rating/${customerId}/${serviceId}`
-    );
-    const response = await axios.get<RatingDto>(
-      `https://skincareservicebooking.onrender.com/api/Rating/${customerId}/${serviceId}`
-    );
-    return response.data?.stars || 0;
-  } catch (error) {
-    console.error("❌ Lỗi khi lấy đánh giá:", error);
-    return 0;
-  }
-};
+      console.log("📤 Gửi request lên API:", payload);
 
-export const useRatings = () => {
-  return useQuery<RatingDto[], Error>({
-    queryKey: ["all"],
-    queryFn: fetchAllRatings,
-    staleTime: 1000 * 60 * 5,
-  });
-};
+      try {
+        const response = await axios.post(
+          `https://skincareservicebooking.onrender.com/api/Rating`,
+          payload,
+          { headers: { "Content-Type": "application/json" } }
+        );
 
-// Hook lấy rating theo customerId và serviceId
-export const useRatingById = (customerId?: number, serviceId?: number) => {
-  return useQuery<number, Error>({
-    queryKey: ["rating", customerId, serviceId],
-    queryFn: () => fetchRatingById(customerId, serviceId),
-    enabled: Boolean(customerId && serviceId), // Chỉ gọi API nếu có đủ dữ liệu
-    staleTime: 1000 * 60 * 5, // Giữ cache trong 5 phút
+        console.log("✅ API Response:", response.data);
+        return response.data;
+      } catch (error) {
+        console.error("❌ Lỗi API:", error);
+        throw error;
+      }
+    },
+    onSuccess: (_, variables) => {
+      console.log("✅ Đánh giá đã được lưu thành công!");
+
+      // 🚀 Fetch lại dữ liệu mới nhất
+      queryClient.invalidateQueries({
+        queryKey: [
+          "latestRating",
+          variables.customerId,
+          variables.serviceId,
+          variables.bookingId, // ✅ Thêm bookingId để đảm bảo fetch chính xác
+        ],
+      });
+    },
+    onError: (error) => {
+      console.error("❌ Lỗi khi gửi đánh giá:", error);
+    },
   });
 };

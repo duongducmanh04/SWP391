@@ -9,7 +9,7 @@ export const useForgotPassword = () => {
   return useMutation({
     mutationFn: async (verifyAccount: ForgorPasswordDto) => {
       const response = await axios.post(
-        `https://skincareservicebooking.onrender.com/api/auth/forgotPassword`,
+        `https://localhost:7071/api/auth/forgotPassword`,
         verifyAccount
       );
       return response.data;

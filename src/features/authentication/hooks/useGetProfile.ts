@@ -69,7 +69,7 @@ export const useGetProfile = () => {
       role,
     }: MutationVariables): Promise<SkintherapistProfileDto> => {
       const response = await axios.get<SkintherapistProfileDto>(
-        `https://skincareservicebooking.onrender.com/getAccountByIdAndRole/${accountId}/${role}`
+        `https://localhost:7071/getAccountByIdAndRole/${accountId}/${role}`
       );
       return response.data;
     },

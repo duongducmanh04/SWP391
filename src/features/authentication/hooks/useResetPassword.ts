@@ -11,7 +11,7 @@ export const useResetPassword = () => {
   return useMutation({
     mutationFn: async (resetPassword: ResetPasswordDto) => {
       const response = await axios.post(
-        `https://skincareservicebooking.onrender.com/api/auth/resetPassword`,
+        `https://localhost:7071/api/auth/resetPassword`,
         resetPassword
       );
       return response.data;

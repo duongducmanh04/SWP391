@@ -27,7 +27,7 @@ interface LoginVariables {
 
 const login = async (credentials: LoginVariables) => {
   const response = await axios.post<LoginResponse>(
-    "https://skincareservicebooking.onrender.com/api/auth/login",
+    "https://localhost:7071/api/auth/login",
     credentials,
     {
       headers: { "Content-Type": "application/json" },

@@ -6,7 +6,7 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: async (newAccount: RegisterDto) => {
       const response = await axios.post(
-        `https://skincareservicebooking.onrender.com/api/auth/register`,
+        `https://localhost:7071/api/auth/register`,
         newAccount
       );
       return response.data;

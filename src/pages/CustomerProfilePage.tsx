@@ -39,6 +39,7 @@ const CustomerProfile = () => {
 
   const customerId = user?.accountId ?? 0;
   const { data: customer, isPending, error, refetch } = useGetCustomerById();
+
   const updateCustomer = useUpdateCustomerById();
   const { data: bookings, isLoading: isBookingLoading } = useBookingHistory(
     customer?.customerId

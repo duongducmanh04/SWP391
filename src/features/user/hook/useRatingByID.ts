@@ -11,6 +11,7 @@ interface Rating {
   createdAt: string;
   customerName?: string;
   serviceName?: string;
+  feedback?: string;
 }
 
 // 🟢 Hàm fetch rating theo ID

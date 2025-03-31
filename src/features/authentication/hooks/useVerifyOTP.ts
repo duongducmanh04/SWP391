@@ -10,7 +10,7 @@ export const useVerifyOTP = () => {
   return useMutation({
     mutationFn: async (verifyOTP: VerifyOTPDto) => {
       const response = await axios.post(
-        `https://skincareservicebooking.onrender.com/api/auth/verifyOtp`,
+        `https://localhost:7071/api/auth/verifyOtp`,
         verifyOTP
       );
       return response.data;

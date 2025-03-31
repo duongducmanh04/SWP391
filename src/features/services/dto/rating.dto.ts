@@ -7,4 +7,5 @@ export interface RatingDto {
   customerName: string;
   serviceName: string;
   feedback: string;
+  bookingId: number;
 }

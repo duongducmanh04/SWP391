@@ -7,7 +7,7 @@ export const useUpdateCustomerProfile = (customerId: number) => {
     queryKey: ["getAccountByIdAndRole", customerId],
     queryFn: async () => {
       const response = await axios.get<CustomerProfileDto[]>(
-        `https://skincareservicebooking.onrender.com/updateCustomer/${customerId}`
+        `https://localhost:7071/updateCustomer/${customerId}`
       );
       return response.data;
     },

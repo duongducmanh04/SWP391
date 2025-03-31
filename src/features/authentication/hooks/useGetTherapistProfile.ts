@@ -8,7 +8,7 @@ export const useGetTherapistProfile = (accountId?: number, role?: string) => {
     queryFn: async () => {
       if (!accountId || !role) throw new Error("Thiếu thông tin đăng nhập");
       const response = await axios.get<SkintherapistProfileDto[]>(
-        `https://skincareservicebooking.onrender.com/getAccountByIdAndRole/${accountId}/${role}`
+        `https://localhost:7071/getAccountByIdAndRole/${accountId}/${role}`
       );
       return response.data;
     },
