@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { Card, Spin, Alert, Button, message, Modal, Rate, Input } from "antd";
+import { Card, Spin, Alert, Button, message, Modal, Rate } from "antd";
 import { useBookingById } from "../features/booking/hooks/useGetBookingId";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
@@ -11,7 +11,7 @@ import { useCancelledBooking } from "../features/booking/hooks/useCancelledBooki
 import { useCreateRating } from "../features/services/hooks/useCreateRating";
 import axios from "axios";
 import { RatingDto } from "../features/services/dto/rating.dto";
-import { useTherapistById } from "../features/skin_therapist/hooks/useGetTherapistId"; // ✅ Import hook lấy chuyên viên
+import { useTherapistById } from "../features/skin_therapist/hooks/useGetTherapistId";
 
 const CustomerBookingDetail = () => {
   const location = useLocation();
@@ -29,14 +29,12 @@ const CustomerBookingDetail = () => {
     error,
   } = useBookingById(String(validBookingId));
 
-  // 📥 Lấy thông tin chuyên viên từ API
   const {
     data: therapist,
     isLoading: isTherapistLoading,
     isError: isTherapistError,
   } = useTherapistById(String(booking?.skintherapistId));
 
-  // 📥 API lấy rating mới nhất dựa trên customerId và serviceId
   const {
     data: latestRating,
     isLoading: isLoadingRating,
@@ -51,9 +49,6 @@ const CustomerBookingDetail = () => {
         { headers: { Accept: "application/json" } }
       );
 
-      console.log("📥 Nhận dữ liệu rating từ API:", response.data);
-
-      // 🎯 Lọc rating theo `customerId`, `serviceId`
       const ratingsForService = response.data.filter(
         (r) =>
           r.serviceId === booking.serviceId && r.customerId === validCustomerId
@@ -61,7 +56,6 @@ const CustomerBookingDetail = () => {
 
       if (ratingsForService.length === 0) return null;
 
-      // 🏆 Lấy rating mới nhất dựa trên `createAt`
       return ratingsForService.sort(
         (a, b) =>
           new Date(b.createAt).getTime() - new Date(a.createAt).getTime()
@@ -71,17 +65,13 @@ const CustomerBookingDetail = () => {
   });
 
   const [rating, setRating] = useState<number>(0);
-  const [feedback, setFeedback] = useState<string>("");
   const [hasRated, setHasRated] = useState<boolean>(false);
 
   useEffect(() => {
     if (latestRating) {
-      setRating(latestRating.stars);
-      setFeedback(latestRating.feedback || "");
       setHasRated(true);
     } else {
       setRating(0);
-      setFeedback("");
       setHasRated(false);
     }
   }, [latestRating]);
@@ -99,12 +89,12 @@ const CustomerBookingDetail = () => {
       ratingId: Math.random(),
       customerId: validCustomerId,
       stars: rating,
-      feedback: feedback.trim(),
       serviceId: booking.serviceId,
       bookingId: validBookingId,
       createAt: new Date(),
       customerName: "Unknown",
       serviceName: booking.serviceName || "Unknown",
+      feedback: "", // ✅ Sửa lỗi kiểu dữ liệu
     };
 
     createRating(newRating, {
@@ -115,7 +105,6 @@ const CustomerBookingDetail = () => {
           ["latestRating", validCustomerId, booking.serviceId],
           newRating
         );
-
         refetchRating();
         setHasRated(true);
       },
@@ -160,7 +149,6 @@ const CustomerBookingDetail = () => {
             <p>
               <strong>Giá tiền:</strong> {booking.amount.toLocaleString()} VND
             </p>
-            {/* ✅ Hiển thị thông tin chuyên viên */}
 
             <p>
               <strong>Tên chuyên viên:</strong>{" "}
@@ -189,33 +177,16 @@ const CustomerBookingDetail = () => {
               </Button>
             )}
 
-            {booking.status === Status.COMPLETED && (
+            {booking.status === Status.COMPLETED && !hasRated && (
               <div style={{ marginTop: "16px" }}>
                 <p>
                   <strong>Đánh giá dịch vụ:</strong>
                 </p>
                 {isLoadingRating ? (
                   <Spin tip="🔄 Đang tải đánh giá..." />
-                ) : hasRated ? (
-                  <>
-                    <Rate value={rating} disabled />
-                    <Input.TextArea
-                      value={feedback}
-                      rows={4}
-                      style={{ marginTop: 10 }}
-                      readOnly
-                    />
-                  </>
                 ) : (
                   <>
                     <Rate value={rating} onChange={setRating} />
-                    <Input.TextArea
-                      value={feedback}
-                      onChange={(e) => setFeedback(e.target.value)}
-                      placeholder="Nhập đánh giá của bạn..."
-                      rows={4}
-                      style={{ marginTop: 10 }}
-                    />
                     <Button
                       type="primary"
                       onClick={handleRatingSubmit}

@@ -4,7 +4,9 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { Button, Input, message, Spin } from "antd";
 import { useCreateBlog } from "../hooks/useCreateBlog";
 import { useNavigate } from "react-router-dom";
+import { useGetCustomerById } from "../../user/hook/useGetCustomerById"; // Import API lấy customerId
 import dayjs from "dayjs";
+import "../../../style/CreateBlog.css";
 
 const CreateBlog: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -15,6 +17,8 @@ const CreateBlog: React.FC = () => {
 
   const { mutate } = useCreateBlog();
   const navigate = useNavigate();
+  const { data: customer } = useGetCustomerById(); // Lấy customer từ API
+  const customerId = customer?.customerId; // Lấy ID từ API
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -56,8 +60,8 @@ const CreateBlog: React.FC = () => {
   };
 
   const handleCreateBlog = () => {
-    if (!title || !content || !imageUrl) {
-      message.error("Vui lòng nhập đầy đủ thông tin và tải ảnh lên!");
+    if (!title || !content || !imageUrl || !customerId) {
+      message.error("Vui lòng nhập đầy đủ thông tin!");
       return;
     }
 
@@ -65,7 +69,7 @@ const CreateBlog: React.FC = () => {
       {
         title,
         content,
-        customerId: 1, // Sửa lại ID người dùng tương ứng
+        customerId, // Sử dụng ID từ API
         image: imageUrl,
         createdAt: dayjs().format(),
       },
@@ -82,46 +86,48 @@ const CreateBlog: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>Tạo Blog Mới</h1>
+    <div className="create-blog-container">
+      <h1 className="create-blog-title">Tạo Blog Mới</h1>
       <Input
         placeholder="Nhập tiêu đề blog"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        style={{ marginBottom: "10px" }}
+        className="input-field"
       />
       <Input.TextArea
         placeholder="Nhập nội dung blog"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={4}
-        style={{ marginBottom: "10px" }}
+        className="input-field"
       />
-      <Input type="file" accept="image/*" onChange={handleImageChange} />
-      <Button
-        onClick={handleUpload}
-        disabled={uploading}
-        style={{ marginTop: "10px" }}
-      >
-        {uploading ? <Spin /> : "Tải ảnh lên"}
-      </Button>
-      <Button
-        type="primary"
-        onClick={handleCreateBlog}
-        style={{ marginTop: "10px" }}
-        disabled={uploading || !imageUrl}
-      >
-        Tạo Blog
-      </Button>
+      <label htmlFor="blog-image" className="file-label">
+        Chọn ảnh:
+      </label>
+      <input
+        id="blog-image"
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+        className="file-input"
+      />
+      <div className="action-buttons">
+        <Button onClick={handleUpload} disabled={uploading}>
+          {uploading ? <Spin /> : "Tải ảnh lên"}
+        </Button>
+        <Button
+          type="primary"
+          onClick={handleCreateBlog}
+          disabled={uploading || !imageUrl || !customerId}
+        >
+          Tạo Blog
+        </Button>
+      </div>
 
       {imageUrl && (
         <div>
           <p>Ảnh đã tải lên:</p>
-          <img
-            src={imageUrl}
-            alt="Uploaded"
-            style={{ width: 200, marginTop: 10 }}
-          />
+          <img src={imageUrl} alt="Uploaded" className="uploaded-image" />
         </div>
       )}
     </div>

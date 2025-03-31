@@ -26,7 +26,13 @@ const BlogPage = () => {
   };
 
   const handleCreateBlog = () => {
-    navigate(PagePath.CREATE_BLOG);
+    if (customer?.[0]?.customerId) {
+      navigate(PagePath.CREATE_BLOG, {
+        state: { customerId: customer[0].customerId },
+      });
+    } else {
+      console.warn("Không tìm thấy customerId của user hiện tại");
+    }
   };
 
   return (
