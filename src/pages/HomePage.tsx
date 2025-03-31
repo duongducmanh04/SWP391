@@ -5,57 +5,16 @@ import "../style/HomePage.css";
 import { Link, useNavigate } from "react-router-dom";
 import { PagePath } from "../enums/page-path.enum";
 import { useTherapists } from "../features/skin_therapist/hooks/useGetTherapist";
+import { useEffect, useState } from "react";
 
 const { Content } = Layout;
-
 const { Title, Text, Paragraph } = Typography;
 
-// const experts = [
-//   {
-//     id: 1,
-//     name: "Nancy Reimer",
-//     expertise: "Giáo dục & Kiến thức chăm sóc da",
-//     experience:
-//       "Hàng chục năm kinh nghiệm và kiến thức chuyên sâu về chăm sóc da.",
-//     field: "Giáo dục",
-//     degree: "Giám đốc Giáo dục",
-//     image: "https://via.placeholder.com/150",
-//   },
-//   {
-//     id: 2,
-//     name: "Tiffany Medois",
-//     expertise: "Tư vấn viên & Chuyên viên thẩm mỹ",
-//     experience:
-//       "Từng làm nhà báo, nhà sản xuất, nhà làm phim tài liệu và biên tập viên.",
-//     field: "Tư vấn",
-//     degree: "Chuyên viên Thẩm mỹ Chứng nhận",
-//     image: "https://via.placeholder.com/150",
-//   },
-//   {
-//     id: 3,
-//     name: "Katina Gilmore",
-//     expertise: "Điều dưỡng & Thẩm mỹ",
-//     experience:
-//       "Kết hợp giữa điều dưỡng và thẩm mỹ để mang lại sự chuyên môn cá nhân hóa.",
-//     field: "Chăm sóc sức khỏe",
-//     degree: "Y tá Chứng nhận (R.N.)",
-//     image: "https://via.placeholder.com/150",
-//   },
-//   {
-//     id: 4,
-//     name: "Bill Levins",
-//     expertise: "Giám đốc Tiếp thị",
-//     experience:
-//       "Mang đến kiến thức thông qua sự am hiểu sâu sắc trong ngành kinh doanh chăm sóc da.",
-//     field: "Tiếp thị",
-//     degree: "Phó Chủ tịch Tiếp thị",
-//     image: "https://via.placeholder.com/150",
-//   },
-// ];
 
 const HomePage = () => {
   const { data: therapists = [] } = useTherapists();
   const navigate = useNavigate();
+  const [blogs, setBlogs] = useState<{ blogId: number; title: string; image: string; createAt: string }[]>([]);
 
   const handleNavigate = (skintherapistId: number) => {
     navigate(PagePath.SKIN_THERAPIST_DETAIL, {
@@ -64,6 +23,18 @@ const HomePage = () => {
       },
     });
   };
+
+  useEffect(() => {
+    fetch("https://skincareservicebooking.onrender.com/getAllBlogs")
+      .then((res) => res.json())
+      .then((data: { blogId: number; title: string; image: string; createAt: string }[]) => {
+        const latestBlogs = data
+          .sort((a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime())
+          .slice(0, 4);
+        setBlogs(latestBlogs);
+      })
+      .catch((err) => console.error("Error fetching blogs:", err));
+  }, []);
 
   const topTherapists = [...therapists]
     .sort((a, b) => parseInt(b.experience) - parseInt(a.experience))
@@ -196,34 +167,22 @@ const HomePage = () => {
           Blog Làm Đẹp
         </Title>
         <Row gutter={[16, 16]} justify="center">
-          <Col xs={24} sm={12} md={6} lg={6}>
-            <Card
-              cover={
-                <Image
-                  src="https://kbeauty.fpt.edu.vn/wp-content/uploads/2021/03/cham-soc-da-mat-o-spa-nao-tot-5.jpg"
-                  alt="Blog 1"
-                  style={{ height: 220 }}
-                />
-              }
-            >
-              <Title level={5}>Quy trình chăm sóc da mặt tốt nhất</Title>
-              <Button type="link">Đọc thêm</Button>
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6} lg={6}>
-            <Card
-              cover={
-                <Image
-                  src="https://th.bing.com/th/id/OIP.fGzFa5roER6jRl2aE47EQgHaFT?w=233&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
-                  alt="Blog 2"
-                  style={{ height: 220 }}
-                />
-              }
-            >
-              <Title level={5}>Top 10 sản phẩm dưỡng da hot nhất</Title>
-              <Button type="link">Đọc thêm</Button>
-            </Card>
-          </Col>
+          {blogs.map((blog) => (
+            <Col key={blog.blogId} xs={24} sm={12} md={6} lg={6}>
+              <Card
+                cover={
+                  <Image
+                    src={blog.image}
+                    alt={blog.title}
+                    style={{ height: 220, objectFit: "cover" }}
+                  />
+                }
+              >
+                <Title level={5}>{blog.title}</Title>
+                <Button type="link">Đọc thêm</Button>
+              </Card>
+            </Col>
+          ))}
         </Row>
       </Content>
 
