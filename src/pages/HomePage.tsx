@@ -40,6 +40,12 @@ const HomePage = () => {
     .sort((a, b) => parseInt(b.experience) - parseInt(a.experience))
     .slice(0, 4);
 
+    const handleViewBlog = (blogId:number) => {
+      navigate(PagePath.BLOG_DETAIL, { state: { blogId } });
+      console.log("blogId",blogId);
+    };
+  
+
   return (
     <Layout>
       <Layout
@@ -163,28 +169,20 @@ const HomePage = () => {
       </div>
 
       <Content style={{ padding: "50px", background: "#f5f5f5" }}>
-        <Title level={3} style={{ textAlign: "center" }}>
-          Blog Làm Đẹp
-        </Title>
-        <Row gutter={[16, 16]} justify="center">
-          {blogs.map((blog) => (
-            <Col key={blog.blogId} xs={24} sm={12} md={6} lg={6}>
-              <Card
-                cover={
-                  <Image
-                    src={blog.image}
-                    alt={blog.title}
-                    style={{ height: 220, objectFit: "cover" }}
-                  />
-                }
-              >
-                <Title level={5}>{blog.title}</Title>
-                <Button type="link">Đọc thêm</Button>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </Content>
+      <Title level={3} style={{ textAlign: "center" }}>Blog Làm Đẹp</Title>
+      <Row gutter={[16, 16]} justify="center">
+        {blogs.map((blog) => (
+          <Col xs={24} sm={12} md={6} lg={6} key={blog.blogId}>
+            <Card
+              cover={<Image src={blog.image} alt={blog.title} style={{ height: 220 }} />}
+            >
+              <Title level={5}>{blog.title}</Title>
+              <Button type="link" onClick={() => handleViewBlog(blog.blogId)}>Xem thêm</Button>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </Content>
 
       <div style={{ padding: "20px", backgroundColor: "#FBFEFB" }}>
         <Title level={3} style={{ textAlign: "center", marginBottom: "30px" }}>
