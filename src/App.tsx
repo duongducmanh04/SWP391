@@ -44,6 +44,7 @@ import SkinTypeTable from "./features/skin_type/components/SkinTypeTable";
 import ResetPassword from "./features/authentication/components/ResetPassword";
 import QuizTable from "./features/quiz/components/QuizTable";
 import BlogTable from "./features/blog/components/BlogTable";
+import CreateBlog from "./features/blog/components/CreateBlog";
 
 const App = () => {
   return (
@@ -102,6 +103,7 @@ const App = () => {
             />
             <Route path={PagePath.BLOG} element={<BlogPage />} />
             <Route path={PagePath.BLOG_DETAIL} element={<BlogDetail />} />
+            <Route path={PagePath.CREATE_BLOG} element={<CreateBlog />} />
             <Route
               path={PagePath.SKIN_THERAPIST}
               element={<SkinTherapistListPage />}

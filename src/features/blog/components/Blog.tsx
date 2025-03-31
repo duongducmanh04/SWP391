@@ -1,5 +1,9 @@
 import { Card, Row, Col, Typography, Avatar, Button } from "antd";
-import { UserOutlined, CalendarOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  CalendarOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { PagePath } from "../../../enums/page-path.enum";
 import { useBlogs } from "../hooks/useGetBlog";
@@ -27,6 +31,23 @@ const BlogPage = () => {
 
   return (
     <div style={{ padding: "20px" }}>
+      {/* ✅ Thêm nút "Tạo Blog Mới" */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: "20px",
+        }}
+      >
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleCreateBlog}
+        >
+          Tạo Blog Mới
+        </Button>
+      </div>
+
       <div style={{ marginBottom: "30px" }}>
         <Card
           hoverable
@@ -38,8 +59,8 @@ const BlogPage = () => {
           className="blog"
           cover={
             <img
-              alt={blogData?.[0].title}
-              src={blogData?.[0].image}
+              alt={blogData?.[0]?.title}
+              src={blogData?.[0]?.image}
               style={{
                 width: "100%",
                 height: "400px",
@@ -52,30 +73,18 @@ const BlogPage = () => {
             handleNavigate(blogData[0].blogId)
           }
         >
-          {/* <Tag color="blue">{featuredPost.category}</Tag> */}
-          <Title
-            level={2}
-            style={{
-              marginTop: "20px",
-              marginBottom: "10px",
-              // textAlign: "center",
-            }}
-          >
-            {blogData?.[0].title}
+          <Title level={2} style={{ marginTop: "20px", marginBottom: "10px" }}>
+            {blogData?.[0]?.title}
           </Title>
           <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              marginTop: "10px",
-            }}
+            style={{ display: "flex", alignItems: "center", marginTop: "10px" }}
           >
             <Avatar icon={<UserOutlined />} style={{ marginRight: "10px" }} />
             <Text>
-              {blogData?.[0].customerId !== undefined &&
+              {blogData?.[0]?.customerId !== undefined &&
                 getCustomerName(blogData[0].customerId)}{" "}
               &nbsp;|&nbsp; <CalendarOutlined />{" "}
-              {dayjs(blogData?.[0].createAt).format("DD [tháng] MM, YYYY")}
+              {dayjs(blogData?.[0]?.createAt).format("DD [tháng] MM, YYYY")}
             </Text>
           </div>
         </Card>
