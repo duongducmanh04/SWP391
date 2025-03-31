@@ -16,8 +16,14 @@ namespace SkincareBookingService.Controllers
         [HttpPost("submitSurvey")]
         public async Task<IActionResult> SubmitSurvey([FromBody] SubmitSurveyDTO request)
         {
-            var surveyId = await _customerSurveyService.SubmitSurveyAsync(request);
-            return Ok(surveyId);
+            if (request == null || request.Answers == null || request.Answers.Count == 0)
+                return BadRequest("Invalid answers list");
+
+            int surveyId = await _customerSurveyService.SubmitSurveyAsync(request);
+
+            var recommendedSkinType = await _customerSurveyService.RecommendSkintypeAsync(surveyId);
+
+            return Ok(new { surveyId, recommendedSkinType });
         }
 
 
