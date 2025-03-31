@@ -11,6 +11,7 @@ import { useCancelledBooking } from "../features/booking/hooks/useCancelledBooki
 import { useCreateRating } from "../features/services/hooks/useCreateRating";
 import axios from "axios";
 import { RatingDto } from "../features/services/dto/rating.dto";
+import { useTherapistById } from "../features/skin_therapist/hooks/useGetTherapistId"; // ✅ Import hook lấy chuyên viên
 
 const CustomerBookingDetail = () => {
   const location = useLocation();
@@ -27,6 +28,13 @@ const CustomerBookingDetail = () => {
     isError,
     error,
   } = useBookingById(String(validBookingId));
+
+  // 📥 Lấy thông tin chuyên viên từ API
+  const {
+    data: therapist,
+    isLoading: isTherapistLoading,
+    isError: isTherapistError,
+  } = useTherapistById(String(booking?.skintherapistId));
 
   // 📥 API lấy rating mới nhất dựa trên customerId và serviceId
   const {
@@ -88,12 +96,12 @@ const CustomerBookingDetail = () => {
     }
 
     const newRating: RatingDto = {
-      ratingId: Math.random(), // 🆕 Tạo ID tạm thời
+      ratingId: Math.random(),
       customerId: validCustomerId,
       stars: rating,
       feedback: feedback.trim(),
       serviceId: booking.serviceId,
-      bookingId: validBookingId, // ✅ Lưu vào cache dù API chưa hỗ trợ
+      bookingId: validBookingId,
       createAt: new Date(),
       customerName: "Unknown",
       serviceName: booking.serviceName || "Unknown",
@@ -103,13 +111,11 @@ const CustomerBookingDetail = () => {
       onSuccess: () => {
         message.success("✅ Đánh giá đã được gửi!");
 
-        // 🆕 Lưu ngay vào cache để hiển thị tức thì
         queryClient.setQueryData(
           ["latestRating", validCustomerId, booking.serviceId],
           newRating
         );
 
-        // 🚀 Refetch API để đảm bảo dữ liệu chính xác
         refetchRating();
         setHasRated(true);
       },
@@ -153,6 +159,16 @@ const CustomerBookingDetail = () => {
             </p>
             <p>
               <strong>Giá tiền:</strong> {booking.amount.toLocaleString()} VND
+            </p>
+            {/* ✅ Hiển thị thông tin chuyên viên */}
+
+            <p>
+              <strong>Tên chuyên viên:</strong>{" "}
+              {isTherapistLoading
+                ? "🔄 Đang tải..."
+                : isTherapistError || !therapist
+                ? "Không có thông tin"
+                : therapist.name}
             </p>
 
             {booking.status === "Booked" && (
