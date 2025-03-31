@@ -165,6 +165,7 @@ namespace SkincareBookingService.BLL.Services
             newBooking.CreateAt = DateTime.Now;
             newBooking.Status = BookingStatus.Booked.ToString();
             newBooking.Amount = booking.Amount;
+            newBooking.SkintherapistId = booking.SkintherapistId;
 
             //Add date from slot
             newBooking.Date = await _scheduleRepository.Query()
@@ -267,28 +268,30 @@ namespace SkincareBookingService.BLL.Services
             BookingDTO bookingDto = new();
             bookingDto.Location = booking.Location;
             bookingDto.BookingId = booking.BookingId;
-            bookingDto.CustomerId = (int)booking.CustomerId;
-            bookingDto.Date = booking.Date;
-            bookingDto.CreateAt = booking.CreateAt;
+            bookingDto.CustomerId = booking.CustomerId ?? 0; // Default to 0 if null
+            bookingDto.Date = booking.Date ?? DateTime.MinValue; // Default to DateTime.MinValue if null
+            bookingDto.CreateAt = booking.CreateAt ?? DateTime.MinValue; // Default to DateTime.MinValue if null
             bookingDto.Status = booking.Status;
-            bookingDto.Amount = booking.Amount;
-            bookingDto.SkintherapistId = (int)booking.SkintherapistId;
-            bookingDto.UpdateAt = booking.UpdateAt;
+            bookingDto.Amount = booking.Amount ?? 0; // Default to 0 if null
+            bookingDto.SkintherapistId = booking.SkintherapistId ?? 0; // Default to 0 if null
+            bookingDto.UpdateAt = booking.UpdateAt; // Nullable, no default needed
             bookingDto.ServiceName = await _serviceRepository.Query()
                 .Where(s => s.ServiceId == booking.ServiceId)
                 .Select(s => s.Name)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync() ?? "Unknown"; // Default to "Unknown" if null
+            bookingDto.Note = booking.Note;
             bookingDto.CustomerName = await _customerRepository.Query()
                 .Where(c => c.CustomerId == booking.CustomerId)
                 .Select(c => c.Name)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync() ?? "Unknown"; // Default to "Unknown" if null
             bookingDto.SkintherapistName = await _skinTherapistRepository.Query()
                 .Where(st => st.SkintherapistId == booking.SkintherapistId)
                 .Select(st => st.Name)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync() ?? "Unknown"; // Default to "Unknown" if null
 
             return bookingDto;
         }
+
 
         public async Task<bool> UpdateBookingNoteAsync(int bookingId, string note)
         {
