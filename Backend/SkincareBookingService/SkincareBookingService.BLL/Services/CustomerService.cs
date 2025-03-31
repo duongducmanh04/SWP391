@@ -24,7 +24,7 @@ namespace SkincareBookingService.BLL.Services
             var newCustomer = new Customer
             {
                 Name = customer.Name,
-                SkintypeId = customer.SkintypeId,
+                SkintypeId = null,
                 AccountId = customer.AccountId,
                 Email = customer.Email,
                 PhoneNumber = customer.PhoneNumber,
@@ -44,7 +44,7 @@ namespace SkincareBookingService.BLL.Services
             {
                 CustomerId = createdCustomer.CustomerId,
                 Name = createdCustomer.Name,
-                SkintypeId = createdCustomer.SkintypeId,
+                SkintypeId = null,
                 AccountId = createdCustomer.AccountId,
                 Email = createdCustomer.Email,
                 PhoneNumber = createdCustomer.PhoneNumber,
@@ -98,12 +98,25 @@ namespace SkincareBookingService.BLL.Services
                 return false;
             }
 
-            customerToUpdate.Name = customer.Name;
-            customerToUpdate.SkintypeId = customer.SkintypeId;
-            customerToUpdate.Email = customer.Email;
-            customerToUpdate.PhoneNumber = customer.PhoneNumber;
-            customerToUpdate.Image = customer.Image;
-            customerToUpdate.Email = customer.Email;
+            if (!string.IsNullOrWhiteSpace(customer.Name))
+            {
+                customerToUpdate.Name = customer.Name;
+            }
+
+            if (!string.IsNullOrWhiteSpace(customer.PhoneNumber))
+            {
+                customerToUpdate.PhoneNumber = customer.PhoneNumber;
+            }
+
+            if (!string.IsNullOrWhiteSpace(customer.Image))
+            {
+                customerToUpdate.Image = customer.Image;
+            }
+
+            if (!string.IsNullOrWhiteSpace(customer.Email))
+            {
+                customerToUpdate.Email = customer.Email;
+            }
 
             await _customerRepository.UpdateAsync(customerToUpdate);
             await _customerRepository.SaveChangesAsync();

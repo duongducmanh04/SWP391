@@ -15,11 +15,11 @@ public partial class Customer
 
     public int? AccountId { get; set; }
 
-    public string PhoneNumber { get; set; }
+    public string PhoneNumber { get; set; } = string.Empty;
 
-    public string Image { get; set; }
+    public string Image { get; set; } = string.Empty;
 
-    public string Email { get; set; }
+    public string Email { get; set; } = string.Empty;
 
     public virtual Account Account { get; set; }
 

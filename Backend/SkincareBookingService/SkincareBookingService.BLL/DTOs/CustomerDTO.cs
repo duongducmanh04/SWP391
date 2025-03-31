@@ -9,17 +9,11 @@ namespace SkincareBookingService.BLL.DTOs
     public class CustomerDTO
     {
         public int CustomerId { get; set; }
-
-        public string Name { get; set; }
-
+        public string Name { get; set; } = string.Empty;
         public int? SkintypeId { get; set; }
-
         public int? AccountId { get; set; }
-
-        public string PhoneNumber { get; set; }
-
-        public string Image { get; set; }
-
-        public string Email { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Image { get; set; }
+        public string? Email { get; set; }
     }
 }
