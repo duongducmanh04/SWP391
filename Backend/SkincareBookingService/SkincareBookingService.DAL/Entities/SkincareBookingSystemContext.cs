@@ -257,9 +257,6 @@ public partial class SkincareBookingSystemContext : DbContext
             entity.Property(e => e.AnswerId).HasColumnName("answerId");
             entity.Property(e => e.Answer).HasColumnName("answer");
             entity.Property(e => e.QuizquestionId).HasColumnName("quizquestionId");
-            entity.Property(e => e.ServiceImpact)
-                .HasMaxLength(255)
-                .HasColumnName("serviceImpact");
             entity.Property(e => e.SkintypeId).HasColumnName("skintypeId");
 
             entity.HasOne(d => d.Quizquestion).WithMany(p => p.QuizAnswers)

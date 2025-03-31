@@ -28,8 +28,7 @@ namespace SkincareBookingService.BLL.Services
                     AnswerId = answer.AnswerId,
                     QuizquestionId = answer.QuizquestionId,
                     SkintypeId = answer.SkintypeId,
-                    Answer = answer.Answer,
-                    ServiceImpact = answer.ServiceImpact
+                    Answer = answer.Answer
                 });
             }
             return result;
@@ -45,8 +44,7 @@ namespace SkincareBookingService.BLL.Services
                 AnswerId = answer.AnswerId,
                 QuizquestionId = answer.QuizquestionId,
                 SkintypeId = answer.SkintypeId,
-                Answer = answer.Answer,
-                ServiceImpact = answer.ServiceImpact
+                Answer = answer.Answer
             };
         }
 
@@ -56,8 +54,7 @@ namespace SkincareBookingService.BLL.Services
             {
                 QuizquestionId = dto.QuizquestionId,
                 SkintypeId = dto.SkintypeId,
-                Answer = dto.Answer,
-                ServiceImpact = dto.ServiceImpact
+                Answer = dto.Answer
             };
             await _quizAnswerRepository.AddAsync(answer);
             var result = new QuizAnswerGetDto
@@ -65,8 +62,7 @@ namespace SkincareBookingService.BLL.Services
                 AnswerId = answer.AnswerId,
                 QuizquestionId = answer.QuizquestionId,
                 SkintypeId = answer.SkintypeId,
-                Answer = answer.Answer,
-                ServiceImpact = answer.ServiceImpact
+                Answer = answer.Answer
             };
             return result;
         }
@@ -79,7 +75,6 @@ namespace SkincareBookingService.BLL.Services
             answer.QuizquestionId = dto.QuizquestionId;
             answer.SkintypeId = dto.SkintypeId;
             answer.Answer = dto.Answer;
-            answer.ServiceImpact = dto.ServiceImpact;
             await _quizAnswerRepository.UpdateAsync(answer);
             return true;
         }
@@ -107,8 +102,7 @@ namespace SkincareBookingService.BLL.Services
                     AnswerId = answer.AnswerId,
                     QuizquestionId = answer.QuizquestionId,
                     SkintypeId = answer.SkintypeId,
-                    Answer = answer.Answer,
-                    ServiceImpact = answer.ServiceImpact
+                    Answer = answer.Answer
                 });
             }
             return result;
@@ -128,8 +122,7 @@ namespace SkincareBookingService.BLL.Services
                     AnswerId = answer.AnswerId,
                     QuizquestionId = answer.QuizquestionId,
                     SkintypeId = answer.SkintypeId,
-                    Answer = answer.Answer,
-                    ServiceImpact = answer.ServiceImpact
+                    Answer = answer.Answer
                 });
             }
             return result;

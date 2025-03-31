@@ -15,8 +15,6 @@ public partial class QuizAnswer
 
     public string Answer { get; set; }
 
-    public string ServiceImpact { get; set; }
-
     public virtual ICollection<CustomerSurveyAnswer> CustomerSurveyAnswers { get; set; } = new List<CustomerSurveyAnswer>();
 
     public virtual QuizQuestion Quizquestion { get; set; }

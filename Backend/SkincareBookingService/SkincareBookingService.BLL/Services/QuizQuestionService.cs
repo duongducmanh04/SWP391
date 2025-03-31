@@ -33,8 +33,7 @@ namespace SkincareBookingService.BLL.Services
                     AnswerId = a.AnswerId,
                     QuizquestionId = a.QuizquestionId,
                     SkintypeId = a.SkintypeId,
-                    Answer = a.Answer,
-                    ServiceImpact = a.ServiceImpact
+                    Answer = a.Answer
                 }).ToList()
             }).ToList();
         }
@@ -58,8 +57,7 @@ namespace SkincareBookingService.BLL.Services
                     AnswerId = a.AnswerId,
                     QuizquestionId = a.QuizquestionId,
                     SkintypeId = a.SkintypeId,
-                    Answer = a.Answer,
-                    ServiceImpact = a.ServiceImpact
+                    Answer = a.Answer
                 }).ToList()
             };
         }

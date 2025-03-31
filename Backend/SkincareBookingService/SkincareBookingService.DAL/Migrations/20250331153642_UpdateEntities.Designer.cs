@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkincareBookingService.DAL.Entities;
 
@@ -11,9 +12,11 @@ using SkincareBookingService.DAL.Entities;
 namespace SkincareBookingService.DAL.Migrations
 {
     [DbContext(typeof(SkincareBookingSystemContext))]
-    partial class SkincareBookingSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20250331153642_UpdateEntities")]
+    partial class UpdateEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
