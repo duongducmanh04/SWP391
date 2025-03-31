@@ -1,6 +1,6 @@
 ﻿using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.Interfaces;
-using SkincareBookingService.Core.Constants;
+using SkincareBookingService.BLL.Constants;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
 

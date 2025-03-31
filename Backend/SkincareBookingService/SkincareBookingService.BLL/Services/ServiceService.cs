@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SkincareBookingService.BLL.DTOs;
 using SkincareBookingService.BLL.Interfaces;
+using SkincareBookingService.BLL.Constants;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
 
@@ -157,7 +158,7 @@ namespace SkincareBookingService.BLL.Services
                 ProcedureDescription = serviceDTO.ProcedureDescription,
                 Image = serviceDTO.Image,
                 AverageStars = 0,
-                Status = "Active"
+                Status = ServiceStatus.Active.ToString()
             };
 
             await _serviceRepository.AddAsync(service);
@@ -243,7 +244,7 @@ namespace SkincareBookingService.BLL.Services
             var service = await _serviceRepository.GetByIdAsync(serviceId);
             if (service == null) return false;
 
-            service.Status = service.Status == "Active" ? "Inactive" : "Active";
+            service.Status = service.Status == ServiceStatus.Active.ToString() ? ServiceStatus.Inactive.ToString() : ServiceStatus.Active.ToString();
             await _serviceRepository.UpdateAsync(service);
             await _serviceRepository.SaveChangesAsync();
 
@@ -253,7 +254,7 @@ namespace SkincareBookingService.BLL.Services
         public async Task<List<ServiceDTO>> GetActiveServicesAsync()
         {
             var service = await _serviceRepository.Query()
-                .Where(s => s.Status == "Active")
+                .Where(s => s.Status == ServiceStatus.Active.ToString())
                 .ToListAsync();
 
             return service.Select(s => new ServiceDTO

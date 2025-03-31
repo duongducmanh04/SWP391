@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkincareBookingService.DAL"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkincareBookingService.BLL", "SkincareBookingService.BLL\SkincareBookingService.BLL.csproj", "{B72BA755-1340-4AEC-AB40-008E4393BEC5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkincareBookingService.Core", "SkincareBookingService.Core\SkincareBookingService.Core.csproj", "{D8E93621-66C3-4C4A-9F3B-C4B61B9A3348}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{B72BA755-1340-4AEC-AB40-008E4393BEC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B72BA755-1340-4AEC-AB40-008E4393BEC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B72BA755-1340-4AEC-AB40-008E4393BEC5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D8E93621-66C3-4C4A-9F3B-C4B61B9A3348}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D8E93621-66C3-4C4A-9F3B-C4B61B9A3348}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D8E93621-66C3-4C4A-9F3B-C4B61B9A3348}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D8E93621-66C3-4C4A-9F3B-C4B61B9A3348}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

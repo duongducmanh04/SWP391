@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SkincareBookingService.BLL.DTOs.BookingDTOss;
 using SkincareBookingService.BLL.Interfaces;
-using SkincareBookingService.Core.Constants;
+using SkincareBookingService.BLL.Constants;
 using SkincareBookingService.DAL.Entities;
 using SkincareBookingService.DAL.Interfaces;
 
