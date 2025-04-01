@@ -88,6 +88,8 @@ namespace SkincareBookingService.BLL.Services
             };
 
             await _ratingRepository.AddAsync(rating);
+            await _ratingRepository.SaveChangesAsync();
+            await SumRatingByServiceId(dto.ServiceId);
             return await MapToGetDto(rating);
         }
 
@@ -99,6 +101,8 @@ namespace SkincareBookingService.BLL.Services
             rating.Stars = dto.Stars;
             rating.Feedback = dto.Feedback;
             await _ratingRepository.UpdateAsync(rating);
+            await _ratingRepository.SaveChangesAsync();
+            await SumRatingByServiceId(rating.ServiceId);
             return true;
         }
 
@@ -106,8 +110,11 @@ namespace SkincareBookingService.BLL.Services
         {
             if (id <= 0) return false;
             var rating = await _ratingRepository.GetByIdAsync(id);
+            var serviceId = rating.ServiceId;
             if (rating == null) return false;
             await _ratingRepository.DeleteAsync(rating);
+            await _ratingRepository.SaveChangesAsync();
+            await SumRatingByServiceId(serviceId);
             return true;
         }
 
