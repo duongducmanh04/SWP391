@@ -2,8 +2,10 @@ import { Button, Form, Input, message } from "antd";
 import "../../../style/App.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PagePath } from "../../../enums/page-path.enum";
+import type { GetProps } from "antd";
 import { useVerifyOTP } from "../hooks/useVerifyOTP";
-import { OTPProps } from "antd/es/input/OTP";
+
+type OTPProps = GetProps<typeof Input.OTP>;
 
 const VerifyOTP = () => {
   const [form] = Form.useForm();
@@ -51,6 +53,10 @@ const VerifyOTP = () => {
 
   return (
     <div>
+      {/* <img
+        src="https://cdn.fpt-is.com/vi/FPT-IS-set-logo-08-1715516291.svg"
+        style={{ width: "200px" }}
+      /> */}
       <h2 style={{ fontWeight: 700, fontSize: "30px", margin: 0 }}>Skincare</h2>
       <p style={{ marginTop: 0 }}>Xác thực OTP</p>
       <div className="form-container">
@@ -60,7 +66,10 @@ const VerifyOTP = () => {
             label="OTP"
             rules={[{ required: true, message: "Nhập OTP" }]}
           >
-            <Input maxLength={6} allowClear placeholder="Nhập mã OTP" />
+            <Input.OTP
+              formatter={(str) => str.replace(/\D/g, "")}
+              {...sharedProps}
+            />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" className="submit-btn">

@@ -8,6 +8,7 @@ const VerifyEmail = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { mutate: forgotPassword } = useForgotPassword();
+
   const handleVerifyAccount = () => {
     form
       .validateFields()
@@ -30,6 +31,10 @@ const VerifyEmail = () => {
 
   return (
     <div>
+      {/* <img
+        src="https://cdn.fpt-is.com/vi/FPT-IS-set-logo-08-1715516291.svg"
+        style={{ width: "200px" }}
+      /> */}
       <h2 style={{ fontWeight: 700, fontSize: "30px", margin: 0 }}>Skincare</h2>
       <p style={{ marginTop: 0 }}>Xác thực email</p>
       <div className="form-container">

@@ -195,13 +195,13 @@ const LoginRegister = () => {
                     { min: 8, message: "Mật khẩu phải có ít nhất 8 ký tự" },
                   ]}
                 >
-                   <Input.Password
-                  placeholder="Mật khẩu"
-                  allowClear
-                  iconRender={(visible) =>
-                  visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                   }
-                   />
+                  <Input.Password
+                    placeholder="Mật khẩu"
+                    allowClear
+                    iconRender={(visible) =>
+                      visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                    }
+                  />
                 </Form.Item>
 
                 <Form.Item

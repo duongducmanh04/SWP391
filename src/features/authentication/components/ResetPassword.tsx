@@ -38,6 +38,10 @@ const ResetPassword = () => {
 
   return (
     <div>
+      {/* <img
+        src="https://cdn.fpt-is.com/vi/FPT-IS-set-logo-08-1715516291.svg"
+        style={{ width: "200px" }}
+      /> */}
       <h2 style={{ fontWeight: 700, fontSize: "30px", margin: 0 }}>Skincare</h2>
       <p style={{ marginTop: 0 }}>Đặt lại mật khẩu</p>
       <div className="form-container">
@@ -45,13 +49,10 @@ const ResetPassword = () => {
           <Form.Item
             name="newPassword"
             label="Mật khẩu mới"
-            rules={[
-              { required: true, message: "Nhập mật khẩu mới" },
-              { min: 8, message: "Mật khẩu mới phải có ít nhất 8 ký tự!" }, 
-            ]}
+            rules={[{ required: true, message: "Nhập mật khẩu mới" }]}
           >
             <Input.Password
-              placeholder="Nhập mật khẩu mới"
+              placeholder="input new password"
               allowClear
               iconRender={(visible) =>
                 visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
@@ -74,7 +75,7 @@ const ResetPassword = () => {
             ]}
           >
             <Input.Password
-              placeholder="Xác nhận mật khẩu mới"
+              placeholder="confirm new password"
               allowClear
               iconRender={(visible) =>
                 visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
@@ -82,7 +83,7 @@ const ResetPassword = () => {
             />
           </Form.Item>
           <Form.Item>
-            <Button className="login-btn" type="primary" htmlType="submit" >
+            <Button className="login-btn" type="primary" htmlType="submit">
               Lưu
             </Button>
           </Form.Item>

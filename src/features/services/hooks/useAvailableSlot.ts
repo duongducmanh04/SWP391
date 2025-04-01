@@ -4,7 +4,7 @@ import { SlotDto } from "../dto/slot.dto";
 
 const fetchAvailableSlots = async (): Promise<SlotDto[]> => {
   const response = await axios.get<SlotDto[]>(
-    "http://skincare-sbs.southeastasia.azurecontainer.io:8080/api/slot/getAvailableSlots"
+    "https://localhost:7071/api/slot/getAvailableSlots"
   );
   return response.data;
 };

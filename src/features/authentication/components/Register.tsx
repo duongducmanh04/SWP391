@@ -1,101 +1,114 @@
+import { useEffect } from "react";
 import { Button, Form, Input, message } from "antd";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import useAuthStore from "../hooks/useAuthStore";
+import "../../../style/App.css";
+import { useNavigate } from "react-router-dom";
+import { LoginDto } from "../dto/login.dto";
+import { PagePath } from "../../../enums/page-path.enum";
 
 const Register = () => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
+  const { login } = useAuthStore();
+  const navigate = useNavigate();
 
-  const registerMutation = useMutation<
+  const mutation = useMutation<
     { success: boolean; message: string },
     unknown,
-    any
+    LoginDto
   >({
-    mutationFn: async (values) => {
-      console.log("🚀 Sending register request to API:", values);
-
-      const payload = {
-        accountName: values.accountName,
-        password: values.password,
-      };
-
-      setLoading(true);
-      const response = await fetch(
-        "https://localhost:7071/api/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
-      setLoading(false);
-      return response.json();
-    },
+    mutationFn: login,
     onSuccess: (response) => {
-      console.log("📦 API Response Data:", response);
       if (response.success) {
-        message.success("Đăng ký thành công! Vui lòng đăng nhập.");
-        form.resetFields();
+        navigate(PagePath.HOME);
+        message.success("Đăng nhập thành công");
+      } else {
+        message.error(response.message);
       }
     },
     onError: (error) => {
-      console.error("❌ Registration error:", error);
-      message.error("Lỗi kết nối đến máy chủ: " + (error as Error).message);
-      setLoading(false);
+      message.error("Login failed: " + (error as Error).message);
     },
   });
 
-  const onFinish = (values: any) => {
-    console.log("🆕 Registering:", values);
-    registerMutation.mutate(values);
+  const onFinish = (values: LoginDto) => {
+    mutation.mutate(values);
   };
 
+  useEffect(() => {
+    document.title = "Đăng ký";
+  }, []);
+
   return (
-    <Form
-      form={form}
-      name="register"
-      onFinish={onFinish}
-      onFinishFailed={(errorInfo) => {
-        console.error("❌ Form submission failed. Errors:", errorInfo);
-        alert("Form submission failed! Check console for errors.");
-      }}
-    >
-      <Form.Item
-        name="accountName"
-        label="Tài khoản"
-        rules={[{ required: true, message: "Nhập tài khoản" }]}
-      >
-        <Input placeholder="Tài khoản" allowClear />
-      </Form.Item>
-
-      <Form.Item
-        name="password"
-        label="Mật khẩu"
-        rules={[{ required: true, message: "Nhập mật khẩu" }]}
-      >
-        <Input.Password
-          placeholder="Mật khẩu"
-          allowClear
-          iconRender={(visible) =>
-            visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-          }
-        />
-      </Form.Item>
-
-      <Form.Item>
-        <Button
-          type="primary"
-          htmlType="submit"
-          className="submit-btn"
-          loading={loading}
+    <div>
+      <img
+        // src="https://dev.ddc.fis.vn/econstruction_web_client/assets/logo-ctc-horizontal-BCKyPDAh.png"
+        src="https://cdn.fpt-is.com/vi/FPT-IS-set-logo-08-1715516291.svg"
+        style={{ width: "200px" }}
+      />
+      <h2 style={{ fontWeight: 700, fontSize: "30px", margin: 0 }}>
+        eConstruction
+      </h2>
+      <p style={{ marginTop: 0 }}>Đăng ký</p>
+      <div className="form-container">
+        <Form
+          form={form}
+          name="control-hooks"
+          onFinish={onFinish}
+          initialValues={{
+            username: "ADMIN@GMAIL.COM",
+            password: "admin",
+          }}
         >
-          Đăng ký
-        </Button>
-      </Form.Item>
-    </Form>
+          <Form.Item
+            name="username"
+            label="Tài khoản"
+            rules={[{ required: true, message: "Nhập tài khoản" }]}
+          >
+            <Input allowClear placeholder="Username" />
+          </Form.Item>
+          <Form.Item
+            name="fullName"
+            label="Họ & Tên"
+            rules={[{ required: true, message: "Nhập họ & tên" }]}
+          >
+            <Input allowClear placeholder="fullName" />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            label="Mật khẩu"
+            rules={[{ required: true, message: "Nhập mật khẩu" }]}
+          >
+            <Input.Password
+              placeholder="input password"
+              allowClear
+              iconRender={(visible) =>
+                visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+              }
+            />
+          </Form.Item>
+          <Form.Item
+            name="confirmPassword"
+            label="Nhập lại mật khẩu"
+            rules={[{ required: true, message: "Nhập lại mật khẩu" }]}
+          >
+            <Input.Password
+              placeholder="confirm password"
+              allowClear
+              iconRender={(visible) =>
+                visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+              }
+            />
+          </Form.Item>
+          <Form.Item>
+            <Button className="login-btn" type="primary" htmlType="submit">
+              Đăng ký
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    </div>
   );
 };
 

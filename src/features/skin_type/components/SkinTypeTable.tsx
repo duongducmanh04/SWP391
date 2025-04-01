@@ -11,12 +11,15 @@ import {
   Tooltip,
   Image,
   Flex,
+  Upload,
+  Switch,
 } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
   SearchOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import { useSkinTypes } from "../hooks/useGetSkin";
 import { useDeleteSkin } from "../hooks/useDeleteSkin";
@@ -25,6 +28,8 @@ import { useUpdateSkin } from "../hooks/useUpdateSkin";
 import { TablePaginationConfig } from "antd/es/table";
 import { SkinDto } from "../dto/skin.dto";
 import { ColumnsType } from "antd/es/table";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "../../../firebase/firebase";
 
 const SkinTypeTable = () => {
   const { data: skinData, isLoading, refetch } = useSkinTypes();
@@ -36,27 +41,70 @@ const SkinTypeTable = () => {
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSkin, setEditingSkin] = useState<any>(null);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [skintypeToDelete, setSkintypeToDelete] = useState<any>(null);
+  const [, setUploading] = useState(false);
+  const [, setImageAsFile] = useState<File | null>(null);
   const [form] = Form.useForm();
 
   const filterSkins = skinData?.filter((skin: any) =>
     skin.skintypeName.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  const handleDeleteSkin = (skintypeId: number) => {
-    deleteSkinType(skintypeId, {
-      onSuccess: () => {
-        message.success("Xóa loại da thành công");
-        refetch();
+  const handleFireBaseUpload = (file: File) => {
+    if (!file) {
+      message.error("Vui lòng chọn một hình ảnh!");
+      return;
+    }
+
+    setUploading(true);
+    const storageRef = ref(storage, `images/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(`Upload is ${progress}% done`);
       },
-      onError: () => {
-        message.error("Xóa loại da thất bại");
+      (error) => {
+        setUploading(false);
+        message.error(`Lỗi khi upload hình ảnh: ${error.message}`);
+        console.error("Upload error:", error);
       },
-    });
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          form.setFieldsValue({ image: downloadURL });
+          setUploading(false);
+          message.success("Upload hình ảnh thành công!");
+        } catch (error) {
+          setUploading(false);
+          message.error("Lỗi khi lấy URL hình ảnh!");
+          console.error("Error getting download URL:", error);
+        }
+      }
+    );
   };
+
+  // const handleDeleteSkin = (skintypeId: number) => {
+  //   deleteSkinType(skintypeId, {
+  //     onSuccess: () => {
+  //       message.success("Xóa loại da thành công");
+  //       refetch();
+  //     },
+  //     onError: () => {
+  //       message.error("Xóa loại da thất bại");
+  //     },
+  //   });
+  // };
 
   const handleCreate = () => {
     setIsModalOpen(true);
     form.resetFields();
+    form.setFieldsValue({ status: "Active" });
+    setImageAsFile(null);
   };
 
   const handleCreateSkin = () => {
@@ -79,6 +127,28 @@ const SkinTypeTable = () => {
     setEditingSkin(record);
     form.setFieldsValue(record);
     setIsModalOpen(true);
+    setImageAsFile(null);
+  };
+
+  const handleDelete = (skintypeId: number) => {
+    setSkintypeToDelete(skintypeId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteSkin = () => {
+    if (skintypeToDelete) {
+      deleteSkinType(skintypeToDelete, {
+        onSuccess: () => {
+          message.success("Xóa loại da thành công");
+          setDeleteModalOpen(false);
+          setSkintypeToDelete(null);
+          refetch();
+        },
+        onError: (err: { message: any }) => {
+          message.error(`Lỗi xóa loại da: ${err.message}`);
+        },
+      });
+    }
   };
 
   const handleUpdate = () => {
@@ -128,6 +198,25 @@ const SkinTypeTable = () => {
       title: "Mô tả",
       dataIndex: "description",
       key: "description",
+      render: (description: string) => {
+        return <div dangerouslySetInnerHTML={{ __html: description }} />;
+      },
+    },
+    {
+      title: "Lợi ích",
+      dataIndex: "pros",
+      key: "pros",
+      render: (pros: string) => {
+        return <div dangerouslySetInnerHTML={{ __html: pros }} />;
+      },
+    },
+    {
+      title: "Bất lợi",
+      dataIndex: "cons",
+      key: "cons",
+      render: (cons: string) => {
+        return <div dangerouslySetInnerHTML={{ __html: cons }} />;
+      },
     },
     {
       title: "Image",
@@ -155,7 +244,7 @@ const SkinTypeTable = () => {
           <Tooltip title="Delete">
             <Button
               icon={<DeleteOutlined />}
-              onClick={() => handleDeleteSkin(record.skintypeId)}
+              onClick={() => handleDelete(record.skintypeId)}
             />
           </Tooltip>
         </Space>
@@ -210,7 +299,11 @@ const SkinTypeTable = () => {
           </>
         )}
       >
-        <Form form={form} layout="vertical">
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{ status: "Active" }}
+        >
           <Form.Item
             name="skintypeName"
             label="Tên loại da"
@@ -231,6 +324,20 @@ const SkinTypeTable = () => {
             rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
           >
             <AntInput.TextArea rows={4} />
+          </Form.Item>
+          <Form.Item
+            name="status"
+            label="Hoạt động"
+            valuePropName="checked"
+            rules={[{ required: true, message: "Vui lòng chọn trạng thái" }]}
+          >
+            <Switch
+              onChange={(checked) => {
+                form.setFieldsValue({
+                  status: checked ? "Active" : "Inactive",
+                });
+              }}
+            />
           </Form.Item>
           <Form.Item
             name="pros"
@@ -263,9 +370,48 @@ const SkinTypeTable = () => {
             label="Hình ảnh"
             rules={[{ required: true, message: "Vui lòng nhập hình ảnh" }]}
           >
-            <AntInput />
+            <Upload
+              listType="picture-card"
+              showUploadList={false}
+              beforeUpload={(file) => {
+                handleFireBaseUpload(file);
+                return false;
+              }}
+              accept="image/*"
+            >
+              {form.getFieldValue("image") ? (
+                <Image
+                  src={form.getFieldValue("image")}
+                  alt="skintype Image"
+                  style={{ width: "100%", height: "100%" }}
+                  preview={false}
+                />
+              ) : (
+                <div>
+                  <UploadOutlined />
+                  <div style={{ marginTop: 8 }}>Upload</div>
+                </div>
+              )}
+            </Upload>
           </Form.Item>
         </Form>
+      </Modal>
+
+      <Modal
+        title="Xác nhận xóa"
+        open={isDeleteModalOpen}
+        style={{ width: "max-content" }}
+        onCancel={() => setDeleteModalOpen(false)}
+        footer={[
+          <Button key="back" onClick={() => setDeleteModalOpen(false)}>
+            Hủy
+          </Button>,
+          <Button key="delete" type="primary" danger onClick={handleDeleteSkin}>
+            Xóa
+          </Button>,
+        ]}
+      >
+        <p>Bạn có chắc chắn muốn xóa loại da này không?</p>
       </Modal>
     </div>
   );

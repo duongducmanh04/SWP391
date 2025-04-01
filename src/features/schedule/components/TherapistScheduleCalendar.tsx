@@ -1,4 +1,4 @@
-import { Calendar, Spin, Flex, Tooltip, Badge } from "antd";
+import { Calendar, Spin, Flex, Tooltip, Badge, Row } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { useGetScheduleByTherapistId } from "../hooks/useGetScheduleByTherapistId";
@@ -31,58 +31,6 @@ const TherapistScheduleView = () => {
 
   const { data: slots, isLoading: loadingSlots } = useSlots();
   const { data: bookings, isLoading: loadingBookings } = useBookingss();
-
-  //   const dateCellRender = (value: Dayjs) => {
-  //     if (!schedule || !Array.isArray(schedule) || !slots || !bookings)
-  //       return null;
-
-  //     const formattedDate = value.format("YYYY-MM-DD");
-
-  //     const scheduleForTherapist = schedule.filter(
-  //       (s: ScheduleDto) => s.skinTherapistId === skintherapistId
-  //     );
-
-  //     const slotMap = new Map(slots.map((slot: SlotDto) => [slot.slotId, slot]));
-
-  //     const bookingsForDate = bookings.filter((booking: BookingDto) => {
-  //       return scheduleForTherapist.some((s: ScheduleDto) => {
-  //         const slot = slotMap.get(s.slotId);
-  //         return (
-  //           slot &&
-  //           slot.bookingId === booking.bookingId &&
-  //           dayjs(booking.date).format("YYYY-MM-DD") === formattedDate
-  //         );
-  //       });
-  //     });
-
-  //     const tooltipContent = (
-  //       <ul>
-  //         {bookingsForDate.map((booking: BookingDto) => {
-  //           const slot = slots.find((s) => s.bookingId === booking.bookingId);
-  //           return (
-  //             <li key={booking.bookingId}>
-  //               {slot ? slot.time : ""} - {booking.serviceName}
-  //             </li>
-  //           );
-  //         })}
-  //       </ul>
-  //     );
-
-  //     const cellContent = (
-  //       <ul>
-  //         {bookingsForDate.map((booking: BookingDto) => {
-  //           const slot = slots.find((s) => s.bookingId === booking.bookingId);
-  //           return <li key={booking.bookingId}>{slot ? slot.time : ""}</li>;
-  //         })}
-  //       </ul>
-  //     );
-
-  //     return (
-  //       <Tooltip title={tooltipContent} placement="top">
-  //         <div>{cellContent}</div>
-  //       </Tooltip>
-  //     );
-  //   };
 
   const dateCellRender = (value: Dayjs) => {
     if (!schedule || !Array.isArray(schedule) || !slots || !bookings)
@@ -154,6 +102,10 @@ const TherapistScheduleView = () => {
         <div className="content-header">Lịch làm việc của chuyên viên</div>
       </Flex>
       <hr style={{ opacity: 0.1 }} />
+      <Row style={{ gap: 30 }}>
+        <Badge status="error" text="Đã đặt" />
+        <Badge status="success" text="Lịch trống" />
+      </Row>
 
       {loadingSchedule ||
       loadingSlots ||

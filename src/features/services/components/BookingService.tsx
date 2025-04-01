@@ -25,7 +25,7 @@ import useAuthStore from "../../authentication/hooks/useAuthStore";
 import { useAvailableSlot } from "../hooks/useAvailableSlot";
 import utc from "dayjs/plugin/utc";
 import { useCustomers } from "../../user/hook/useGetCustomer";
-import { useGetSchedule } from "../../schedule/hooks/useGetSchedule";
+import { useGetScheduleByServiceId } from "../../schedule/hooks/useGetScheduleByServiceId";
 import { useNavigate } from "react-router-dom";
 import { PagePath } from "../../../enums/page-path.enum";
 
@@ -45,7 +45,7 @@ const SkincareBooking = () => {
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
   const { data: customers, isLoading, error } = useCustomers();
   const { amount, serviceId, serviceName } = location.state || {};
-  const { data: schedules } = useGetSchedule(serviceId);
+  const { data: schedules } = useGetScheduleByServiceId(serviceId);
   const navigate = useNavigate();
   const [therapistModalVisible, setTherapistModalVisible] = useState(false);
   const [selectedTherapist, setSelectedTherapist] = useState<any>(null);
@@ -68,19 +68,8 @@ const SkincareBooking = () => {
 
     const flatSchedules = schedules.flat();
 
-    console.log(
-      "📡 Debugging: Full Flattened Schedules Data:",
-      JSON.stringify(flatSchedules, null, 2)
-    );
-    console.log("📡 Debugging: Raw Available Slots:", availableSlots);
-
-    const scheduleSlotIds = flatSchedules.map(
-      (schedule) => schedule.slotId || "MISSING_SLOT_ID"
-    );
-    const availableSlotIds = availableSlots.map((slot) => slot.slotId);
-
-    console.log("🔍 All Schedule Slot IDs:", scheduleSlotIds);
-    console.log("🔍 All Available Slot IDs:", availableSlotIds);
+    const now = dayjs();
+    const today = now.format("YYYY-MM-DD");
 
     return flatSchedules
       .filter((schedule) => {
@@ -98,11 +87,17 @@ const SkincareBooking = () => {
             slot.slotId === schedule.slotId && slot.status === "Available"
         );
 
-        console.log(
-          `🧐 Checking Schedule - Date: ${scheduleDate}, Therapist ID: ${
-            schedule.skinTherapistId
-          }, Slot ID: ${schedule.slotId}, Match: ${!!matchingSlot}`
-        );
+        if (!matchingSlot) return false;
+
+        if (scheduleDate === today) {
+          const slotTime = dayjs(matchingSlot.time, ["h:mm A", "HH:mm"]);
+          if (slotTime.isBefore(now)) {
+            console.log(
+              `⏳ Removing past slot ${matchingSlot.time} (ID: ${matchingSlot.slotId}) as it is before the current time.`
+            );
+            return false;
+          }
+        }
 
         return isDateMatch && isTherapistMatch && matchingSlot;
       })
@@ -110,11 +105,6 @@ const SkincareBooking = () => {
         const matchingSlot = availableSlots.find(
           (slot) =>
             slot.slotId === schedule.slotId && slot.status === "Available"
-        );
-
-        console.log(
-          `🔗 Matched Slot for Schedule Slot ID ${schedule.slotId}:`,
-          matchingSlot
         );
 
         return matchingSlot
@@ -217,7 +207,7 @@ const SkincareBooking = () => {
       <Title
         level={2}
         style={{
-          color: "#3A5A40",
+          color: "#321414",
           fontSize: "32px",
           fontWeight: "bold",
           marginBottom: "40px",
@@ -302,7 +292,7 @@ const SkincareBooking = () => {
                           <Col span={24} style={{ textAlign: "center" }}>
                             <Title
                               level={4}
-                              style={{ marginTop: "10px", color: "#3A5A40" }}
+                              style={{ marginTop: "10px", color: "#321414" }}
                             >
                               {expert.name}
                             </Title>
@@ -341,14 +331,14 @@ const SkincareBooking = () => {
                                   backgroundColor:
                                     selectedExpert === expert.skintherapistId &&
                                     selectedTime === time
-                                      ? "#A7C957"
+                                      ? "#8b4513"
                                       : "white",
                                   color:
                                     selectedExpert === expert.skintherapistId &&
                                     selectedTime === time
                                       ? "white"
-                                      : "#3A5A40",
-                                  border: "1px solid #A7C957",
+                                      : "#321414",
+                                  border: "1px solid #8b4513",
                                   cursor: "pointer",
                                 }}
                               >
@@ -389,19 +379,13 @@ const SkincareBooking = () => {
                     icon={<CheckCircleOutlined />}
                     onClick={handleConfirmBooking}
                     style={{
-                      backgroundColor: "#A7C957",
+                      backgroundColor: "#8b4513",
                       border: "none",
                       fontSize: "16px",
                       padding: "12px 24px",
                       borderRadius: "8px",
                       transition: "all 0.3s ease-in-out",
                     }}
-                    onMouseOver={(e) =>
-                      (e.currentTarget.style.backgroundColor = "#8AA851")
-                    }
-                    onMouseOut={(e) =>
-                      (e.currentTarget.style.backgroundColor = "#A7C957")
-                    }
                   >
                     Xác nhận
                   </Button>
@@ -413,7 +397,7 @@ const SkincareBooking = () => {
       </Row>
       <Modal
         title={
-          <Title level={3} style={{ margin: 0, color: "#3A5A40" }}>
+          <Title level={3} style={{ margin: 0, color: "#321414" }}>
             Thông Tin Chuyên Viên
           </Title>
         }
@@ -431,7 +415,7 @@ const SkincareBooking = () => {
               icon={!selectedTherapist.image && <UserOutlined />}
               style={{ marginBottom: "15px" }}
             />
-            <Title level={4} style={{ color: "#3A5A40" }}>
+            <Title level={4} style={{ color: "#321414" }}>
               {selectedTherapist.name}
             </Title>
 
@@ -448,19 +432,19 @@ const SkincareBooking = () => {
                 >
                   <p>
                     <MailOutlined
-                      style={{ marginRight: "8px", color: "#3A5A40" }}
+                      style={{ marginRight: "8px", color: "#321414" }}
                     />{" "}
                     <strong>Email:</strong> {selectedTherapist.email}
                   </p>
                   <p>
                     <SolutionOutlined
-                      style={{ marginRight: "8px", color: "#3A5A40" }}
+                      style={{ marginRight: "8px", color: "#321414" }}
                     />{" "}
                     <strong>Kinh nghiệm:</strong> {selectedTherapist.experience}
                   </p>
                   <p>
                     <ReadOutlined
-                      style={{ marginRight: "8px", color: "#3A5A40" }}
+                      style={{ marginRight: "8px", color: "#321414" }}
                     />{" "}
                     <strong>Bằng cấp:</strong> {selectedTherapist.degree}
                   </p>

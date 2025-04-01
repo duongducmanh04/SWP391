@@ -1,5 +1,9 @@
-import { Card, Row, Col, Typography, Avatar } from "antd";
-import { UserOutlined, CalendarOutlined } from "@ant-design/icons";
+import { Card, Row, Col, Typography, Avatar, Button } from "antd";
+import {
+  UserOutlined,
+  CalendarOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { PagePath } from "../../../enums/page-path.enum";
 import { useBlogs } from "../hooks/useGetBlog";
@@ -61,8 +65,33 @@ const BlogPage = () => {
     });
   };
 
+  const handleCreateBlog = () => {
+    if (customer?.[0]?.customerId) {
+      navigate(PagePath.CREATE_BLOG, {
+        state: { customerId: customer[0].customerId },
+      });
+    } else {
+      console.warn("Không tìm thấy customerId của user hiện tại");
+    }
+  };
+
   return (
     <div style={{ padding: "20px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: "20px",
+        }}
+      >
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleCreateBlog}
+        >
+          Tạo Blog
+        </Button>
+      </div>
       <div style={{ marginBottom: "30px" }}>
         <Card
           hoverable
@@ -111,7 +140,7 @@ const BlogPage = () => {
               {blogData?.[0].customerId !== undefined &&
                 getCustomerName(blogData[0].customerId)}{" "}
               &nbsp;|&nbsp; <CalendarOutlined />{" "}
-              {dayjs(blogData?.[0].createdAt).format("DD [tháng] MM, YYYY")}
+              {dayjs(blogData?.[0].createAt).format("DD [tháng] MM, YYYY")}
             </Text>
           </div>
         </Card>
@@ -154,7 +183,7 @@ const BlogPage = () => {
                 <Text>
                   {getCustomerName(blog.customerId)} &nbsp;|&nbsp;{" "}
                   <CalendarOutlined />{" "}
-                  {dayjs(blog.createdAt).format("DD [tháng] MM, YYYY")}
+                  {dayjs(blog.createAt).format("DD [tháng] MM, YYYY")}
                 </Text>
               </div>
             </Card>

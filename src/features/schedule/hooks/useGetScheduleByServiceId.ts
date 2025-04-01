@@ -2,7 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { ScheduleDto } from "../dto/schedule.dto";
 
-const fetchScheduleByService = async (serviceId: number): Promise<ScheduleDto[]> => {
+const fetchScheduleByService = async (
+  serviceId: number
+): Promise<ScheduleDto[]> => {
   if (!serviceId) throw new Error("Service ID is required to fetch schedules!");
 
   const response = await axios.get<ScheduleDto[]>(
@@ -11,10 +13,10 @@ const fetchScheduleByService = async (serviceId: number): Promise<ScheduleDto[]>
   return response.data;
 };
 
-export const useGetSchedule = (serviceId: number) => {
+export const useGetScheduleByServiceId = (serviceId: number) => {
   return useQuery<ScheduleDto[], Error>({
-    queryKey: ["getSchedule", serviceId], 
+    queryKey: ["getSchedule", serviceId],
     queryFn: () => fetchScheduleByService(serviceId),
-    enabled: !!serviceId, 
+    enabled: !!serviceId,
   });
 };

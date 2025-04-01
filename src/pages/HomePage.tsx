@@ -10,11 +10,12 @@ import { useEffect, useState } from "react";
 const { Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
 
-
 const HomePage = () => {
   const { data: therapists = [] } = useTherapists();
   const navigate = useNavigate();
-  const [blogs, setBlogs] = useState<{ blogId: number; title: string; image: string; createAt: string }[]>([]);
+  const [blogs, setBlogs] = useState<
+    { blogId: number; title: string; image: string; createAt: string }[]
+  >([]);
 
   const handleNavigate = (skintherapistId: number) => {
     navigate(PagePath.SKIN_THERAPIST_DETAIL, {
@@ -27,12 +28,24 @@ const HomePage = () => {
   useEffect(() => {
     fetch("https://skincareservicebooking.onrender.com/getAllBlogs")
       .then((res) => res.json())
-      .then((data: { blogId: number; title: string; image: string; createAt: string }[]) => {
-        const latestBlogs = data
-          .sort((a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime())
-          .slice(0, 4);
-        setBlogs(latestBlogs);
-      })
+      .then(
+        (
+          data: {
+            blogId: number;
+            title: string;
+            image: string;
+            createAt: string;
+          }[]
+        ) => {
+          const latestBlogs = data
+            .sort(
+              (a, b) =>
+                new Date(b.createAt).getTime() - new Date(a.createAt).getTime()
+            )
+            .slice(0, 4);
+          setBlogs(latestBlogs);
+        }
+      )
       .catch((err) => console.error("Error fetching blogs:", err));
   }, []);
 
@@ -40,11 +53,10 @@ const HomePage = () => {
     .sort((a, b) => parseInt(b.experience) - parseInt(a.experience))
     .slice(0, 4);
 
-    const handleViewBlog = (blogId:number) => {
-      navigate(PagePath.BLOG_DETAIL, { state: { blogId } });
-      console.log("blogId",blogId);
-    };
-  
+  const handleViewBlog = (blogId: number) => {
+    navigate(PagePath.BLOG_DETAIL, { state: { blogId } });
+    console.log("blogId", blogId);
+  };
 
   return (
     <Layout>
@@ -169,20 +181,30 @@ const HomePage = () => {
       </div>
 
       <Content style={{ padding: "50px", background: "#f5f5f5" }}>
-      <Title level={3} style={{ textAlign: "center" }}>Blog Làm Đẹp</Title>
-      <Row gutter={[16, 16]} justify="center">
-        {blogs.map((blog) => (
-          <Col xs={24} sm={12} md={6} lg={6} key={blog.blogId}>
-            <Card
-              cover={<Image src={blog.image} alt={blog.title} style={{ height: 220 }} />}
-            >
-              <Title level={5}>{blog.title}</Title>
-              <Button type="link" onClick={() => handleViewBlog(blog.blogId)}>Xem thêm</Button>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-    </Content>
+        <Title level={3} style={{ textAlign: "center" }}>
+          Blog Làm Đẹp
+        </Title>
+        <Row gutter={[16, 16]} justify="center">
+          {blogs.map((blog) => (
+            <Col xs={24} sm={12} md={6} lg={6} key={blog.blogId}>
+              <Card
+                cover={
+                  <Image
+                    src={blog.image}
+                    alt={blog.title}
+                    style={{ height: 220 }}
+                  />
+                }
+              >
+                <Title level={5}>{blog.title}</Title>
+                <Button type="link" onClick={() => handleViewBlog(blog.blogId)}>
+                  Xem thêm
+                </Button>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Content>
 
       <div style={{ padding: "20px", backgroundColor: "#FBFEFB" }}>
         <Title level={3} style={{ textAlign: "center", marginBottom: "30px" }}>

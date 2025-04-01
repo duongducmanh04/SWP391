@@ -9,7 +9,6 @@ import useAuthStore from "../features/authentication/hooks/useAuthStore";
 import { useGetCustomerProfile } from "../features/authentication/hooks/useGetCustomerProfile";
 import { useEffect, useState } from "react";
 
-
 const NavbarMenu = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();

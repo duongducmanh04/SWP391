@@ -3,7 +3,7 @@ import axios from "axios";
 import { QuizQuestionDto } from "../dto/quiz-question.dto";
 
 interface MutationVariables {
-  id: string;
+  quizquestionId: number;
   data: QuizQuestionDto;
 }
 
@@ -11,8 +11,14 @@ export const useUpdateQuizQuestion = () => {
   const queryClient = useQueryClient();
 
   return useMutation<void, Error, MutationVariables>({
-    mutationFn: async ({ id, data }: MutationVariables): Promise<void> => {
-      await axios.put(`https://localhost:7071/api/QuizQuestion/${id}`, data);
+    mutationFn: async ({
+      quizquestionId,
+      data,
+    }: MutationVariables): Promise<void> => {
+      await axios.put(
+        `https://localhost:7071/api/QuizQuestion/${quizquestionId}`,
+        data
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["QuizQuestion"] });
