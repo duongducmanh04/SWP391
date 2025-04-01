@@ -12,6 +12,7 @@ import {
   HourglassOutlined,
   SkinOutlined,
   QuestionOutlined,
+  BookOutlined,
 } from "@ant-design/icons";
 import {
   Breadcrumb,
@@ -179,7 +180,7 @@ const SidebarMenu = () => {
       ? [
           {
             key: PagePath.BLOG_MANAGEMENT,
-            icon: <QuestionOutlined />,
+            icon: <BookOutlined />,
             label: <Link to={PagePath.BLOG_MANAGEMENT}>Quản lý blog</Link>,
           },
         ]
@@ -193,21 +194,6 @@ const SidebarMenu = () => {
           },
         ]
       : []),
-    // {
-    //   key: "2",
-    //   icon: <AppstoreOutlined />,
-    //   label: "Quản lý",
-    //   children: [
-    //     {
-    //       key: PagePath.WORK_VOLUME,
-    //       label: <Link to={PagePath.WORK_VOLUME}>Bảng khối lượng</Link>,
-    //     },
-    //     {
-    //       key: PagePath.USER,
-    //       label: <Link to={PagePath.USER}>Người dùng</Link>,
-    //     },
-    //   ],
-    // },
     ...(user?.role === RoleCode.STAFF || user?.role === RoleCode.THERAPIST
       ? [
           {
@@ -237,6 +223,19 @@ const SidebarMenu = () => {
             icon: <ScheduleOutlined />,
             label: (
               <Link to={PagePath.SCHEDULE_FOR_THERAPIST}>Lịch làm việc</Link>
+            ),
+          },
+        ]
+      : []),
+    ...(user?.role === RoleCode.STAFF
+      ? [
+          {
+            key: PagePath.THERAPIST_MANAGEMENT,
+            icon: <UserOutlined />,
+            label: (
+              <Link to={PagePath.THERAPIST_MANAGEMENT}>
+                Quản lý chuyên viên
+              </Link>
             ),
           },
         ]

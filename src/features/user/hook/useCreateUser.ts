@@ -6,7 +6,7 @@ export const useCreateUser = () => {
   return useMutation({
     mutationFn: async (newUser: UserDto) => {
       const response = await axios.post(
-        `https://skincareservicebooking.onrender.com/createAccount`,
+        `https://localhost:7071/createAccount`,
         newUser
       );
       return response.data;

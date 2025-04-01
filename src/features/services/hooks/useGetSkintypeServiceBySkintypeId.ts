@@ -7,7 +7,7 @@ export const useSkintypeServiceBySkintypeId = (skintypeId: string) => {
     queryKey: ["getSkintypeServiceBySkintypeId", skintypeId],
     queryFn: async () => {
       const response = await axios.get<SkintypeServiceDto>(
-        `https://skincareservicebooking.onrender.com/getSkintypeServiceBySkintypeId/${skintypeId}`
+        `https://localhost:7071/getSkintypeServiceBySkintypeId/${skintypeId}`
       );
       return response.data;
     },

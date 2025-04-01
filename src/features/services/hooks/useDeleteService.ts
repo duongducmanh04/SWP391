@@ -7,7 +7,7 @@ export const useDeleteService = () => {
   return useMutation<void, Error, string>({
     mutationFn: async (id: string): Promise<void> => {
       await axios.delete(
-        `https://skincareservicebooking.onrender.com/api/service/deleteService/${id}`
+        `https://localhost:7071/api/service/deleteService/${id}`
       );
     },
     onSuccess: () => {

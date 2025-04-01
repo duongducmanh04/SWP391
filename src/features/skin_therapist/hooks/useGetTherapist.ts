@@ -4,7 +4,7 @@ import { TherapistDto } from "../dto/get-therapist.dto";
 
 const fetchTherapists = async (): Promise<TherapistDto[]> => {
   const response = await axios.get<TherapistDto[]>(
-    "https://skincareservicebooking.onrender.com/api/skintherapist/getAllSkintherapist"
+    "https://localhost:7071/api/skintherapist/getAllSkintherapist"
   );
   return response.data;
 };

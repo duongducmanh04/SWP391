@@ -4,7 +4,7 @@ import { ServiceDto } from "../dto/get-service.dto";
 
 const fetchServices = async (): Promise<ServiceDto[]> => {
   const response = await axios.get<ServiceDto[]>(
-    "https://skincareservicebooking.onrender.com/api/service/getAllServices"
+    "https://localhost:7071/api/service/getAllServices"
   );
   return response.data;
 };

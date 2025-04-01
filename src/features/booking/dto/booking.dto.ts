@@ -7,11 +7,10 @@ export interface BookingDto {
   status: string;
   amount: number;
   skintherapistId: number;
-  skintherapistName: string;
   serviceName: string;
   serviceId: number;
   note: string;
-
+  skintherapistName: string;
   customer: string;
   updateAt: string;
 }

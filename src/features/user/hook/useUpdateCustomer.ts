@@ -1,30 +1,55 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { CustomerDto } from "../dto/customer.dto";
 
-interface UpdateCustomerParams {
+export interface CustomerDto {
+  customerId: number;
+  name: string;
+  skintypeId: number;
   accountId: number;
-  role: string;
-  updateData: Partial<CustomerDto>; // Chỉ cập nhật một phần dữ liệu
+  phoneNumber: string;
+  image: string;
+  email: string;
 }
 
-// Hàm gọi API cập nhật thông tin khách hàng
-const updateCustomer = async ({
-  accountId,
-  role,
-  updateData,
-}: UpdateCustomerParams): Promise<CustomerDto | null> => {
-  const response = await axios.put(
-    `https://skincareservicebooking.onrender.com/updateCustomer/${accountId}/${role}`,
-    updateData
-  );
-
-  return response.data || null;
-};
-
-// Hook sử dụng React Query để cập nhật dữ liệu
+// 🛠 Hook cập nhật khách hàng
 export const useUpdateCustomer = () => {
-  return useMutation<CustomerDto | null, Error, UpdateCustomerParams>({
-    mutationFn: updateCustomer,
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (customer: CustomerDto): Promise<CustomerDto> => {
+      if (!customer || !customer.customerId) {
+        throw new Error("⚠ Thiếu thông tin khách hàng");
+      }
+
+      console.log("📡 Gửi yêu cầu cập nhật khách hàng:", customer);
+
+      try {
+        const response = await axios.put<CustomerDto>(
+          `https://localhost:7071/updateCustomer/${customer.customerId}`,
+          customer,
+          { headers: { "Content-Type": "application/json" } }
+        );
+
+        console.log("✅ Cập nhật thành công:", response.data);
+        return response.data;
+      } catch (error) {
+        console.error("❌ Lỗi khi cập nhật khách hàng:", error);
+        throw error;
+      }
+    },
+    onSuccess: (data) => {
+      console.log(
+        "🔄 Invalidate dữ liệu khách hàng sau khi cập nhật:",
+        data.customerId
+      );
+
+      // ✅ Cách gọi invalidateQueries đúng
+      queryClient.invalidateQueries({
+        queryKey: ["getCustomerById", data.customerId],
+      });
+    },
+    onError: (error) => {
+      console.error("⚠ Lỗi khi cập nhật:", error);
+    },
   });
 };

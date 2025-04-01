@@ -45,6 +45,7 @@ import ResetPassword from "./features/authentication/components/ResetPassword";
 import QuizTable from "./features/quiz/components/QuizTable";
 import BlogTable from "./features/blog/components/BlogTable";
 import CreateBlog from "./features/blog/components/CreateBlog";
+import TherapistTable from "./features/skin_therapist/components/TherapistTable";
 
 const App = () => {
   return (
@@ -89,6 +90,10 @@ const App = () => {
               path={PagePath.SKIN_TYPE_MANAGEMENT}
               element={<SkinTypeTable />}
             />
+            <Route
+              path={PagePath.THERAPIST_MANAGEMENT}
+              element={<TherapistTable />}
+            />
           </Route>
           <Route element={<NavbarMenu />}>
             <Route path={PagePath.HOME_PAGE} element={<HomePage />} />
@@ -103,7 +108,6 @@ const App = () => {
             />
             <Route path={PagePath.BLOG} element={<BlogPage />} />
             <Route path={PagePath.BLOG_DETAIL} element={<BlogDetail />} />
-            <Route path={PagePath.CREATE_BLOG} element={<CreateBlog />} />
             <Route
               path={PagePath.SKIN_THERAPIST}
               element={<SkinTherapistListPage />}
@@ -134,6 +138,7 @@ const App = () => {
               path={PagePath.CUSTOMER_BOOKING_DETAIL}
               element={<CustomerBookingDetail />}
             />
+            <Route path={PagePath.CREATE_BLOG} element={<CreateBlog />} />
           </Route>
         </Routes>
       </AuthGuardProvider>

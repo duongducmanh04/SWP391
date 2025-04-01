@@ -1,60 +1,58 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { storage } from "../../../firebase/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { Button, Input, message, Spin } from "antd";
+import { Button, Input, message, Upload, Spin, Flex } from "antd";
 import { useCreateBlog } from "../hooks/useCreateBlog";
 import { useNavigate } from "react-router-dom";
-import { useGetCustomerById } from "../../user/hook/useGetCustomerById"; // Import API lấy customerId
 import dayjs from "dayjs";
-import "../../../style/CreateBlog.css";
+import { useGetCustomerById } from "../../user/hook/useGetCustomerById";
+import { UploadOutlined } from "@ant-design/icons";
+import Title from "antd/es/typography/Title";
 
-const CreateBlog: React.FC = () => {
-  const [imageFile, setImageFile] = useState<File | null>(null);
+const CreateBlog = () => {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [title, setTitle] = useState<string>("");
+  const [content, setContent] = useState<string>("");
 
   const { mutate } = useCreateBlog();
   const navigate = useNavigate();
   const { data: customer } = useGetCustomerById(); // Lấy customer từ API
-  const customerId = customer?.customerId; // Lấy ID từ API
+  const customerId = customer?.customerId;
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImageFile(e.target.files[0]);
-    }
-  };
-
-  const handleUpload = () => {
-    if (!imageFile) {
-      message.error("Vui lòng chọn một ảnh để tải lên!");
+  const handleFireBaseUpload = (file: File) => {
+    if (!file) {
+      message.error("Vui lòng chọn một hình ảnh!");
       return;
     }
 
-    const storageRef = ref(storage, `blogs/${imageFile.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, imageFile);
-
     setUploading(true);
+    const storageRef = ref(storage, `images/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
       "state_changed",
       (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log(`Đang tải lên: ${progress}%`);
+        console.log(`Upload is ${progress}% done`);
       },
       (error) => {
-        console.error("Lỗi tải lên:", error);
-        message.error("Lỗi tải ảnh lên, vui lòng thử lại!");
         setUploading(false);
+        message.error(`Lỗi khi upload hình ảnh: ${error.message}`);
+        console.error("Upload error:", error);
       },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setImageUrl(downloadURL);
-          message.success("Tải ảnh lên thành công!");
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          setImageUrl(downloadURL); // Cập nhật imageUrl sau khi upload thành công
           setUploading(false);
-        });
+          message.success("Upload hình ảnh thành công!");
+        } catch (error) {
+          setUploading(false);
+          message.error("Lỗi khi lấy URL hình ảnh!");
+          console.error("Error getting download URL:", error);
+        }
       }
     );
   };
@@ -67,11 +65,12 @@ const CreateBlog: React.FC = () => {
 
     mutate(
       {
+        blogId: 0,
         title,
         content,
-        customerId, // Sử dụng ID từ API
+        customerId: 1,
         image: imageUrl,
-        createdAt: dayjs().format(),
+        createAt: dayjs().toDate(),
       },
       {
         onSuccess: () => {
@@ -86,51 +85,53 @@ const CreateBlog: React.FC = () => {
   };
 
   return (
-    <div className="create-blog-container">
-      <h1 className="create-blog-title">Tạo Blog Mới</h1>
+    <Flex vertical style={{ padding: "20px" }}>
+      <Title level={2}>Tạo Blog Mới</Title>
       <Input
         placeholder="Nhập tiêu đề blog"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        className="input-field"
+        style={{ marginBottom: "10px" }}
       />
       <Input.TextArea
         placeholder="Nhập nội dung blog"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={4}
-        className="input-field"
+        style={{ marginBottom: "10px" }}
       />
-      <label htmlFor="blog-image" className="file-label">
-        Chọn ảnh:
-      </label>
-      <input
-        id="blog-image"
-        type="file"
+      <Upload
+        showUploadList={false}
+        beforeUpload={(file) => {
+          handleFireBaseUpload(file);
+          return false;
+        }}
         accept="image/*"
-        onChange={handleImageChange}
-        className="file-input"
-      />
-      <div className="action-buttons">
-        <Button onClick={handleUpload} disabled={uploading}>
-          {uploading ? <Spin /> : "Tải ảnh lên"}
-        </Button>
+      >
         <Button
-          type="primary"
-          onClick={handleCreateBlog}
-          disabled={uploading || !imageUrl || !customerId}
+          icon={<UploadOutlined />}
+          loading={uploading}
+          style={{ marginBottom: "10px" }}
         >
-          Tạo Blog
+          Tải ảnh lên
         </Button>
-      </div>
-
+      </Upload>
+      {uploading && <Spin style={{ marginBottom: "10px" }} />}
       {imageUrl && (
-        <div>
+        <div style={{ marginBottom: "10px" }}>
           <p>Ảnh đã tải lên:</p>
-          <img src={imageUrl} alt="Uploaded" className="uploaded-image" />
+          <img src={imageUrl} alt="Uploaded" style={{ width: 200 }} />
         </div>
       )}
-    </div>
+      <Button
+        type="primary"
+        onClick={handleCreateBlog}
+        size="large"
+        disabled={uploading || !title || !content || !imageUrl}
+      >
+        Tạo Blog
+      </Button>
+    </Flex>
   );
 };
 

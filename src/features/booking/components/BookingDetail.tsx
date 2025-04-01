@@ -26,7 +26,6 @@ import { useEffect, useState } from "react";
 import { CloseOutlined, EditOutlined, SaveOutlined } from "@ant-design/icons";
 import { useUpdateServiceName } from "../hooks/useUpdateService";
 import { useUpdateServiceAmount } from "../hooks/useUpdateServiceAmount";
-import { useServices } from "../../services/hooks/useGetService";
 import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
 import { TherapistDto } from "../../skin_therapist/dto/get-therapist.dto";
 import { useCustomers } from "../../user/hook/useGetCustomer";
@@ -37,15 +36,14 @@ import { Status } from "../../../enums/status-booking";
 import TextArea from "antd/es/input/TextArea";
 import { PagePath } from "../../../enums/page-path.enum";
 import { useUpdateNote } from "../hooks/useUpdateNoteBooking";
-// import { useUpdateTherapist } from "../hooks/useUpdateTherapist";
 import { useSlots } from "../../services/hooks/useGetSlot";
 import { SlotDto } from "../../services/dto/slot.dto";
 import { useGetServiceByTherapistId } from "../../services/hooks/useGetServiceByTherapistId";
 import { ServiceDto } from "../../services/dto/get-service.dto";
+
 const { Title } = Typography;
 
 const BookingDetail = () => {
-  // const { bookingId } = useParams();
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -61,37 +59,48 @@ const BookingDetail = () => {
     isError,
     refetch,
   } = useBookingById(bookingId || "");
-  const { data: service } = useServices();
   const { data: therapists } = useTherapists();
   const { data: customers } = useCustomers();
   const { data: slots } = useSlots();
-
   const { data: serviceTherapist } = useGetServiceByTherapistId(
     booking?.skintherapistId || 0
   );
 
   const { mutate: updateServiceName } = useUpdateServiceName();
   const { mutate: updateServiceAmount } = useUpdateServiceAmount();
-  // const { mutate: updateTherapist } = useUpdateTherapist();
   const { mutate: updateNote, isPending: isUpdatingNote } = useUpdateNote();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedService, setSelectedService] = useState<string>("");
-  // const [selectedTherapist, setSelectedTherapist] = useState<number>(0);
+  const [selectedServiceId, setSelectedServiceId] = useState<number | null>(
+    null
+  );
   const [selectedServiceAmount, setSelectedServiceAmount] = useState<number>(0);
   const [note, setNote] = useState<string>(booking?.note || "");
+
+  const activeServiceTherapist = serviceTherapist?.filter(
+    (service) => service.status === "Active"
+  );
+
+  // Chỉ khởi tạo state ban đầu khi component mount lần đầu
+  useEffect(() => {
+    if (booking && activeServiceTherapist && !selectedServiceId && !isEditing) {
+      const currentService = activeServiceTherapist.find(
+        (s: ServiceDto) => s.name === booking.serviceName
+      );
+      setSelectedServiceId(
+        currentService
+          ? currentService.serviceId
+          : activeServiceTherapist?.[0]?.serviceId ?? null
+      );
+      setSelectedServiceAmount(
+        booking.amount || activeServiceTherapist[0]?.price || 0
+      );
+    }
+  }, [booking, activeServiceTherapist, selectedServiceId, isEditing]);
 
   useEffect(() => {
     if (booking?.note !== undefined) {
       setNote(booking.note);
-    }
-  }, [booking]);
-
-  useEffect(() => {
-    if (booking) {
-      setSelectedService(booking.serviceName);
-      setSelectedServiceAmount(booking.amount);
-      // setSelectedTherapist(booking.skintherapistId);
     }
   }, [booking]);
 
@@ -181,11 +190,16 @@ const BookingDetail = () => {
     );
   };
 
-  const handleServiceChange = (value: string) => {
-    setSelectedService(value);
-    const selected = service?.find((service) => service.name === value);
-    if (selected) {
-      setSelectedServiceAmount(selected.price);
+  const handleServiceChange = (serviceId: number) => {
+    setSelectedServiceId(serviceId);
+    const selectedService = activeServiceTherapist?.find(
+      (service: ServiceDto) => service.serviceId === serviceId
+    );
+    if (selectedService) {
+      setSelectedServiceAmount(selectedService.price);
+    } else {
+      message.warning("Dịch vụ không hợp lệ!");
+      setSelectedServiceAmount(0); // Đặt giá về 0 nếu dịch vụ không hợp lệ
     }
   };
 
@@ -205,7 +219,7 @@ const BookingDetail = () => {
   };
 
   const handleUpdateService = async () => {
-    if (!selectedService) {
+    if (!selectedServiceId) {
       message.warning("Vui lòng chọn một dịch vụ!");
       return;
     }
@@ -213,13 +227,18 @@ const BookingDetail = () => {
     try {
       await new Promise((resolve, reject) => {
         updateServiceName(
-          { bookingId: booking.bookingId, serviceName: selectedService },
+          { bookingId: booking.bookingId, serviceId: selectedServiceId },
           {
             onSuccess: () => {
-              message.success("Cập nhật tên dịch vụ thành công");
+              message.success("Cập nhật dịch vụ thành công");
               resolve(null);
             },
-            onError: reject,
+            onError: (error) => {
+              message.error(
+                "Lỗi cập nhật dịch vụ: " + (error as Error).message
+              );
+              reject(error);
+            },
           }
         );
       });
@@ -232,28 +251,18 @@ const BookingDetail = () => {
               message.success("Cập nhật giá thành công");
               resolve(null);
             },
-            onError: reject,
+            onError: (error) => {
+              message.error("Lỗi cập nhật giá: " + (error as Error).message);
+              reject(error);
+            },
           }
         );
       });
 
-      // await new Promise((resolve, reject) => {
-      //   updateTherapist(
-      //     { bookingId: booking.bookingId, skintherapistId: selectedTherapist },
-      //     {
-      //       onSuccess: () => {
-      //         message.success("Cập nhật chuyên viên thành công");
-      //         resolve(null);
-      //       },
-      //       onError: reject,
-      //     }
-      //   );
-      // });
-
       await refetch();
       setIsEditing(false);
     } catch {
-      message.error("Có lỗi xảy ra khi cập nhật!");
+      message.error("Có lỗi xảy ra khi cập nhật dịch vụ!");
     }
   };
 
@@ -261,7 +270,9 @@ const BookingDetail = () => {
     {
       key: "1",
       name: "Tên dịch vụ",
-      value: booking.serviceName,
+      value:
+        activeServiceTherapist?.find((s) => s.serviceId === selectedServiceId)
+          ?.name || booking.serviceName,
       editable: true,
     },
     {
@@ -291,52 +302,31 @@ const BookingDetail = () => {
       title: "Giá trị",
       dataIndex: "value",
       key: "value",
-      render: (text: string, record: any) => {
-        if (isEditing) {
-          if (record.key === "1") {
-            return (
-              <Select
-                style={{ width: "100%" }}
-                value={selectedService}
-                onChange={handleServiceChange}
-              >
-                {/* {service?.map((service: any) => (
-                  <Select.Option key={service.serviceId} value={service.name}>
-                    {service.name}
-                  </Select.Option>
-                ))} */}
-                {serviceTherapist?.map((service: ServiceDto) => (
-                  <Select.Option key={service.serviceId} value={service.name}>
-                    {service.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            );
-          }
-          // if (record.key === "3") {
-          //   return (
-          //     <Select
-          //       style={{ width: "100%" }}
-          //       value={
-          //         (therapists?.find(
-          //           (t) => t.skintherapistId === selectedTherapist
-          //         )?.name as unknown as number) ?? selectedTherapist
-          //       }
-          //       onChange={handleTherapistChange}
-          //     >
-          //       {therapists?.map((therapist: any) => (
-          //         <Select.Option
-          //           key={therapist.skintherapistId}
-          //           value={therapist.therapistId}
-          //         >
-          //           {therapist.name}
-          //         </Select.Option>
-          //       ))}
-          //     </Select>
-          //   );
-          // }
+      render: (text: string | number, record: any) => {
+        if (isEditing && record.key === "1") {
+          return (
+            <Select
+              style={{ width: "100%" }}
+              value={selectedServiceId}
+              onChange={handleServiceChange}
+              placeholder="Chọn dịch vụ"
+              disabled={
+                !activeServiceTherapist || activeServiceTherapist.length === 0
+              }
+              showSearch
+            >
+              {activeServiceTherapist?.map((service: ServiceDto) => (
+                <Select.Option
+                  key={service.serviceId}
+                  value={service.serviceId}
+                >
+                  {service.name} (Giá: {service.price})
+                </Select.Option>
+              )) || []}
+            </Select>
+          );
         }
-        return text;
+        return typeof text === "number" ? text.toString() : text;
       },
     },
     {
@@ -357,7 +347,17 @@ const BookingDetail = () => {
               </Button>
               <Button
                 icon={<CloseOutlined />}
-                onClick={() => setIsEditing(false)}
+                onClick={() => {
+                  setIsEditing(false);
+                  // Reset về giá trị ban đầu khi hủy
+                  const currentService = activeServiceTherapist?.find(
+                    (s: ServiceDto) => s.name === booking.serviceName
+                  );
+                  setSelectedServiceId(
+                    currentService ? currentService.serviceId : null
+                  );
+                  setSelectedServiceAmount(booking.amount || 0);
+                }}
                 style={{ width: "100%" }}
               >
                 Hủy
@@ -368,8 +368,15 @@ const BookingDetail = () => {
               type="primary"
               icon={<EditOutlined />}
               onClick={() => {
-                setSelectedService(booking.serviceName);
-                // setSelectedTherapist(booking.skintherapistId);
+                const currentService = activeServiceTherapist?.find(
+                  (s: ServiceDto) => s.name === booking.serviceName
+                );
+                setSelectedServiceId(
+                  currentService
+                    ? currentService.serviceId
+                    : activeServiceTherapist?.[0]?.serviceId ?? null
+                );
+                setSelectedServiceAmount(booking.amount || 0);
                 setIsEditing(true);
               }}
             >
@@ -434,13 +441,8 @@ const BookingDetail = () => {
               onDenied={handleDenied}
               onFinished={handleFinished}
             />
-            {/* <h4 style={{ marginTop: 20 }}>Lịch sử trạng thái</h4>
-            <p>
-              🟢 {dayjs(booking.updateAt).format("DD/MM/YYYY HH:mm:ss")} -{" "}
-              {booking.status}
-            </p> */}
           </Card>
-          {user?.role == RoleCode.THERAPIST &&
+          {user?.role === RoleCode.THERAPIST &&
             booking?.status === Status.CHECK_IN && (
               <Card style={{ marginTop: "10px" }}>
                 <Title level={4}>Ghi chú</Title>
@@ -448,9 +450,7 @@ const BookingDetail = () => {
                   rows={4}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                >
-                  {booking.note}
-                </TextArea>
+                />
                 <Button
                   type="primary"
                   onClick={handleUpdateNote}
@@ -463,7 +463,7 @@ const BookingDetail = () => {
             )}
         </Col>
       </Row>
-      {booking?.status === Status.BOOKED && user?.role == RoleCode.STAFF && (
+      {booking?.status === Status.BOOKED && user?.role === RoleCode.STAFF && (
         <Card
           title="Chi tiết dịch vụ"
           style={{ marginBottom: 16, marginTop: 16 }}

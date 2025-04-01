@@ -3,7 +3,7 @@ import axios from "axios";
 
 interface MutationVariables {
   bookingId: number;
-  serviceName: string;
+  serviceId: number;
 }
 
 export const useUpdateServiceName = () => {
@@ -12,10 +12,10 @@ export const useUpdateServiceName = () => {
   return useMutation<void, Error, MutationVariables>({
     mutationFn: async ({
       bookingId,
-      serviceName,
+      serviceId,
     }: MutationVariables): Promise<void> => {
       await axios.put(
-        `https://localhost:7071/api/Booking/serviceName/${bookingId}?serviceName=${serviceName}`
+        `https://localhost:7071/api/Booking/serviceName/${bookingId}?serviceId=${serviceId}`
       );
     },
     onSuccess: () => {

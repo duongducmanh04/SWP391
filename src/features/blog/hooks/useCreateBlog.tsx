@@ -6,7 +6,7 @@ export const useCreateBlog = () => {
   return useMutation({
     mutationFn: async (newBlog: BlogDto) => {
       const response = await axios.post(
-        `https://skincareservicebooking.onrender.com/createBlog`,
+        `https://localhost:7071/createBlog`,
         newBlog
       );
       return response.data;

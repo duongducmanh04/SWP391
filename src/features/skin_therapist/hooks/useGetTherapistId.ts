@@ -3,7 +3,7 @@ import axios from "axios";
 import { TherapistDto } from "../dto/get-therapist.dto";
 
 const API_BASE_URL =
-  "https://skincareservicebooking.onrender.com/api/skintherapist/getSkintherapistById";
+  "https://localhost:7071/api/skintherapist/getSkintherapistById";
 
 export const useTherapistById = (skintherapistId: string) => {
   return useQuery<TherapistDto, Error>({

@@ -6,9 +6,7 @@ export const useDeleteBlog = () => {
 
   return useMutation<void, Error, string>({
     mutationFn: async (id: string): Promise<void> => {
-      await axios.delete(
-        `https://skincareservicebooking.onrender.com/deleteBlog/${id}`
-      );
+      await axios.delete(`https://localhost:7071/deleteBlog/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["deleteBlog"] });

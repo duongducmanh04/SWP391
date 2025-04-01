@@ -7,7 +7,7 @@ export const useRatingById = (ratingId: number) => {
     queryKey: ["Rating", ratingId],
     queryFn: async () => {
       const response = await axios.get<RatingDto>(
-        `https://skincareservicebooking.onrender.com/api/Rating/${ratingId}`
+        `https://localhost:7071/api/Rating/${ratingId}`
       );
       return response.data;
     },

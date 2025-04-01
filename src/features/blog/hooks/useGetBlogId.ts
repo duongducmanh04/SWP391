@@ -7,7 +7,7 @@ export const useBlogById = (blogId: string) => {
     queryKey: ["getBookingById", blogId],
     queryFn: async () => {
       const response = await axios.get<BlogDto>(
-        `https://skincareservicebooking.onrender.com/getBlogById/${blogId}`
+        `https://localhost:7071/getBlogById/${blogId}`
       );
       return response.data;
     },

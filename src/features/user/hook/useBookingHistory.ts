@@ -15,7 +15,7 @@ const fetchBookingHistory = async (
 
   try {
     const response = await axios.get<BookingDto[]>(
-      `${API_BASE_URL}/getBookingByCustomerId/${customerId}`
+      `${API_BASE_URL}/previousBooking/${customerId}`
     );
     return response.data;
   } catch (error: unknown) {

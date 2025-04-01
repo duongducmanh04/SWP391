@@ -8,7 +8,6 @@ export const useGetCustomerId = () => {
   if (isLoading) return { customerId: null, isLoading, error };
   if (error) return { customerId: null, isLoading, error };
 
-  // Ép kiểu để đảm bảo so sánh chính xác
   const userAccountId = Number(user?.accountId);
 
   const customer = customers?.find(

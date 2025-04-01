@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { Card, Spin, Alert, Button, message, Modal, Rate } from "antd";
 import { useBookingById } from "../features/booking/hooks/useGetBookingId";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import StatusTag from "../components/TagStatus";
 import { useState, useEffect } from "react";
@@ -9,15 +9,16 @@ import { useGetCustomerId } from "../features/user/hook/useGetCustomerId";
 import { Status } from "../enums/status-booking";
 import { useCancelledBooking } from "../features/booking/hooks/useCancelledBooking";
 import { useCreateRating } from "../features/services/hooks/useCreateRating";
-import axios from "axios";
-import { RatingDto } from "../features/services/dto/rating.dto";
-import { useTherapistById } from "../features/skin_therapist/hooks/useGetTherapistId";
+import { useGetRatingByCustomerId } from "../features/user/hook/useGetRatingByCustomerId";
+import { useTherapists } from "../features/skin_therapist/hooks/useGetTherapist";
+import { TherapistDto } from "../features/skin_therapist/dto/get-therapist.dto";
 
 const CustomerBookingDetail = () => {
   const location = useLocation();
   const { bookingId } = location.state || {};
   const queryClient = useQueryClient();
   const { customerId } = useGetCustomerId();
+  const { data: therapists } = useTherapists();
 
   const validBookingId = bookingId ? Number(bookingId) : 0;
   const validCustomerId = customerId ?? 0;
@@ -27,54 +28,25 @@ const CustomerBookingDetail = () => {
     isLoading,
     isError,
     error,
+    refetch,
   } = useBookingById(String(validBookingId));
 
-  const {
-    data: therapist,
-    isLoading: isTherapistLoading,
-    isError: isTherapistError,
-  } = useTherapistById(String(booking?.skintherapistId));
+  const { data: ratings, isLoading: isLoadingRating } =
+    useGetRatingByCustomerId(validCustomerId);
 
-  const {
-    data: latestRating,
-    isLoading: isLoadingRating,
-    refetch: refetchRating,
-  } = useQuery<RatingDto | null>({
-    queryKey: ["latestRating", validCustomerId, booking?.serviceId],
-    queryFn: async () => {
-      if (!validCustomerId || !booking?.serviceId) return null;
-
-      const response = await axios.get<RatingDto[]>(
-        `https://skincareservicebooking.onrender.com/api/Rating/customer/${validCustomerId}`,
-        { headers: { Accept: "application/json" } }
-      );
-
-      const ratingsForService = response.data.filter(
-        (r) =>
-          r.serviceId === booking.serviceId && r.customerId === validCustomerId
-      );
-
-      if (ratingsForService.length === 0) return null;
-
-      return ratingsForService.sort(
-        (a, b) =>
-          new Date(b.createAt).getTime() - new Date(a.createAt).getTime()
-      )[0];
-    },
-    enabled: !!validCustomerId && !!booking?.serviceId,
-  });
+  const existingRating = ratings?.find(
+    (r) => r.serviceId === booking?.serviceId
+  );
 
   const [rating, setRating] = useState<number>(0);
-  const [hasRated, setHasRated] = useState<boolean>(false);
+  const [feedback, setFeedback] = useState<string>("");
 
   useEffect(() => {
-    if (latestRating) {
-      setHasRated(true);
-    } else {
-      setRating(0);
-      setHasRated(false);
+    if (existingRating) {
+      setRating(existingRating.stars);
+      setFeedback(existingRating.feedback || "");
     }
-  }, [latestRating]);
+  }, [existingRating]);
 
   const { mutate: cancelBooking } = useCancelledBooking();
   const { mutate: createRating } = useCreateRating();
@@ -85,31 +57,60 @@ const CustomerBookingDetail = () => {
       return;
     }
 
-    const newRating: RatingDto = {
-      ratingId: Math.random(),
-      customerId: validCustomerId,
-      stars: rating,
-      serviceId: booking.serviceId,
-      bookingId: validBookingId,
-      createAt: new Date(),
-      customerName: "Unknown",
-      serviceName: booking.serviceName || "Unknown",
-      feedback: "", // ✅ Sửa lỗi kiểu dữ liệu
-    };
-
-    createRating(newRating, {
-      onSuccess: () => {
-        message.success("✅ Đánh giá đã được gửi!");
-
-        queryClient.setQueryData(
-          ["latestRating", validCustomerId, booking.serviceId],
-          newRating
-        );
-        refetchRating();
-        setHasRated(true);
+    createRating(
+      {
+        ratingId: 0,
+        customerId: validCustomerId,
+        stars: rating,
+        feedback: feedback.trim(),
+        serviceId: booking.serviceId,
+        createAt: new Date(),
+        customerName: "",
+        serviceName: booking.serviceName || "",
       },
-      onError: () => {
-        message.error("❌ Lỗi khi gửi đánh giá!");
+      {
+        onSuccess: () => {
+          message.success("Đánh giá thành công");
+          queryClient.invalidateQueries({
+            queryKey: ["ratings", validCustomerId],
+          });
+        },
+        onError: () => {
+          message.error("❌ Lỗi khi gửi đánh giá!");
+        },
+      }
+    );
+  };
+
+  const therapistMap = new Map<number, TherapistDto>();
+  if (therapists) {
+    therapists.forEach((therapist) => {
+      therapistMap.set(therapist.skintherapistId, therapist);
+    });
+  }
+
+  const handleCancelBooking = () => {
+    Modal.confirm({
+      title: "Bạn có chắc chắn muốn hủy đặt lịch?",
+      content: "Hành động này không thể hoàn tác!",
+      okText: "Hủy lịch",
+      cancelText: "Đóng",
+      onOk: () => {
+        cancelBooking(
+          { BookingId: validBookingId },
+          {
+            onSuccess: () => {
+              message.success("Hủy lịch thành công");
+              refetch();
+              queryClient.invalidateQueries({
+                queryKey: ["booking", validBookingId],
+              });
+            },
+            onError: (error) => {
+              message.error(`Lỗi khi hủy lịch: ${error.message}`); // Thông báo lỗi nếu có
+            },
+          }
+        );
       },
     });
   };
@@ -147,46 +148,33 @@ const CustomerBookingDetail = () => {
               <strong>Địa điểm:</strong> {booking.location}
             </p>
             <p>
+              <strong>Nhân viên:</strong>{" "}
+              {therapistMap.get(booking.skintherapistId)?.name}
+            </p>
+            <p>
               <strong>Giá tiền:</strong> {booking.amount.toLocaleString()} VND
             </p>
 
-            <p>
-              <strong>Tên chuyên viên:</strong>{" "}
-              {isTherapistLoading
-                ? "🔄 Đang tải..."
-                : isTherapistError || !therapist
-                ? "Không có thông tin"
-                : therapist.name}
-            </p>
-
             {booking.status === "Booked" && (
-              <Button
-                type="primary"
-                danger
-                onClick={() => {
-                  Modal.confirm({
-                    title: "Bạn có chắc chắn muốn hủy đặt lịch?",
-                    content: "Hành động này không thể hoàn tác!",
-                    okText: "Hủy lịch",
-                    cancelText: "Đóng",
-                    onOk: () => cancelBooking({ BookingId: validBookingId }),
-                  });
-                }}
-              >
+              <Button type="primary" danger onClick={handleCancelBooking}>
                 Hủy Đặt Lịch
               </Button>
             )}
 
-            {booking.status === Status.COMPLETED && !hasRated && (
+            {booking.status === Status.COMPLETED && (
               <div style={{ marginTop: "16px" }}>
                 <p>
-                  <strong>Đánh giá dịch vụ:</strong>
+                  <strong>Đánh giá:</strong>
                 </p>
                 {isLoadingRating ? (
                   <Spin tip="🔄 Đang tải đánh giá..." />
                 ) : (
                   <>
-                    <Rate value={rating} onChange={setRating} />
+                    <Rate
+                      value={rating}
+                      onChange={setRating}
+                      style={{ width: "-webkit-fill-available" }}
+                    />
                     <Button
                       type="primary"
                       onClick={handleRatingSubmit}

@@ -15,6 +15,7 @@ import {
   Empty,
   Tooltip,
   Upload,
+  Switch,
 } from "antd";
 import { useServices } from "../hooks/useGetService";
 import { useServiceStore } from "../hooks/useServiceStore";
@@ -32,6 +33,7 @@ import { ColumnsType } from "antd/es/table";
 import { ServiceDto } from "../dto/get-service.dto";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../../../firebase/firebase";
+import CustomUpdateStatusModal from "../../../components/CustomUpdateStatusModal";
 
 const ServiceTable = () => {
   const { data, isLoading, error, refetch: refetchService } = useServices();
@@ -48,6 +50,8 @@ const ServiceTable = () => {
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
   const [, setUploading] = useState(false);
   const [, setImageAsFile] = useState<File | null>(null);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState<any>(null);
 
   useEffect(() => {
     if (data) {
@@ -173,6 +177,37 @@ const ServiceTable = () => {
       });
   };
 
+  const handleStatusChange = (record: any) => {
+    setSelectedService(record);
+    setIsStatusModalOpen(true);
+  };
+
+  const handleConfirmStatusChange = () => {
+    if (selectedService) {
+      const newStatus =
+        selectedService.status === "Active" ? "Inactive" : "Active";
+      updateService(
+        {
+          serviceId: selectedService.serviceId,
+          data: { ...selectedService, status: newStatus },
+        },
+        {
+          onSuccess: () => {
+            message.success(
+              `Đã ${newStatus === "Active" ? "bật" : "tắt"} dịch vụ thành công`
+            );
+            setIsStatusModalOpen(false);
+            setSelectedService(null);
+            refetchService();
+          },
+          onError: (err: { message: any }) => {
+            message.error(`Lỗi cập nhật trạng thái: ${err.message}`);
+          },
+        }
+      );
+    }
+  };
+
   const handleTableChange = (pagination: any) => {
     setPagination(pagination);
   };
@@ -236,6 +271,17 @@ const ServiceTable = () => {
       key: "procedureDescription",
     },
     {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      render: (_: unknown, record: any) => (
+        <Switch
+          checked={record.status === "Active"}
+          onChange={() => handleStatusChange(record)}
+        />
+      ),
+    },
+    {
       title: "Actions",
       key: "actions",
       render: (_: unknown, record: any) => (
@@ -262,7 +308,7 @@ const ServiceTable = () => {
   }
 
   if (error) {
-    return <div>Error loading users</div>;
+    return <div>Error loading service</div>;
   }
 
   return (
@@ -346,6 +392,9 @@ const ServiceTable = () => {
           >
             <InputNumber min={15} style={{ width: "-webkit-fill-available" }} />
           </Form.Item>
+          <Form.Item name="averageStars" label="Rating">
+            <InputNumber disabled />
+          </Form.Item>
           <Form.Item
             name="image"
             label="Hình ảnh"
@@ -406,6 +455,18 @@ const ServiceTable = () => {
       >
         <p>Bạn có chắc chắn muốn xóa dịch vụ này không?</p>
       </Modal>
+
+      <CustomUpdateStatusModal
+        custom={selectedService?.status === "Active" ? "red" : "blue"}
+        isOpen={isStatusModalOpen}
+        title={`Xác nhận thay đổi trạng thái`}
+        subTitle={[
+          "Bạn có chắc chắn muốn tắt trạng thái sử dụng của dịch vụ này không?",
+        ]}
+        textClose="Hủy"
+        handleClose={() => setIsStatusModalOpen(false)}
+        handleConfirm={handleConfirmStatusChange}
+      />
     </div>
   );
 };

@@ -7,7 +7,7 @@ export const useDeleteSkin = () => {
   return useMutation<void, Error, number>({
     mutationFn: async (skintypeId: number): Promise<void> => {
       await axios.delete(
-        `https://skincareservicebooking.onrender.com/api/skintype/deleteSkintype/${skintypeId}`
+        `https://localhost:7071/api/skintype/deleteSkintype/${skintypeId}`
       );
     },
     onSuccess: () => {

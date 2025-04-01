@@ -64,14 +64,11 @@ export default function CustomUpdateStatusModal(
         <div className="h-[72px] w-[72px]">
           <Image preview={false} src={topIconString} />
         </div>
-        <Typography className="text-black-1 mb-1 mt-4 text-center text-xl font-semibold">
+        <Typography style={{ fontSize: 21, fontWeight: 600, margin: 10 }}>
           {title}
         </Typography>
         {subTitle?.map((subString, index) => (
-          <Typography
-            key={index}
-            className="text-black-1 text-center text-sm font-normal text-opacity-80"
-          >
+          <Typography key={index} style={{ textAlign: "center" }}>
             {subString}
           </Typography>
         ))}
