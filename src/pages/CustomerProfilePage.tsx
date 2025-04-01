@@ -105,7 +105,7 @@ const CustomerProfile = () => {
       setFormData({
         name: customer.name || "",
         email: customer.email || "",
-        phoneNumber: customer.phoneNumber?.toString() || "",
+        phoneNumber: customer.phoneNumber || "",
         image: customer.image || "",
       });
     }

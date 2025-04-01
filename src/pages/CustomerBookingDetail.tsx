@@ -28,6 +28,7 @@ const CustomerBookingDetail = () => {
     isLoading,
     isError,
     error,
+    refetch,
   } = useBookingById(String(validBookingId));
 
   const { data: ratings, isLoading: isLoadingRating } =
@@ -88,6 +89,32 @@ const CustomerBookingDetail = () => {
     });
   }
 
+  const handleCancelBooking = () => {
+    Modal.confirm({
+      title: "Bạn có chắc chắn muốn hủy đặt lịch?",
+      content: "Hành động này không thể hoàn tác!",
+      okText: "Hủy lịch",
+      cancelText: "Đóng",
+      onOk: () => {
+        cancelBooking(
+          { BookingId: validBookingId },
+          {
+            onSuccess: () => {
+              message.success("Hủy lịch thành công");
+              refetch();
+              queryClient.invalidateQueries({
+                queryKey: ["booking", validBookingId],
+              });
+            },
+            onError: (error) => {
+              message.error(`Lỗi khi hủy lịch: ${error.message}`); // Thông báo lỗi nếu có
+            },
+          }
+        );
+      },
+    });
+  };
+
   return (
     <div style={{ padding: "24px", background: "#f5f1eb", minHeight: "100vh" }}>
       <Card
@@ -129,19 +156,7 @@ const CustomerBookingDetail = () => {
             </p>
 
             {booking.status === "Booked" && (
-              <Button
-                type="primary"
-                danger
-                onClick={() => {
-                  Modal.confirm({
-                    title: "Bạn có chắc chắn muốn hủy đặt lịch?",
-                    content: "Hành động này không thể hoàn tác!",
-                    okText: "Hủy lịch",
-                    cancelText: "Đóng",
-                    onOk: () => cancelBooking({ BookingId: validBookingId }),
-                  });
-                }}
-              >
+              <Button type="primary" danger onClick={handleCancelBooking}>
                 Hủy Đặt Lịch
               </Button>
             )}

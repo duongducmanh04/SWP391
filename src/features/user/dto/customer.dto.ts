@@ -3,7 +3,7 @@ export interface CustomerDto {
   name: string;
   skintypeId: number;
   accountId: number;
-  phoneNumber: number;
+  phoneNumber: string;
   image: string;
   email: string;
 }
