@@ -73,7 +73,7 @@ const BookingDetail = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<number | null>(
     null
-  ); // Lưu serviceId thay vì serviceName
+  );
   const [selectedServiceAmount, setSelectedServiceAmount] = useState<number>(0);
   const [note, setNote] = useState<string>(booking?.note || "");
 
@@ -81,30 +81,28 @@ const BookingDetail = () => {
     (service) => service.status === "Active"
   );
 
+  // Chỉ khởi tạo state ban đầu khi component mount lần đầu
+  useEffect(() => {
+    if (booking && activeServiceTherapist && !selectedServiceId && !isEditing) {
+      const currentService = activeServiceTherapist.find(
+        (s: ServiceDto) => s.name === booking.serviceName
+      );
+      setSelectedServiceId(
+        currentService
+          ? currentService.serviceId
+          : activeServiceTherapist?.[0]?.serviceId ?? null
+      );
+      setSelectedServiceAmount(
+        booking.amount || activeServiceTherapist[0]?.price || 0
+      );
+    }
+  }, [booking, activeServiceTherapist, selectedServiceId, isEditing]);
+
   useEffect(() => {
     if (booking?.note !== undefined) {
       setNote(booking.note);
     }
   }, [booking]);
-
-  // useEffect(() => {
-  //   if (booking && serviceTherapist) {
-  //     const currentService = serviceTherapist.find(
-  //       (s: ServiceDto) => s.name === booking.serviceName
-  //     );
-  //     setSelectedServiceId(currentService ? currentService.serviceId : null);
-  //     setSelectedServiceAmount(booking.amount);
-  //   }
-  // }, [booking, serviceTherapist]);
-  useEffect(() => {
-    if (booking && activeServiceTherapist) {
-      const currentService = activeServiceTherapist.find(
-        (s: ServiceDto) => s.name === booking.serviceName
-      );
-      setSelectedServiceId(currentService ? currentService.serviceId : null);
-      setSelectedServiceAmount(booking.amount);
-    }
-  }, [booking, activeServiceTherapist]);
 
   if (isLoading) {
     return <Spin size="large" />;
@@ -192,22 +190,16 @@ const BookingDetail = () => {
     );
   };
 
-  // const handleServiceChange = (serviceId: number) => {
-  //   setSelectedServiceId(serviceId);
-  //   const selected = serviceTherapist?.find(
-  //     (service: ServiceDto) => service.serviceId === serviceId
-  //   );
-  //   if (selected) {
-  //     setSelectedServiceAmount(selected.price);
-  //   }
-  // };
   const handleServiceChange = (serviceId: number) => {
     setSelectedServiceId(serviceId);
-    const selected = activeServiceTherapist?.find(
+    const selectedService = activeServiceTherapist?.find(
       (service: ServiceDto) => service.serviceId === serviceId
     );
-    if (selected) {
-      setSelectedServiceAmount(selected.price);
+    if (selectedService) {
+      setSelectedServiceAmount(selectedService.price);
+    } else {
+      message.warning("Dịch vụ không hợp lệ!");
+      setSelectedServiceAmount(0); // Đặt giá về 0 nếu dịch vụ không hợp lệ
     }
   };
 
@@ -235,13 +227,18 @@ const BookingDetail = () => {
     try {
       await new Promise((resolve, reject) => {
         updateServiceName(
-          { bookingId: booking.bookingId, serviceId: selectedServiceId }, // Truyền serviceId thay vì serviceName
+          { bookingId: booking.bookingId, serviceId: selectedServiceId },
           {
             onSuccess: () => {
               message.success("Cập nhật dịch vụ thành công");
               resolve(null);
             },
-            onError: reject,
+            onError: (error) => {
+              message.error(
+                "Lỗi cập nhật dịch vụ: " + (error as Error).message
+              );
+              reject(error);
+            },
           }
         );
       });
@@ -254,7 +251,10 @@ const BookingDetail = () => {
               message.success("Cập nhật giá thành công");
               resolve(null);
             },
-            onError: reject,
+            onError: (error) => {
+              message.error("Lỗi cập nhật giá: " + (error as Error).message);
+              reject(error);
+            },
           }
         );
       });
@@ -262,7 +262,7 @@ const BookingDetail = () => {
       await refetch();
       setIsEditing(false);
     } catch {
-      message.error("Có lỗi xảy ra khi cập nhật!");
+      message.error("Có lỗi xảy ra khi cập nhật dịch vụ!");
     }
   };
 
@@ -270,7 +270,9 @@ const BookingDetail = () => {
     {
       key: "1",
       name: "Tên dịch vụ",
-      value: booking.serviceName,
+      value:
+        activeServiceTherapist?.find((s) => s.serviceId === selectedServiceId)
+          ?.name || booking.serviceName,
       editable: true,
     },
     {
@@ -300,35 +302,31 @@ const BookingDetail = () => {
       title: "Giá trị",
       dataIndex: "value",
       key: "value",
-      render: (text: string, record: any) => {
+      render: (text: string | number, record: any) => {
         if (isEditing && record.key === "1") {
           return (
             <Select
               style={{ width: "100%" }}
-              value={selectedServiceId} // Hiển thị serviceId trong Select
+              value={selectedServiceId}
               onChange={handleServiceChange}
               placeholder="Chọn dịch vụ"
+              disabled={
+                !activeServiceTherapist || activeServiceTherapist.length === 0
+              }
+              showSearch
             >
-              {/* {serviceTherapist?.map((service: ServiceDto) => (
-                <Select.Option
-                  key={service.serviceId}
-                  value={service.serviceId}
-                >
-                  {service.name}
-                </Select.Option>
-              ))} */}
               {activeServiceTherapist?.map((service: ServiceDto) => (
                 <Select.Option
                   key={service.serviceId}
                   value={service.serviceId}
                 >
-                  {service.name}
+                  {service.name} (Giá: {service.price})
                 </Select.Option>
-              ))}
+              )) || []}
             </Select>
           );
         }
-        return text;
+        return typeof text === "number" ? text.toString() : text;
       },
     },
     {
@@ -349,7 +347,17 @@ const BookingDetail = () => {
               </Button>
               <Button
                 icon={<CloseOutlined />}
-                onClick={() => setIsEditing(false)}
+                onClick={() => {
+                  setIsEditing(false);
+                  // Reset về giá trị ban đầu khi hủy
+                  const currentService = activeServiceTherapist?.find(
+                    (s: ServiceDto) => s.name === booking.serviceName
+                  );
+                  setSelectedServiceId(
+                    currentService ? currentService.serviceId : null
+                  );
+                  setSelectedServiceAmount(booking.amount || 0);
+                }}
                 style={{ width: "100%" }}
               >
                 Hủy
@@ -364,8 +372,11 @@ const BookingDetail = () => {
                   (s: ServiceDto) => s.name === booking.serviceName
                 );
                 setSelectedServiceId(
-                  currentService ? currentService.serviceId : null
+                  currentService
+                    ? currentService.serviceId
+                    : activeServiceTherapist?.[0]?.serviceId ?? null
                 );
+                setSelectedServiceAmount(booking.amount || 0);
                 setIsEditing(true);
               }}
             >
