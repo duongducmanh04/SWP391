@@ -237,6 +237,7 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.SLOT_MANAGEMENT,
         PagePath.BOOKING_DETAIL,
         PagePath.SCHEDULE_FOR_STAFF_MANAGEMENT,
+        PagePath.THERAPIST_MANAGEMENT,
       ],
       Skintherapist: [
         PagePath.HOME,
@@ -260,6 +261,7 @@ export function AuthGuardProvider(props: AuthGuardProviderProps) {
         PagePath.BOOKING_INFO_CONFIRM,
         PagePath.COMPLETE_RESULT,
         PagePath.CUSTOMER_BOOKING_DETAIL,
+        PagePath.CREATE_BLOG,
       ],
       Manager: [],
     };

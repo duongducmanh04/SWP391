@@ -87,6 +87,7 @@ import {
   Divider,
   Spin,
   Tag,
+  Rate,
 } from "antd";
 import { DollarOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -163,7 +164,7 @@ const ServiceDetail = () => {
             <Divider />
             <div style={{ marginBottom: 16 }}>
               <DollarOutlined style={{ color: "#52c41a", marginRight: 8 }} />
-              <Text strong>Giá:</Text> {service.price} VND
+              <Text strong>Giá:</Text> {service.price.toLocaleString()} VND
             </div>
             <div style={{ marginBottom: 16 }}>
               <ClockCircleOutlined
@@ -179,6 +180,11 @@ const ServiceDetail = () => {
                 .filter(Boolean)
                 .join(", ")}
             </Text>
+            <div style={{ marginTop: "10px" }}>
+              <Text strong>Đánh giá: </Text>
+              <Rate disabled allowHalf value={service.averageStars} />
+              <Text style={{ marginLeft: 8 }}>({service.averageStars})</Text>
+            </div>
             <Divider />
             <Title level={4} style={{ marginBottom: 12 }}>
               Quy trình dịch vụ

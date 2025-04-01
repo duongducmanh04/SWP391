@@ -26,7 +26,6 @@ import { useEffect, useState } from "react";
 import { CloseOutlined, EditOutlined, SaveOutlined } from "@ant-design/icons";
 import { useUpdateServiceName } from "../hooks/useUpdateService";
 import { useUpdateServiceAmount } from "../hooks/useUpdateServiceAmount";
-import { useServices } from "../../services/hooks/useGetService";
 import { useTherapists } from "../../skin_therapist/hooks/useGetTherapist";
 import { TherapistDto } from "../../skin_therapist/dto/get-therapist.dto";
 import { useCustomers } from "../../user/hook/useGetCustomer";
@@ -37,15 +36,14 @@ import { Status } from "../../../enums/status-booking";
 import TextArea from "antd/es/input/TextArea";
 import { PagePath } from "../../../enums/page-path.enum";
 import { useUpdateNote } from "../hooks/useUpdateNoteBooking";
-// import { useUpdateTherapist } from "../hooks/useUpdateTherapist";
 import { useSlots } from "../../services/hooks/useGetSlot";
 import { SlotDto } from "../../services/dto/slot.dto";
 import { useGetServiceByTherapistId } from "../../services/hooks/useGetServiceByTherapistId";
 import { ServiceDto } from "../../services/dto/get-service.dto";
+
 const { Title } = Typography;
 
 const BookingDetail = () => {
-  // const { bookingId } = useParams();
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -61,25 +59,27 @@ const BookingDetail = () => {
     isError,
     refetch,
   } = useBookingById(bookingId || "");
-  const { data: service } = useServices();
   const { data: therapists } = useTherapists();
   const { data: customers } = useCustomers();
   const { data: slots } = useSlots();
-
   const { data: serviceTherapist } = useGetServiceByTherapistId(
     booking?.skintherapistId || 0
   );
 
   const { mutate: updateServiceName } = useUpdateServiceName();
   const { mutate: updateServiceAmount } = useUpdateServiceAmount();
-  // const { mutate: updateTherapist } = useUpdateTherapist();
   const { mutate: updateNote, isPending: isUpdatingNote } = useUpdateNote();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedService, setSelectedService] = useState<string>("");
-  // const [selectedTherapist, setSelectedTherapist] = useState<number>(0);
+  const [selectedServiceId, setSelectedServiceId] = useState<number | null>(
+    null
+  ); // Lưu serviceId thay vì serviceName
   const [selectedServiceAmount, setSelectedServiceAmount] = useState<number>(0);
   const [note, setNote] = useState<string>(booking?.note || "");
+
+  const activeServiceTherapist = serviceTherapist?.filter(
+    (service) => service.status === "Active"
+  );
 
   useEffect(() => {
     if (booking?.note !== undefined) {
@@ -87,13 +87,24 @@ const BookingDetail = () => {
     }
   }, [booking]);
 
+  // useEffect(() => {
+  //   if (booking && serviceTherapist) {
+  //     const currentService = serviceTherapist.find(
+  //       (s: ServiceDto) => s.name === booking.serviceName
+  //     );
+  //     setSelectedServiceId(currentService ? currentService.serviceId : null);
+  //     setSelectedServiceAmount(booking.amount);
+  //   }
+  // }, [booking, serviceTherapist]);
   useEffect(() => {
-    if (booking) {
-      setSelectedService(booking.serviceName);
+    if (booking && activeServiceTherapist) {
+      const currentService = activeServiceTherapist.find(
+        (s: ServiceDto) => s.name === booking.serviceName
+      );
+      setSelectedServiceId(currentService ? currentService.serviceId : null);
       setSelectedServiceAmount(booking.amount);
-      // setSelectedTherapist(booking.skintherapistId);
     }
-  }, [booking]);
+  }, [booking, activeServiceTherapist]);
 
   if (isLoading) {
     return <Spin size="large" />;
@@ -181,9 +192,20 @@ const BookingDetail = () => {
     );
   };
 
-  const handleServiceChange = (value: string) => {
-    setSelectedService(value);
-    const selected = service?.find((service) => service.name === value);
+  // const handleServiceChange = (serviceId: number) => {
+  //   setSelectedServiceId(serviceId);
+  //   const selected = serviceTherapist?.find(
+  //     (service: ServiceDto) => service.serviceId === serviceId
+  //   );
+  //   if (selected) {
+  //     setSelectedServiceAmount(selected.price);
+  //   }
+  // };
+  const handleServiceChange = (serviceId: number) => {
+    setSelectedServiceId(serviceId);
+    const selected = activeServiceTherapist?.find(
+      (service: ServiceDto) => service.serviceId === serviceId
+    );
     if (selected) {
       setSelectedServiceAmount(selected.price);
     }
@@ -205,7 +227,7 @@ const BookingDetail = () => {
   };
 
   const handleUpdateService = async () => {
-    if (!selectedService) {
+    if (!selectedServiceId) {
       message.warning("Vui lòng chọn một dịch vụ!");
       return;
     }
@@ -213,10 +235,10 @@ const BookingDetail = () => {
     try {
       await new Promise((resolve, reject) => {
         updateServiceName(
-          { bookingId: booking.bookingId, serviceName: selectedService },
+          { bookingId: booking.bookingId, serviceId: selectedServiceId }, // Truyền serviceId thay vì serviceName
           {
             onSuccess: () => {
-              message.success("Cập nhật tên dịch vụ thành công");
+              message.success("Cập nhật dịch vụ thành công");
               resolve(null);
             },
             onError: reject,
@@ -236,19 +258,6 @@ const BookingDetail = () => {
           }
         );
       });
-
-      // await new Promise((resolve, reject) => {
-      //   updateTherapist(
-      //     { bookingId: booking.bookingId, skintherapistId: selectedTherapist },
-      //     {
-      //       onSuccess: () => {
-      //         message.success("Cập nhật chuyên viên thành công");
-      //         resolve(null);
-      //       },
-      //       onError: reject,
-      //     }
-      //   );
-      // });
 
       await refetch();
       setIsEditing(false);
@@ -292,49 +301,32 @@ const BookingDetail = () => {
       dataIndex: "value",
       key: "value",
       render: (text: string, record: any) => {
-        if (isEditing) {
-          if (record.key === "1") {
-            return (
-              <Select
-                style={{ width: "100%" }}
-                value={selectedService}
-                onChange={handleServiceChange}
-              >
-                {/* {service?.map((service: any) => (
-                  <Select.Option key={service.serviceId} value={service.name}>
-                    {service.name}
-                  </Select.Option>
-                ))} */}
-                {serviceTherapist?.map((service: ServiceDto) => (
-                  <Select.Option key={service.serviceId} value={service.name}>
-                    {service.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            );
-          }
-          // if (record.key === "3") {
-          //   return (
-          //     <Select
-          //       style={{ width: "100%" }}
-          //       value={
-          //         (therapists?.find(
-          //           (t) => t.skintherapistId === selectedTherapist
-          //         )?.name as unknown as number) ?? selectedTherapist
-          //       }
-          //       onChange={handleTherapistChange}
-          //     >
-          //       {therapists?.map((therapist: any) => (
-          //         <Select.Option
-          //           key={therapist.skintherapistId}
-          //           value={therapist.therapistId}
-          //         >
-          //           {therapist.name}
-          //         </Select.Option>
-          //       ))}
-          //     </Select>
-          //   );
-          // }
+        if (isEditing && record.key === "1") {
+          return (
+            <Select
+              style={{ width: "100%" }}
+              value={selectedServiceId} // Hiển thị serviceId trong Select
+              onChange={handleServiceChange}
+              placeholder="Chọn dịch vụ"
+            >
+              {/* {serviceTherapist?.map((service: ServiceDto) => (
+                <Select.Option
+                  key={service.serviceId}
+                  value={service.serviceId}
+                >
+                  {service.name}
+                </Select.Option>
+              ))} */}
+              {activeServiceTherapist?.map((service: ServiceDto) => (
+                <Select.Option
+                  key={service.serviceId}
+                  value={service.serviceId}
+                >
+                  {service.name}
+                </Select.Option>
+              ))}
+            </Select>
+          );
         }
         return text;
       },
@@ -368,8 +360,12 @@ const BookingDetail = () => {
               type="primary"
               icon={<EditOutlined />}
               onClick={() => {
-                setSelectedService(booking.serviceName);
-                // setSelectedTherapist(booking.skintherapistId);
+                const currentService = activeServiceTherapist?.find(
+                  (s: ServiceDto) => s.name === booking.serviceName
+                );
+                setSelectedServiceId(
+                  currentService ? currentService.serviceId : null
+                );
                 setIsEditing(true);
               }}
             >
@@ -434,13 +430,8 @@ const BookingDetail = () => {
               onDenied={handleDenied}
               onFinished={handleFinished}
             />
-            {/* <h4 style={{ marginTop: 20 }}>Lịch sử trạng thái</h4>
-            <p>
-              🟢 {dayjs(booking.updateAt).format("DD/MM/YYYY HH:mm:ss")} -{" "}
-              {booking.status}
-            </p> */}
           </Card>
-          {user?.role == RoleCode.THERAPIST &&
+          {user?.role === RoleCode.THERAPIST &&
             booking?.status === Status.CHECK_IN && (
               <Card style={{ marginTop: "10px" }}>
                 <Title level={4}>Ghi chú</Title>
@@ -448,9 +439,7 @@ const BookingDetail = () => {
                   rows={4}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                >
-                  {booking.note}
-                </TextArea>
+                />
                 <Button
                   type="primary"
                   onClick={handleUpdateNote}
@@ -463,7 +452,7 @@ const BookingDetail = () => {
             )}
         </Col>
       </Row>
-      {booking?.status === Status.BOOKED && user?.role == RoleCode.STAFF && (
+      {booking?.status === Status.BOOKED && user?.role === RoleCode.STAFF && (
         <Card
           title="Chi tiết dịch vụ"
           style={{ marginBottom: 16, marginTop: 16 }}
