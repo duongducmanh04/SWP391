@@ -1,111 +1,47 @@
-/* Container tổng */
-.container {
-  padding: 80px 10%;
-  background: #f1ebe4; /* Màu be nhẹ nhàng */
-  text-align: center;
+/* Bọc bảng trong container để kiểm soát kích thước */
+.service-table-container {
+  max-width: 1000px; /* Làm bảng to hơn */
+  margin: 30px auto;
+  /* background: #ffffff; */
   border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-/* Tiêu đề chính */
-.heading {
-  font-size: 32px;
-  font-weight: bold;
-  color: #3a5a40; /* Màu xanh rêu nhẹ */
-  margin-bottom: 20px;
-}
-
-/* Phần mô tả dưới tiêu đề */
-.subheading {
-  font-size: 18px;
-  color: #6b705c; /* Xanh nhạt */
-  margin-bottom: 40px;
-}
-
-/* Thẻ dịch vụ */
-.card {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-  background: white;
   padding: 20px;
+  /* box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15); */
+  overflow: hidden;
 }
 
-.card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Thẻ nổi bật */
-.popular {
-  border: 2px solid #ffd700; /* Viền vàng nhẹ */
-  background: #fff9e6; /* Màu vàng nhạt */
-}
-
-/* Header của card */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-/* Tag "Phổ Biến" */
-.popularTag {
+/* Đảm bảo tiêu đề bảng có màu trắng */
+.service-table-container .ant-table-thead > tr > th {
+  background: #d2691e !important;
+  color: white !important;
+  text-align: center !important;
   font-weight: bold;
-  color: #d48806; /* Màu vàng cam */
-  background: #fff3cd; /* Màu nền nhẹ */
-  padding: 3px 8px;
-  border-radius: 4px;
+  border-bottom: 2px solid white;
+  padding: 14px;
+  white-space: nowrap;
+  font-size: 18px;
 }
 
-/* Giá dịch vụ */
-.price {
-  color: #a7c957; /* Màu xanh thiên nhiên */
-  font-weight: bold;
-  font-size: 22px;
-  margin: 20px 0;
+/* Đảm bảo header không bị mờ */
+.service-table-container .ant-table-thead {
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-/* Danh sách tính năng */
-.features {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0;
-}
-
-.featureItem {
-  margin-bottom: 8px;
+/* Hàng trong bảng */
+.service-table-container .ant-table-tbody > tr > td {
+  text-align: center;
+  padding: 12px;
   font-size: 16px;
-  color: #555;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-/* Biểu tượng tích xanh */
-.featureItem::before {
-  content: "✅";
-  margin-right: 8px;
+/* Hiệu ứng hover nhẹ nhàng hơn */
+.service-table-container .ant-table-tbody > tr:hover {
+  background: #f0f8ff;
+  transition: background 0.2s ease;
 }
 
-/* Nút đặt dịch vụ */
-.button {
-  width: 100%;
-  padding: 12px 24px;
-  font-size: 16px;
+/* Giữ nguyên kích thước chữ trên header */
+.service-table-container .ant-table-thead > tr > th span {
+  font-size: 18px;
   font-weight: bold;
-  border-radius: 8px;
-  background: #a7c957;
-  color: white;
-  border: none;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
-  cursor: pointer;
-}
-
-.button:hover {
-  background: #8aa851;
-  transform: translateY(-2px);
 }

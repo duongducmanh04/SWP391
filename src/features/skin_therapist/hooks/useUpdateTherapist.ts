@@ -1,27 +1,27 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { ServiceDto } from "../dto/get-service.dto";
+import { TherapistDto } from "../dto/get-therapist.dto";
 
 interface MutationVariables {
-  serviceId: string;
-  data: ServiceDto;
+  skintherapistId: string;
+  data: TherapistDto;
 }
 
-export const useUpdateService = () => {
+export const useUpdateTherapist = () => {
   const queryClient = useQueryClient();
 
   return useMutation<void, Error, MutationVariables>({
     mutationFn: async ({
-      serviceId,
+      skintherapistId,
       data,
     }: MutationVariables): Promise<void> => {
       await axios.put(
-        `https://localhost:7071/api/service/updateService/${serviceId}`,
+        `https://localhost:7071/api/skintherapist/updateSkintherapist/${skintherapistId}`,
         data
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["update"] });
+      queryClient.invalidateQueries({ queryKey: ["updateSkintherapist"] });
     },
   });
 };

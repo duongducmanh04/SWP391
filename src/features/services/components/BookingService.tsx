@@ -207,7 +207,7 @@ const SkincareBooking = () => {
       <Title
         level={2}
         style={{
-          color: "#3A5A40",
+          color: "#321414",
           fontSize: "32px",
           fontWeight: "bold",
           marginBottom: "40px",
@@ -292,7 +292,7 @@ const SkincareBooking = () => {
                           <Col span={24} style={{ textAlign: "center" }}>
                             <Title
                               level={4}
-                              style={{ marginTop: "10px", color: "#3A5A40" }}
+                              style={{ marginTop: "10px", color: "#321414" }}
                             >
                               {expert.name}
                             </Title>
@@ -331,14 +331,14 @@ const SkincareBooking = () => {
                                   backgroundColor:
                                     selectedExpert === expert.skintherapistId &&
                                     selectedTime === time
-                                      ? "#A7C957"
+                                      ? "#8b4513"
                                       : "white",
                                   color:
                                     selectedExpert === expert.skintherapistId &&
                                     selectedTime === time
                                       ? "white"
-                                      : "#3A5A40",
-                                  border: "1px solid #A7C957",
+                                      : "#321414",
+                                  border: "1px solid #8b4513",
                                   cursor: "pointer",
                                 }}
                               >
@@ -379,19 +379,13 @@ const SkincareBooking = () => {
                     icon={<CheckCircleOutlined />}
                     onClick={handleConfirmBooking}
                     style={{
-                      backgroundColor: "#A7C957",
+                      backgroundColor: "#8b4513",
                       border: "none",
                       fontSize: "16px",
                       padding: "12px 24px",
                       borderRadius: "8px",
                       transition: "all 0.3s ease-in-out",
                     }}
-                    onMouseOver={(e) =>
-                      (e.currentTarget.style.backgroundColor = "#8AA851")
-                    }
-                    onMouseOut={(e) =>
-                      (e.currentTarget.style.backgroundColor = "#A7C957")
-                    }
                   >
                     Xác nhận
                   </Button>
@@ -403,7 +397,7 @@ const SkincareBooking = () => {
       </Row>
       <Modal
         title={
-          <Title level={3} style={{ margin: 0, color: "#3A5A40" }}>
+          <Title level={3} style={{ margin: 0, color: "#321414" }}>
             Thông Tin Chuyên Viên
           </Title>
         }
@@ -421,7 +415,7 @@ const SkincareBooking = () => {
               icon={!selectedTherapist.image && <UserOutlined />}
               style={{ marginBottom: "15px" }}
             />
-            <Title level={4} style={{ color: "#3A5A40" }}>
+            <Title level={4} style={{ color: "#321414" }}>
               {selectedTherapist.name}
             </Title>
 
@@ -438,19 +432,19 @@ const SkincareBooking = () => {
                 >
                   <p>
                     <MailOutlined
-                      style={{ marginRight: "8px", color: "#3A5A40" }}
+                      style={{ marginRight: "8px", color: "#321414" }}
                     />{" "}
                     <strong>Email:</strong> {selectedTherapist.email}
                   </p>
                   <p>
                     <SolutionOutlined
-                      style={{ marginRight: "8px", color: "#3A5A40" }}
+                      style={{ marginRight: "8px", color: "#321414" }}
                     />{" "}
                     <strong>Kinh nghiệm:</strong> {selectedTherapist.experience}
                   </p>
                   <p>
                     <ReadOutlined
-                      style={{ marginRight: "8px", color: "#3A5A40" }}
+                      style={{ marginRight: "8px", color: "#321414" }}
                     />{" "}
                     <strong>Bằng cấp:</strong> {selectedTherapist.degree}
                   </p>

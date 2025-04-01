@@ -3,9 +3,13 @@ import axios from "axios";
 import { SubmitQuizDto, SubmitQuizResponse } from "../dto/submit-survey.dto";
 
 const submitQuiz = async (data: SubmitQuizDto): Promise<SubmitQuizResponse> => {
-  const response = await axios.post("https://localhost:7071/submit", data, {
-    headers: { "Content-Type": "application/json" },
-  });
+  const response = await axios.post(
+    "https://localhost:7071/submitSurvey",
+    data,
+    {
+      headers: { "Content-Type": "application/json" },
+    }
+  );
 
   return response.data;
 };

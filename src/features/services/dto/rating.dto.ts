@@ -6,4 +6,5 @@ export interface RatingDto {
   serviceId: number;
   customerName: string;
   serviceName: string;
+  feedback: string;
 }
