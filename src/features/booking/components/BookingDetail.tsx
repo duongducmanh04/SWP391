@@ -258,14 +258,14 @@ const BookingDetail = () => {
 
   const handleUpdateNote = () => {
     updateNote(
-      { bookingId: booking.bookingId, note },
+      { bookingId: booking.bookingId, note: "BILL_UPLOADED" },
       {
         onSuccess: () => {
-          message.success("Cập nhật ghi chú thành công!");
-          refetch();
+          message.success("Đã upload bill thành công");
+          refetch(); // để load lại booking.note
         },
         onError: () => {
-          message.error("Không thể cập nhật ghi chú!");
+          message.error("Không thể upload bill");
         },
       }
     );
@@ -511,51 +511,69 @@ const BookingDetail = () => {
                 now.isAfter(checkInStart) && now.isBefore(checkInEnd);
               const isStaff = user?.role === RoleCode.STAFF;
 
-              console.log("✅ bookingDateTime:", bookingDateTime.format());
-              console.log("🕐 now:", now.format());
-              console.log("🚪 checkInStart:", checkInStart.format());
-              console.log("🚪 checkInEnd:", checkInEnd.format());
-              console.log("🔍 isInCheckInWindow:", isInCheckInWindow);
-              console.log("👤 isStaff:", isStaff);
-              console.log("📦 slot:", slot);
-
-              if (!isStaff || !isInCheckInWindow) {
-                console.log("❌ Không hiển thị nút vì không đủ điều kiện");
-                return null;
+              // ✅ Nếu đã Hoàn tất nhưng chưa upload bill → hiện nút upload
+              if (
+                isStaff &&
+                booking.status === Status.FINISHED &&
+                booking.note !== "BILL_UPLOADED"
+              ) {
+                return (
+                  <Button
+                    type="primary"
+                    danger
+                    loading={isUpdatingNote}
+                    onClick={handleUpdateNote}
+                  >
+                    Upload Bill
+                  </Button>
+                );
               }
 
-              return (
-                <ActionButtons
-                  status={booking.status}
-                  bookingId={booking.bookingId}
-                  onCheckIn={handleCheckIn}
-                  onCancelled={handleCancelled}
-                  onCompleted={handleCompleted}
-                  onDenied={handleDenied}
-                  onFinished={handleFinished}
-                />
-              );
+              // ✅ Nếu đã upload bill → hiện các action như check-out
+              if (
+                isStaff &&
+                booking.status === Status.FINISHED &&
+                booking.note === "BILL_UPLOADED"
+              ) {
+                return (
+                  <ActionButtons
+                    status={booking.status}
+                    bookingId={booking.bookingId}
+                    onCheckIn={handleCheckIn}
+                    // onCancelled={handleCancelled}
+                    onCompleted={handleCompleted}
+                    onDenied={handleDenied}
+                    onFinished={handleFinished}
+                  />
+                );
+              }
+
+              // ✅ Trong thời gian check-in (booking chưa done)
+              if (
+                isStaff &&
+                isInCheckInWindow &&
+                booking.status === Status.BOOKED
+              ) {
+                return (
+                  <ActionButtons
+                    status={booking.status}
+                    bookingId={booking.bookingId}
+                    onCheckIn={handleCheckIn}
+                    onCancelled={handleCancelled}
+                    onCompleted={handleCompleted}
+                    onDenied={handleDenied}
+                    onFinished={handleFinished}
+                  />
+                );
+              }
+
+              return null;
             })()}
           </Card>
 
           {user?.role === RoleCode.THERAPIST &&
             booking?.status === Status.CHECK_IN && (
               <Card style={{ marginTop: "10px" }}>
-                <Title level={4}>Ghi chú</Title>
-                <TextArea
-                  rows={4}
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                />
-                <Button
-                  type="primary"
-                  onClick={handleUpdateNote}
-                  loading={isUpdatingNote}
-                  style={{ marginTop: "10px", marginRight: "8px" }}
-                >
-                  Lưu ghi chú
-                </Button>
-
                 <Button
                   type="primary"
                   danger
