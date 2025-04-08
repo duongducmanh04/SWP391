@@ -9,7 +9,9 @@ export const useDeniedBooking = () => {
 
   return useMutation<void, Error, MutationVariables>({
     mutationFn: async ({ BookingId }: MutationVariables): Promise<void> => {
-      await axios.put(`https://localhost:7071/api/Booking/denied/${BookingId}`);
+      await axios.put(
+        `https://skincareservicebooking.onrender.com/api/Booking/denied/${BookingId}`
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["denied"] });

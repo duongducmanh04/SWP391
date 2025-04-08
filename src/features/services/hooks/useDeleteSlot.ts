@@ -7,7 +7,7 @@ export const useDeleteSlot = () => {
   return useMutation<void, Error, number>({
     mutationFn: async (slotId: number): Promise<void> => {
       await axios.delete(
-        `https://localhost:7071/api/slot/deleteSlot/${slotId}`
+        `https://skincareservicebooking.onrender.com/api/slot/deleteSlot/${slotId}`
       );
     },
     onSuccess: () => {

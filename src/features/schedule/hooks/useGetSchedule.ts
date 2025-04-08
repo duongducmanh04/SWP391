@@ -4,7 +4,7 @@ import { ScheduleDto } from "../dto/schedule.dto";
 
 const fetchSchedule = async (): Promise<ScheduleDto[]> => {
   const response = await axios.get<ScheduleDto[]>(
-    "https://localhost:7071/api/Schedule/getAll"
+    "https://skincareservicebooking.onrender.com/api/Schedule/getAll"
   );
   return response.data;
 };

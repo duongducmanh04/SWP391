@@ -10,7 +10,7 @@ export const useDeleteQuizAnswer = () => {
   return useMutation<{ message: string }, Error, number>({
     mutationFn: async (id: number) => {
       const response = await axios.delete<{ message: string }>(
-        `https://localhost:7071/api/QuizAnswer/${id}`
+        `https://skincareservicebooking.onrender.com/api/QuizAnswer/${id}`
       );
       return response.data;
     },

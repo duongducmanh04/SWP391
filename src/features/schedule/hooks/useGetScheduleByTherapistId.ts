@@ -7,7 +7,7 @@ export const useGetScheduleByTherapistId = (skintherapistId: number) => {
     queryKey: ["search-by-skintherapist", skintherapistId],
     queryFn: async () => {
       const response = await axios.get<ScheduleDto>(
-        `https://localhost:7071/search-by-skintherapist/${skintherapistId}`
+        `https://skincareservicebooking.onrender.com/search-by-skintherapist/${skintherapistId}`
       );
       return response.data;
     },

@@ -16,7 +16,7 @@ export const useUpdateQuizAnswer = () => {
       data,
     }: MutationVariables): Promise<void> => {
       await axios.put(
-        `https://localhost:7071/api/QuizAnswer/${answerId}`,
+        `https://skincareservicebooking.onrender.com/api/QuizAnswer/${answerId}`,
         data
       );
     },

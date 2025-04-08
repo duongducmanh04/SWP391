@@ -12,7 +12,10 @@ export const useUpdateBlog = () => {
 
   return useMutation<void, Error, MutationVariables>({
     mutationFn: async ({ blogId, data }: MutationVariables): Promise<void> => {
-      await axios.put(`https://localhost:7071/updateBlog/${blogId}`, data);
+      await axios.put(
+        `https://skincareservicebooking.onrender.com/updateBlog/${blogId}`,
+        data
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["update"] });

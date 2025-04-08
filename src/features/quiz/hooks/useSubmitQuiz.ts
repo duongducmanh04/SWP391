@@ -4,7 +4,7 @@ import { SubmitQuizDto, SubmitQuizResponse } from "../dto/submit-survey.dto";
 
 const submitQuiz = async (data: SubmitQuizDto): Promise<SubmitQuizResponse> => {
   const response = await axios.post(
-    "https://localhost:7071/submitSurvey",
+    "https://skincareservicebooking.onrender.com/submitSurvey",
     data,
     {
       headers: { "Content-Type": "application/json" },

@@ -15,7 +15,7 @@ export const useUpdateTherapist = () => {
       skintherapistId,
     }: MutationVariables): Promise<void> => {
       await axios.put(
-        `https://localhost:7071/api/Booking/skintherapist/${bookingId}?skintherapistId=${skintherapistId}`
+        `https://skincareservicebooking.onrender.com/api/Booking/skintherapist/${bookingId}?skintherapistId=${skintherapistId}`
       );
     },
     onSuccess: () => {

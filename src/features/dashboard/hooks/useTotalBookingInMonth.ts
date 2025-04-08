@@ -6,7 +6,7 @@ const fetchTotalBookingsInMonth = async (): Promise<number> => {
   const month = new Date().getMonth() + 1;
 
   const response = await axios.get<number>(
-    `https://localhost:7071/getTotalBookingsInMonth/${year}/${month}`
+    `https://skincareservicebooking.onrender.com/getTotalBookingsInMonth/${year}/${month}`
   );
   return response.data;
 };

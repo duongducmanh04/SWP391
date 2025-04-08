@@ -12,7 +12,7 @@ export const useUpdateNote = () => {
   return useMutation({
     mutationFn: async ({ bookingId, note }: MutationVariables) => {
       await axios.put(
-        `https://localhost:7071/api/Booking/note/${bookingId}?note=${note}`
+        `https://skincareservicebooking.onrender.com/api/Booking/note/${bookingId}?note=${note}`
       );
     },
     onSuccess: () => {

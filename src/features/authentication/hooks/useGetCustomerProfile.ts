@@ -8,7 +8,7 @@ export const useGetCustomerProfile = (accountId?: number, role?: string) => {
     queryFn: async () => {
       if (!accountId || !role) throw new Error("Thiếu thông tin đăng nhập");
       const response = await axios.get<CustomerProfileDto[]>(
-        `https://localhost:7071/getAccountByIdAndRole/${accountId}/${role}`
+        `https://skincareservicebooking.onrender.com/getAccountByIdAndRole/${accountId}/${role}`
       );
       return response.data;
     },

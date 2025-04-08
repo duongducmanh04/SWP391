@@ -16,7 +16,7 @@ export const useUpdateSkin = () => {
       data,
     }: MutationVariables): Promise<void> => {
       await axios.put(
-        `https://localhost:7071/api/skintype/updateSkintype/${skintypeId}`,
+        `https://skincareservicebooking.onrender.com/api/skintype/updateSkintype/${skintypeId}`,
         data
       );
     },

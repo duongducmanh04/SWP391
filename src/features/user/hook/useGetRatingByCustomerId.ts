@@ -8,7 +8,7 @@ export const useGetRatingByCustomerId = (customerId?: number) => {
     queryFn: async () => {
       if (!customerId) return [];
       const response = await axios.get(
-        `https://localhost:7071/api/Rating/customer/${customerId}`
+        `https://skincareservicebooking.onrender.com/api/Rating/customer/${customerId}`
       );
       return response.data;
     },

@@ -14,7 +14,7 @@ interface GetSurveyByIdResponse {
 const getSurveyById = async (id: number): Promise<GetSurveyByIdResponse> => {
   try {
     const response = await axios.get(
-      `https://localhost:7071/getSurveyById/${id}`,
+      `https://skincareservicebooking.onrender.com/getSurveyById/${id}`,
       {
         headers: { Accept: "application/json" },
       }

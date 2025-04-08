@@ -8,7 +8,7 @@ const fetchMonthlyBookingRevenue = async (): Promise<
   const year = new Date().getFullYear();
 
   const response = await axios.get<MonthlyBookingRevenue[]>(
-    `https://localhost:7071/getMonthlyBookingRevenue/${year}`
+    `https://skincareservicebooking.onrender.com/getMonthlyBookingRevenue/${year}`
   );
   return response.data;
 };

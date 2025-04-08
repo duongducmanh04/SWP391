@@ -8,7 +8,7 @@ const fetchServiceBySkinTherapistId = async (
   if (!skintherapistId) throw new Error("SkinTherapistId is needed");
 
   const response = await axios.get<ServiceDto[]>(
-    `https://localhost:7071/api/service/getServiceBySkintherapistId/${skintherapistId}`
+    `https://skincareservicebooking.onrender.com/api/service/getServiceBySkintherapistId/${skintherapistId}`
   );
   return response.data;
 };

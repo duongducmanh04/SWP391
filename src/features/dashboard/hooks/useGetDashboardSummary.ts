@@ -4,7 +4,7 @@ import { DashboardDto } from "../dto/dashboard.dto";
 
 const fetchDashboardSummary = async (): Promise<DashboardDto> => {
   const response = await axios.get<DashboardDto>(
-    "https://localhost:7071/getDashboardSummary"
+    "https://skincareservicebooking.onrender.com/getDashboardSummary"
   );
   return response.data;
 };

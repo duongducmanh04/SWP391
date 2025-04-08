@@ -7,7 +7,7 @@ const fetchCustomerProfile = async (
   role: string
 ): Promise<CustomerProfileDto | null> => {
   const response = await axios.get(
-    `https://localhost:7071/getAccountByIdAndRole/${accountId}/${role}`
+    `https://skincareservicebooking.onrender.com/getAccountByIdAndRole/${accountId}/${role}`
   );
 
   if (!response.data || response.data.length === 0) {

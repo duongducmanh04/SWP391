@@ -6,7 +6,7 @@ export const useCreateRating = () => {
   return useMutation({
     mutationFn: async (newRating: RatingDto) => {
       const response = await axios.post(
-        `https://localhost:7071/api/Rating`,
+        `https://skincareservicebooking.onrender.com/api/Rating`,
         newRating
       );
       return response.data;

@@ -7,7 +7,7 @@ export const useBookingById = (bookingId: string) => {
     queryKey: ["getBookingById", bookingId],
     queryFn: async () => {
       const response = await axios.get<BookingDto>(
-        `https://localhost:7071/api/Booking/getBookingById/${bookingId}`
+        `https://skincareservicebooking.onrender.com/api/Booking/getBookingById/${bookingId}`
       );
       return response.data;
     },

@@ -14,7 +14,7 @@ export const useCreateBooking = () => {
       }
 
       const response = await axios.post<BookingResponse>(
-        `https://localhost:7071/api/Booking/create-booking?slotId=${createBooking.slotId}`,
+        `https://skincareservicebooking.onrender.com/api/Booking/create-booking?slotId=${createBooking.slotId}`,
         createBooking,
         { headers: { "Content-Type": "application/json" } }
       );

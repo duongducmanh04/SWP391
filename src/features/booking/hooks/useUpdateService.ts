@@ -15,7 +15,7 @@ export const useUpdateServiceName = () => {
       serviceId,
     }: MutationVariables): Promise<void> => {
       await axios.put(
-        `https://localhost:7071/api/Booking/serviceName/${bookingId}?serviceId=${serviceId}`
+        `https://skincareservicebooking.onrender.com/api/Booking/serviceName/${bookingId}?serviceId=${serviceId}`
       );
     },
     onSuccess: () => {

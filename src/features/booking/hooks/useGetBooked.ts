@@ -4,7 +4,7 @@ import { BookingDto } from "../dto/booking.dto";
 
 const fetchBookings = async (bookingStatus: string): Promise<BookingDto[]> => {
   const response = await axios.get<BookingDto[]>(
-    `https://localhost:7071/api/Booking/booked/${bookingStatus}`
+    `https://skincareservicebooking.onrender.com/api/Booking/booked/${bookingStatus}`
   );
   return response.data;
 };

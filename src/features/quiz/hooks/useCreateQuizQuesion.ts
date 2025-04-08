@@ -6,7 +6,7 @@ export const useCreateQuizQuestion = () => {
   return useMutation({
     mutationFn: async (newQuizQuestion: QuizQuestionDto) => {
       const response = await axios.post(
-        `https://localhost:7071/api/QuizQuestion`,
+        `https://skincareservicebooking.onrender.com/api/QuizQuestion`,
         newQuizQuestion
       );
       return response.data;

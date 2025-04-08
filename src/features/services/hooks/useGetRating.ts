@@ -4,7 +4,7 @@ import { RatingDto } from "../dto/rating.dto";
 
 const fetchAllRatings = async (): Promise<RatingDto[]> => {
   const response = await axios.get<RatingDto[]>(
-    "https://localhost:7071/api/Rating/all"
+    "https://skincareservicebooking.onrender.com/api/Rating/all"
   );
   return response.data;
 };

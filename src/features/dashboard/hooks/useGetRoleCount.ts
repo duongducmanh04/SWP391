@@ -4,7 +4,7 @@ import { RoleCountDto } from "../dto/dashboard.dto";
 
 const fetchRoleCounts = async (): Promise<RoleCountDto[]> => {
   const response = await axios.get<RoleCountDto[]>(
-    "https://localhost:7071/getRoleCounts"
+    "https://skincareservicebooking.onrender.com/getRoleCounts"
   );
   return response.data;
 };

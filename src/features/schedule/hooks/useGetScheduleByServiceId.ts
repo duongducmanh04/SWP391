@@ -8,7 +8,7 @@ const fetchScheduleByService = async (
   if (!serviceId) throw new Error("Service ID is required to fetch schedules!");
 
   const response = await axios.get<ScheduleDto[]>(
-    `https://localhost:7071/search-by-service/${serviceId}`
+    `https://skincareservicebooking.onrender.com/search-by-service/${serviceId}`
   );
   return response.data;
 };

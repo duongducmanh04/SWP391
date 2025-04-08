@@ -10,7 +10,7 @@ export const useUpdateRatingById = () => {
       if (!rating.ratingId) throw new Error("Thiếu ratingId để cập nhật!");
 
       const response = await axios.put(
-        `https://localhost:7071/api/Rating/${rating.ratingId}`,
+        `https://skincareservicebooking.onrender.com/api/Rating/${rating.ratingId}`,
         rating,
         { headers: { "Content-Type": "application/json" } }
       );

@@ -4,7 +4,7 @@ import { SkinDto } from "../dto/skin.dto";
 
 const fetchSkinTypes = async (): Promise<SkinDto[]> => {
   const response = await axios.get<SkinDto[]>(
-    "https://localhost:7071/api/skintype/getAllSkintypes"
+    "https://skincareservicebooking.onrender.com/api/skintype/getAllSkintypes"
   );
   return response.data;
 };

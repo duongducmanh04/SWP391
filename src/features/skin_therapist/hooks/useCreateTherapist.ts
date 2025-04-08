@@ -6,7 +6,7 @@ export const useCreateTherapist = () => {
   return useMutation({
     mutationFn: async (newTherapist: TherapistDto) => {
       const response = await axios.post(
-        `https://localhost:7071/api/skintherapist/addSkinTherapist`,
+        `https://skincareservicebooking.onrender.com/api/skintherapist/addSkinTherapist`,
         newTherapist
       );
       return response.data;

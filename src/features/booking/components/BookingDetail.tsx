@@ -15,6 +15,9 @@ import {
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useBookingById } from "../hooks/useGetBookingId";
 import dayjs from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter"; // 👈 import plugin
+dayjs.extend(isSameOrAfter); // 👈 kích hoạt plugin
+
 import StatusTag from "../../../components/TagStatus";
 import ActionButtons from "../../../components/ButtonStatus";
 import { useCheckInBooking } from "../hooks/useCheckInBooking";
@@ -38,9 +41,6 @@ import { PagePath } from "../../../enums/page-path.enum";
 import { useUpdateNote } from "../hooks/useUpdateNoteBooking";
 import { useSlots } from "../../services/hooks/useGetSlot";
 import { SlotDto } from "../../services/dto/slot.dto";
-import { useGetServiceByTherapistId } from "../../services/hooks/useGetServiceByTherapistId";
-import { ServiceDto } from "../../services/dto/get-service.dto";
-
 import { useGetServiceByTherapistId } from "../../services/hooks/useGetServiceByTherapistId";
 import { ServiceDto } from "../../services/dto/get-service.dto";
 
@@ -68,9 +68,6 @@ const BookingDetail = () => {
   const { data: serviceTherapist } = useGetServiceByTherapistId(
     booking?.skintherapistId || 0
   );
-  const { data: serviceTherapist } = useGetServiceByTherapistId(
-    booking?.skintherapistId || 0
-  );
 
   const { mutate: updateServiceName } = useUpdateServiceName();
   const { mutate: updateServiceAmount } = useUpdateServiceAmount();
@@ -79,16 +76,9 @@ const BookingDetail = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<number | null>(
     null
-  ); // Lưu serviceId thay vì serviceName
-  const [selectedServiceId, setSelectedServiceId] = useState<number | null>(
-    null
   );
   const [selectedServiceAmount, setSelectedServiceAmount] = useState<number>(0);
   const [note, setNote] = useState<string>(booking?.note || "");
-
-  const activeServiceTherapist = serviceTherapist?.filter(
-    (service) => service.status === "Active"
-  );
 
   const activeServiceTherapist = serviceTherapist?.filter(
     (service) => service.status === "Active"
@@ -116,25 +106,6 @@ const BookingDetail = () => {
       setNote(booking.note);
     }
   }, [booking]);
-
-  // useEffect(() => {
-  //   if (booking && serviceTherapist) {
-  //     const currentService = serviceTherapist.find(
-  //       (s: ServiceDto) => s.name === booking.serviceName
-  //     );
-  //     setSelectedServiceId(currentService ? currentService.serviceId : null);
-  //     setSelectedServiceAmount(booking.amount);
-  //   }
-  // }, [booking, serviceTherapist]);
-  useEffect(() => {
-    if (booking && activeServiceTherapist) {
-      const currentService = activeServiceTherapist.find(
-        (s: ServiceDto) => s.name === booking.serviceName
-      );
-      setSelectedServiceId(currentService ? currentService.serviceId : null);
-      setSelectedServiceAmount(booking.amount);
-    }
-  }, [booking, activeServiceTherapist]);
 
   if (isLoading) {
     return <Spin size="large" />;
@@ -165,13 +136,63 @@ const BookingDetail = () => {
     });
   }
 
-  const handleCheckIn = async (bookingId: number) => {
-    updateCheckIn(
+  const handleCheckIn = async (bookingId: number): Promise<void> => {
+    message.destroy(); // Xóa message cũ để tránh chồng lấn
+
+    if (!booking || !booking.date) {
+      message.error("Không tìm thấy ngày đặt lịch!");
+      return;
+    }
+
+    const slot = slotMap.get(bookingId);
+    if (!slot || !slot.time) {
+      message.error("Không tìm thấy thời gian đặt lịch!");
+      return;
+    }
+
+    const bookingDateOnly = dayjs(booking.date).format("YYYY-MM-DD");
+    const bookingDateTime = dayjs(
+      `${bookingDateOnly}T${slot.time}`,
+      "YYYY-MM-DDTHH:mm"
+    );
+    const now = dayjs();
+
+    console.log("✅ bookingDateTime:", bookingDateTime.format());
+    console.log("🕐 now:", now.format());
+    const checkInStart = bookingDateTime.subtract(1, "hour");
+    const checkInEnd = bookingDateTime.add(1, "hour");
+    console.log("🚪 checkInStart:", checkInStart.format());
+    console.log("🚪 checkInEnd:", checkInEnd.format());
+    console.log("🔍 isNowAfterStart:", now.isSameOrAfter(checkInStart));
+    console.log("🔍 isNowBeforeEnd:", now.isBefore(checkInEnd));
+
+    if (now.isBefore(checkInStart)) {
+      message.warning(
+        `Bạn chỉ có thể check-in từ ${checkInStart.format(
+          "HH:mm"
+        )} đến ${checkInEnd.format("HH:mm")}!`
+      );
+      return;
+    }
+
+    if (now.isSameOrAfter(checkInEnd)) {
+      message.error("Quá thời gian check-in, không thể thực hiện!");
+      return;
+    }
+
+    // 🟢 Nếu đủ điều kiện thời gian, gọi API check-in
+    await updateCheckIn(
       { BookingId: bookingId },
       {
         onSuccess: () => {
+          message.success("Check-in thành công!");
           refetch();
           navigate(PagePath.BOOKING);
+        },
+        onError: (error: any) => {
+          console.error("Error details:", error);
+          const errorMessage = error.response?.data?.message || error.message;
+          message.error(`Có lỗi xảy ra khi check-in: ${errorMessage}`);
         },
       }
     );
@@ -222,22 +243,6 @@ const BookingDetail = () => {
     );
   };
 
-  // const handleServiceChange = (serviceId: number) => {
-  //   setSelectedServiceId(serviceId);
-  //   const selected = serviceTherapist?.find(
-  //     (service: ServiceDto) => service.serviceId === serviceId
-  //   );
-  //   if (selected) {
-  //     setSelectedServiceAmount(selected.price);
-  //   }
-  // };
-  const handleServiceChange = (serviceId: number) => {
-    setSelectedServiceId(serviceId);
-    const selected = activeServiceTherapist?.find(
-      (service: ServiceDto) => service.serviceId === serviceId
-    );
-    if (selected) {
-      setSelectedServiceAmount(selected.price);
   const handleServiceChange = (serviceId: number) => {
     setSelectedServiceId(serviceId);
     const selectedService = activeServiceTherapist?.find(
@@ -268,7 +273,6 @@ const BookingDetail = () => {
 
   const handleUpdateService = async () => {
     if (!selectedServiceId) {
-    if (!selectedServiceId) {
       message.warning("Vui lòng chọn một dịch vụ!");
       return;
     }
@@ -276,11 +280,9 @@ const BookingDetail = () => {
     try {
       await new Promise((resolve, reject) => {
         updateServiceName(
-          { bookingId: booking.bookingId, serviceId: selectedServiceId }, // Truyền serviceId thay vì serviceName
           { bookingId: booking.bookingId, serviceId: selectedServiceId },
           {
             onSuccess: () => {
-              message.success("Cập nhật dịch vụ thành công");
               message.success("Cập nhật dịch vụ thành công");
               resolve(null);
             },
@@ -302,10 +304,6 @@ const BookingDetail = () => {
               message.success("Cập nhật giá thành công");
               resolve(null);
             },
-            onError: reject,
-          }
-        );
-      });
             onError: (error) => {
               message.error("Lỗi cập nhật giá: " + (error as Error).message);
               reject(error);
@@ -357,35 +355,31 @@ const BookingDetail = () => {
       title: "Giá trị",
       dataIndex: "value",
       key: "value",
-      render: (text: string, record: any) => {
+      render: (text: string | number, record: any) => {
         if (isEditing && record.key === "1") {
           return (
             <Select
               style={{ width: "100%" }}
-              value={selectedServiceId} // Hiển thị serviceId trong Select
+              value={selectedServiceId}
               onChange={handleServiceChange}
               placeholder="Chọn dịch vụ"
+              disabled={
+                !activeServiceTherapist || activeServiceTherapist.length === 0
+              }
+              showSearch
             >
-              {/* {serviceTherapist?.map((service: ServiceDto) => (
-                <Select.Option
-                  key={service.serviceId}
-                  value={service.serviceId}
-                >
-                  {service.name}
-                </Select.Option>
-              ))} */}
               {activeServiceTherapist?.map((service: ServiceDto) => (
                 <Select.Option
                   key={service.serviceId}
                   value={service.serviceId}
                 >
-                  {service.name}
+                  {service.name} (Giá: {service.price})
                 </Select.Option>
-              ))}
+              )) || []}
             </Select>
           );
         }
-        return text;
+        return typeof text === "number" ? text.toString() : text;
       },
     },
     {
@@ -427,12 +421,6 @@ const BookingDetail = () => {
               type="primary"
               icon={<EditOutlined />}
               onClick={() => {
-                const currentService = activeServiceTherapist?.find(
-                  (s: ServiceDto) => s.name === booking.serviceName
-                );
-                setSelectedServiceId(
-                  currentService ? currentService.serviceId : null
-                );
                 const currentService = activeServiceTherapist?.find(
                   (s: ServiceDto) => s.name === booking.serviceName
                 );
@@ -497,16 +485,59 @@ const BookingDetail = () => {
               <b>Trạng thái:</b>{" "}
               <StatusTag status={booking.status} showLabel={true} />
             </p>
-            <ActionButtons
-              status={booking.status}
-              bookingId={booking.bookingId}
-              onCheckIn={handleCheckIn}
-              onCancelled={handleCancelled}
-              onCompleted={handleCompleted}
-              onDenied={handleDenied}
-              onFinished={handleFinished}
-            />
+            {(() => {
+              if (!booking || !booking.bookingId || !booking.date) {
+                console.log("⛔ Booking không đầy đủ:", booking);
+                return null;
+              }
+
+              const slot = slotMap.get(booking.bookingId);
+              if (!slot || !slot.time) {
+                console.log("⛔ Không tìm thấy slot hoặc slot.time:", slot);
+                return null;
+              }
+
+              const bookingDateOnly = dayjs(booking.date).format("YYYY-MM-DD");
+              const bookingDateTime = dayjs(
+                `${bookingDateOnly}T${slot.time}`,
+                "YYYY-MM-DDTHH:mm"
+              );
+              const now = dayjs();
+
+              const checkInStart = bookingDateTime.subtract(1, "hour");
+              const checkInEnd = bookingDateTime.add(1, "hour");
+
+              const isInCheckInWindow =
+                now.isAfter(checkInStart) && now.isBefore(checkInEnd);
+              const isStaff = user?.role === RoleCode.STAFF;
+
+              console.log("✅ bookingDateTime:", bookingDateTime.format());
+              console.log("🕐 now:", now.format());
+              console.log("🚪 checkInStart:", checkInStart.format());
+              console.log("🚪 checkInEnd:", checkInEnd.format());
+              console.log("🔍 isInCheckInWindow:", isInCheckInWindow);
+              console.log("👤 isStaff:", isStaff);
+              console.log("📦 slot:", slot);
+
+              if (!isStaff || !isInCheckInWindow) {
+                console.log("❌ Không hiển thị nút vì không đủ điều kiện");
+                return null;
+              }
+
+              return (
+                <ActionButtons
+                  status={booking.status}
+                  bookingId={booking.bookingId}
+                  onCheckIn={handleCheckIn}
+                  onCancelled={handleCancelled}
+                  onCompleted={handleCompleted}
+                  onDenied={handleDenied}
+                  onFinished={handleFinished}
+                />
+              );
+            })()}
           </Card>
+
           {user?.role === RoleCode.THERAPIST &&
             booking?.status === Status.CHECK_IN && (
               <Card style={{ marginTop: "10px" }}>
@@ -520,28 +551,19 @@ const BookingDetail = () => {
                   type="primary"
                   onClick={handleUpdateNote}
                   loading={isUpdatingNote}
-                  style={{ marginTop: "10px" }}
+                  style={{ marginTop: "10px", marginRight: "8px" }}
                 >
                   Lưu ghi chú
                 </Button>
-              </Card>
-            )}
-          {user?.role === RoleCode.THERAPIST &&
-            booking?.status === Status.CHECK_IN && (
-              <Card style={{ marginTop: "10px" }}>
-                <Title level={4}>Ghi chú</Title>
-                <TextArea
-                  rows={4}
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                />
+
                 <Button
                   type="primary"
-                  onClick={handleUpdateNote}
+                  danger
+                  onClick={() => handleFinished(booking.bookingId)}
                   loading={isUpdatingNote}
                   style={{ marginTop: "10px" }}
                 >
-                  Lưu ghi chú
+                  Hoàn tất
                 </Button>
               </Card>
             )}

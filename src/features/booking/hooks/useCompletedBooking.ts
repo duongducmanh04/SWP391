@@ -10,7 +10,7 @@ export const useCompletedBooking = () => {
   return useMutation<void, Error, MutationVariables>({
     mutationFn: async ({ BookingId }: MutationVariables): Promise<void> => {
       await axios.put(
-        `https://localhost:7071/api/Booking/completed/${BookingId}`
+        `https://skincareservicebooking.onrender.com/api/Booking/completed/${BookingId}`
       );
     },
     onSuccess: () => {
